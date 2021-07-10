@@ -31,7 +31,7 @@ def get_b(d):
 # t-th step
 # c is for get_ct
 # returns an approximation of the gradient
-def partials(f, x, d, t, c):
+def partials(f, x, d, t, c=200):
     c_t = get_ct(c, t)
     b = get_b(d)
     pert = np.multiply(b, c_t)
@@ -45,7 +45,7 @@ def partials(f, x, d, t, c):
     return np.array(partials)
 
 
-def step(x, t, partials, a):
+def step(x, t, partials, a=100):
     a_t = get_at(a, t)
     return np.add(x, np.multiply(partials, a_t))
 
@@ -54,20 +54,20 @@ def f(x):
     sum = 0
     for a in x:
         sum += abs(a)
-    return 100-sum
+    return sum
 
 
 # x is starting point
 def gradDescent(f, x, d, steps, a, c):
-    max = f(x)
-    maxParams = x
+    min = f(x)
+    minParams = x
     for t in range(steps):
         grad = partials(f, x, d, t+1, c)
         x = step(x, t+1, grad, a)
-        if f(x) > max:
-            max = f(x)
-            maxParams = x
-    return (maxParams, max)
+        if f(x) < min:
+            min = f(x)
+            minParams = x
+    return (minParams, min)
 
 
 #print(gradDescent(f, [1000]*5, 5, 10000, 100, .2))

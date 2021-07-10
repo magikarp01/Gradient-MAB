@@ -1,9 +1,19 @@
 import SPSA
 import functions
+#import metaMax
+import math
+from scipy.spatial import ConvexHull
+import numpy as np
 
-print(functions.ackley([0, 0, 0], 3))
-print()
+# functions.display3D(functions.griewank, [-5, 5])
 
-print(SPSA.gradDescent(functions.ackley, [1]*5, 5, 100, 100, .2))
+for point in ConvexHull([[0, 0], [1,1], [2, 3]]).simplices:
+    print(point)
 
-#def ackley_Adjusted(x, d, a = 20, b=.2, c=2*math.pi):
+print(np.argmax([0, 2, 5, 1, 3]))
+
+# x = metaMax.randomParams(3)
+# f = functions.ackley_adjusted
+# initVal = f(x)
+# (minParams, min) = SPSA.gradDescent(f, x, 3, 10000, 1000, 200)
+
