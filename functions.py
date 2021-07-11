@@ -27,6 +27,14 @@ def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi):
     return ackley(np.array(x), a, b, c)
 
 
+# negative
+def reverse_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi):
+    x = []
+    for i in x_adjusted:
+        x.append((i-.5)*2*32.768)
+    return -ackley(np.array(x), a, b, c)
+
+
 # griewank is best for ranges of [-10, 10]
 def griewank(x):
     d = len(x)
