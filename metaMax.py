@@ -3,7 +3,9 @@ import matplotlib
 import math
 import random
 from scipy.spatial import ConvexHull
-import SPSA
+import gradDescent
+
+SPSAObject = gradDescent.SPSA()
 from tqdm import tqdm
 
 # all params are in range [0, 1)
@@ -103,7 +105,6 @@ def metaMaxSPSA(f, k, d, numRounds):
 
     # budget = t_r, function has already been evaluated k times
     budget = k
-    numSPSAEvals = 0
 
     for round in tqdm(range(numRounds)):
         # default is that the instance was not sampled
@@ -119,8 +120,8 @@ def metaMaxSPSA(f, k, d, numRounds):
         # update the selected points
 
         for pointIndex in selected:
-            partials = SPSA.partials(f, xPos[pointIndex], d, numSPSAEvals)
-            xPos[pointIndex] = SPSA.step(xPos[pointIndex], numSPSAEvals, partials)
+            partials = np.negative(SPSAObject.partials(f, xPos[pointIndex], round))
+            xPos[pointIndex] = SPSAObject.step(xPos[pointIndex], round, partials)
             n[pointIndex] += 1
             fVal = f(xPos[pointIndex])
             if fVal > fHats[pointIndex]:
@@ -128,7 +129,6 @@ def metaMaxSPSA(f, k, d, numRounds):
                 xHats[pointIndex] = xPos[pointIndex]
             # possibly budget += 1
 
-        numSPSAEvals += 3*len(selected)
         budget += 3*len(selected)
 
     maxIndex = np.argmax(fHats)
@@ -149,9 +149,10 @@ def metaMaxSPSABudget(f, k, d, maxBudget):
 
     # budget = t_r, function has already been evaluated k times
     budget = k
-    numSPSAEvals = 0
 
     round = -1
+
+    convergeDic = {}
     while budget < maxBudget:
         round += 1
         # default is that the instance was not sampled
@@ -167,8 +168,58 @@ def metaMaxSPSABudget(f, k, d, maxBudget):
         # update the selected points
 
         for pointIndex in selected:
-            partials = SPSA.partials(f, xPos[pointIndex], d, numSPSAEvals)
-            xPos[pointIndex] = SPSA.step(xPos[pointIndex], numSPSAEvals, partials)
+            partials = np.negative(SPSAObject.partials(f, xPos[pointIndex], round))
+            oldXPos = xPos[pointIndex]
+            xPos[pointIndex] = SPSAObject.step(xPos[pointIndex], round, partials)
+            n[pointIndex] += 1
+            fVal = f(xPos[pointIndex])
+            if fVal > fHats[pointIndex]:
+                fHats[pointIndex] = fVal
+                xHats[pointIndex] = xPos[pointIndex]
+            else:
+                xPos[pointIndex] = oldXPos
+            # possibly budget += 1
+
+        budget += 3 * len(selected)
+        convergeDic[budget] = max(fHats)
+
+    maxIndex = np.argmax(fHats)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic)
+
+
+def metaMaxSPSABudgetGivenX(f, k, d, maxBudget, xPos):
+    n = [1] * k
+    xHats = [None] * k  # argmax over xPos so far
+    fHats = [None] * k  # max values of f, corresponding to xHats
+
+    for i in range(k):
+        startPoint = randomParams(d)
+        xHats[i] = startPoint
+        fHats[i] = f(startPoint)
+
+    # budget = t_r, function has already been evaluated k times
+    budget = k
+
+    round = -1
+
+    convergeDic = {}
+    while budget < maxBudget:
+        round += 1
+        # default is that the instance was not sampled
+
+        # find the hVals for this round
+        hVals = [None] * k
+        for i in range(k):
+            hVals[i] = h(n[i], budget)
+
+        # select the points for sampling
+        selected = selectPoints(hVals, fHats)
+
+        # update the selected points
+
+        for pointIndex in selected:
+            partials = np.negative(SPSAObject.partials(f, xPos[pointIndex], round))
+            xPos[pointIndex] = SPSAObject.step(xPos[pointIndex], round, partials)
             n[pointIndex] += 1
             fVal = f(xPos[pointIndex])
             if fVal > fHats[pointIndex]:
@@ -176,9 +227,8 @@ def metaMaxSPSABudget(f, k, d, maxBudget):
                 xHats[pointIndex] = xPos[pointIndex]
             # possibly budget += 1
 
-        numSPSAEvals += 3 * len(selected)
         budget += 3 * len(selected)
-
+        convergeDic[budget] = max(fHats)
 
     maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], round, n)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic)

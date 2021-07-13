@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import SPSA
+import gradDescent
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
@@ -55,6 +55,9 @@ def griewank_adjusted(x_adjusted):
         x.append((i-.5)*2*10)
     return griewank(np.array(x))
 
+
+def reverse_griewank_adjusted(x_adjusted):
+    return -griewank_adjusted(x_adjusted)
 
 
 def display3D(fun, range):
