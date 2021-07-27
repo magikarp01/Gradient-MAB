@@ -17,8 +17,8 @@ def fit_func(modelFunc, points, pointValues, numParams, discountRate = 1):
     x_0 = [1] * numParams
     leastSquares = optimize.minimize(errorFunc, x_0)
     optParams = list(leastSquares.x)
-    # return optParams
-    return lambda inp: modelFunc(inp, optParams)
+    # return error, function with optParams
+    return errorFunc(optParams), lambda inp: modelFunc(inp, optParams)
 
 # points is a set
 def quadFit(points, pointValues):
@@ -49,10 +49,11 @@ def quadFit(points, pointValues):
 # probably a way to do this with linAlg
 # https://calculus.subwiki.org/wiki/Quadratic_function_of_multiple_variables
 def quadEstMin(points, pointValues):
-    quadFunc = quadFit(points, pointValues)
+    error, quadFunc = quadFit(points, pointValues)
     x_0 = [0]*len(points[0])
     result = optimize.minimize(quadFunc, x_0)
-    return quadFunc(result.x)
+    # returns the variance, quadratic func
+    return error, quadFunc(result.x)
 
 
 def linFit(points, pointValues):
@@ -70,6 +71,7 @@ def expFit(points, pointValues):
     return
 
 startTime = time.time()
-print(quadFit([(1,), (2,), (3,)], [1, 4, 9]))
+print(quadFit([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
 print(quadFit([(1,), (2,), (3,)], [0, 2, 6]))
+print(quadEstMin([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
 print("time is " + str(time.time() - startTime))

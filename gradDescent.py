@@ -19,33 +19,59 @@ class finiteDifs:
         denom = (t+1) ** self.gamma
         return c/denom
 
-    def partials(self, f, x, t, c=.2):
+# for the analytic functions, try doing a direct gradient
+    def partials(self, f, x, t, c=.001):
         c_t = self.get_ct(c, t)
+        d = len(x)
+        grad = [0]*d
+        for dim in range(d):
+            x1 = x.copy()
+            x1[dim] += c_t
+            x2 = x.copy()
+            x2[dim] -= c_t
+            numer = f(x1) - f(x2)
+            grad[dim] = numer/(2*c_t)
+
+        return np.array(grad)
+
+
         return np.array(optimize.approx_fprime(x, f, c_t))
 
     def step(self, x, t, partials, a=.16):
         a_t = self.get_at(a, t)
         return np.add(x, np.multiply(partials, a_t))
 
+    # x is starting point
+    def gradDescent(self, f, x, steps, a=.01, c=.2):
+        min = f(x)
+        minParams = x
+        samples = [(x, min)]
+        for t in range(steps):
+            grad = self.partials(f, x, t+1, c)
+            x = self.step(x, t+1, np.negative(grad), a)
+            eval = f(x)
+            samples.append(x, eval)
+            if eval < min:
+                min = f(x)
+                minParams = x
+        return minParams, min, samples
+
+    def gradAscent(self, f, x, steps, a=.01, c=.001):
+        max = f(x)
+        maxParams = x
+        samples = [(x, max)]
+        for t in range(steps):
+            grad = self.partials(f, x, t + 1, c)
+            x = self.step(x, t + 1, grad, a)
+            eval = f(x)
+            samples.append(x, eval)
+            if eval > max:
+                max = f(x)
+                maxParams = x
+        return maxParams, max, samples
+
 
 class SPSA(finiteDifs):
-
-    def __init__(self, alpha = .602, gamma = .101, stability = 60):
-        self.alpha = alpha
-        self.gamma = gamma
-        self.stability = stability
-
-    # a has to be derived empirically
-    def get_at(self, a, t):
-        denom = (self.stability+t+1)**self.alpha
-        return a/denom
-
-
-    # c has to be derived empirically
-    def get_ct(self, c, t):
-        denom = (t+1) ** self.gamma
-        return c/denom
-
 
     # b is B_t, random vector
     # d is number of dimensions
@@ -58,7 +84,7 @@ class SPSA(finiteDifs):
     # t-th step
     # c is for get_ct
     # returns an approximation of the gradient
-    def partials(self, f, x, t, c=.2):
+    def partials(self, f, x, t, c=.001):
         d = len(x)
         c_t = self.get_ct(c, t)
         b = self.get_b(d)
@@ -71,22 +97,4 @@ class SPSA(finiteDifs):
             partials[l] = numer/denom
 
         return np.array(partials)
-
-    def step(self, x, t, partials, a=.16):
-        a_t = self.get_at(a, t)
-        return np.add(x, np.multiply(partials, a_t))
-
-
-    # x is starting point
-    def gradDescent(self, f, x, steps, a, c):
-        min = f(x)
-        minParams = x
-        for t in range(steps):
-            grad = self.partials(f, x, t+1, c)
-            x = self.step(x, t+1, grad, a)
-            if f(x) < min:
-                min = f(x)
-                minParams = x
-        return (minParams, min)
-
 

@@ -17,7 +17,7 @@ def randomParams(d):
     return np.array(vec)
 
 
-def uniformSPSABudget(f, k, d, maxBudget):
+def SPSABudget(f, k, d, maxBudget):
     budget = 0
     xPos = [None] * k  # current position
     xHats = [None] * k  # argmax over xPos so far
