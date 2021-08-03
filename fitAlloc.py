@@ -2,15 +2,21 @@ import numpy as np
 import matplotlib
 import math
 import random
-from scipy.spatial import ConvexHull
 import gradDescent
 import kriging
 
+# range in [0, 1]
 def randomParams(d):
     vec = [None]*d
     for i in range(d):
         vec[i] = random.random()
     return np.array(vec)
+
+
+# range in [0, 1]
+# best if numInstances is a d-power
+# def evenSpaceParams(d, numInstances):
+
 
 
 # takes negative differences
@@ -102,37 +108,53 @@ def getBudget(values, variances, kroneckers, numSamples):
 
     return budget
 
-
+# allocate samples given a budget allocation with fractions and a whole number batch size
+# returns array of integers
 def allocateSamples(budgetAlloc, batchSize):
-    adjustedBudget = []
     totSize = sum(budgetAlloc)
+    fracParts = {}
+    intParts = []
     for i in range(len(budgetAlloc)):
-        adjustedBudget.append(budgetAlloc[i]*batchSize/totSize)
+        est = budgetAlloc[i]*batchSize/totSize
+        intParts.append(math.floor(est))
+        fracParts[est-intParts[i]] = i
 
-    return
+    residue = int(round(totSize - sum(fracParts)))
+    sortedFracParts = sorted(fracParts.keys(), reverse=True)
+
+    for r in range(residue):
+        intParts[sortedFracParts[r]] += 1
+
+    return intParts
 
 
 # minSamples will be done at the start so theres enough points to fit
-def OCBA_SPSA_Budget(f, k, d, maxBudget, minSamples, batchSize):
+# assuming we want to maximize a function
+# using finite differences for partials, not SPSA
+# maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
+def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
     estMins = [None] * k
     variances = [None] * k
-    kroneckers = [None] * k
     numSamples = [minSamples] * k
 
-
     finiteDifsObject = gradDescent.finiteDifs()
+    elapsedBudget = 0
+
     for i in range(k):
         startPoint = randomParams(d)
         xHats[i] = startPoint
         fHats[i] = f(startPoint)
+        elapsedBudget += 1
         # this is for minimizing not maximizing
         instances[i] = finiteDifsObject.gradDescent(f, startPoint, minSamples)[2]
+        elapsedBudget += minSamples * numEvalsPerGrad
 
     # change True to while budget < maxBudget
-    while True:
+    convergeDic = {}
+    while elapsedBudget < maxBudget:
         for i in range(k):
             points = []
             pointValues = []
@@ -143,6 +165,32 @@ def OCBA_SPSA_Budget(f, k, d, maxBudget, minSamples, batchSize):
         
         kroneckers = getKroneckers(estMins)
         budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
+        # sample allocation is the actual allocations to give to each
+        sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+
+        # perform sampleAlloc[i] steps for every instance
+        # could add in multi-threading here
+        for i in range(k):
+            samples = sampleAlloc[i]
+            for j in range(samples):
+                # step from the previous point of the ith instance once
+                partials = finiteDifsObject.partials(f, instances[i][-1], numSamples[i])
+                instances[i].append(finiteDifsObject.step(instances[i][-1], numSamples[i], partials))
+                elapsedBudget += numEvalsPerGrad
+
+                fVal = f(instances[i][-1])
+                elapsedBudget += 1
+                if fVal > fHats[i]:
+                    fHats[i] = fVal
+                    xHats[i] = instances[i][-1]
+
+                numSamples[i] += 1
+        convergeDic[elapsedBudget] = max(fHats)
+    maxIndex = np.argmax(fHats)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic)
+
 
 # when fitting, we should make sure the function had a minimum
 # or, if it is opposite, we should just have the value be unbounded
+
+
