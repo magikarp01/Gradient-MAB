@@ -4,6 +4,8 @@ import math
 import random
 import gradDescent
 import kriging
+import pyDOE
+import functions
 
 # range in [0, 1]
 def randomParams(d):
@@ -14,9 +16,8 @@ def randomParams(d):
 
 
 # range in [0, 1]
-# best if numInstances is a d-power
-# def evenSpaceParams(d, numInstances):
-
+def latinHypercube(d, numInstances):
+    return pyDOE.lhs(d, numInstances)
 
 
 # takes negative differences
@@ -193,4 +194,5 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
 # when fitting, we should make sure the function had a minimum
 # or, if it is opposite, we should just have the value be unbounded
 
-
+# OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+OCBA_Budget(functions.max3Parabola, 5, 1, 10000, 10, 1, 2)

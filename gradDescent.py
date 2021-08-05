@@ -50,7 +50,7 @@ class finiteDifs:
             grad = self.partials(f, x, t+1, c)
             x = self.step(x, t+1, np.negative(grad), a)
             eval = f(x)
-            samples.append(x, eval)
+            samples.append((x, eval))
             if eval < min:
                 min = f(x)
                 minParams = x

@@ -70,8 +70,8 @@ def linFit(points, pointValues):
 def expFit(points, pointValues):
     return
 
-startTime = time.time()
-print(quadFit([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
-print(quadFit([(1,), (2,), (3,)], [0, 2, 6]))
-print(quadEstMin([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
-print("time is " + str(time.time() - startTime))
+# startTime = time.time()
+# print(quadFit([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
+# print(quadFit([(1,), (2,), (3,)], [0, 2, 6]))
+# print(quadEstMin([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
+# print("time is " + str(time.time() - startTime))

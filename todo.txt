@@ -1,0 +1,2 @@
+I think the most problematic area is the gradient descent
+I have to make sure that the step size parameter is adjusted for the function domain + range
