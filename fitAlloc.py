@@ -15,9 +15,26 @@ def randomParams(d):
     return np.array(vec)
 
 
-# range in [0, 1]
-def latinHypercube(d, numInstances):
-    return pyDOE.lhs(d, numInstances)
+# each element has range in [0, 1]
+# returns list of k vectors, d elements per vector
+# splits up the d dimensional hypercube into k smaller hypercubes
+# spaces out starting positions by placing them in the smaller hypercubes
+
+def stratifiedSampling(d, k):
+    numDivPerDim = math.ceil(float(k) ** (1.0/d))
+    totalDivs = numDivPerDim**d
+    randomVecs = []
+    for i in range(totalDivs):
+        randomVec = []
+        for dim in range(d):
+            pos = (i % (numDivPerDim**(dim+1))) // (numDivPerDim ** dim)
+            pos += random.random()
+            pos /= numDivPerDim
+            randomVec.append(pos)
+        randomVecs.append(randomVec)
+
+    to_keep = set(random.sample(range(totalDivs), k))
+    return [randomVecs[i] for i in to_keep]
 
 
 # takes negative differences
@@ -26,8 +43,8 @@ def getKroneckers(values):
 
     minValue = values[0]
     for i in range(numInstances):
-        if numInstances[i] < minValue:
-            minValue = numInstances[i]
+        if values[i] < minValue:
+            minValue = values[i]
 
     kroneckers = [0]*numInstances
     for i in range(numInstances):
@@ -120,19 +137,21 @@ def allocateSamples(budgetAlloc, batchSize):
         intParts.append(math.floor(est))
         fracParts[est-intParts[i]] = i
 
-    residue = int(round(totSize - sum(fracParts)))
+    residue = int(round(batchSize - sum(intParts)))
     sortedFracParts = sorted(fracParts.keys(), reverse=True)
 
     for r in range(residue):
-        intParts[sortedFracParts[r]] += 1
+        intParts[fracParts[sortedFracParts[r]]] += 1
+
 
     return intParts
 
 
 # minSamples will be done at the start so theres enough points to fit
-# assuming we want to maximize a function
+# assuming we want to minimize a function
 # using finite differences for partials, not SPSA
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
+# k is number of instances
 def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
     instances = [None]*k
     xHats = [None] * k
@@ -144,13 +163,16 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
     finiteDifsObject = gradDescent.finiteDifs()
     elapsedBudget = 0
 
+    startPositions = stratifiedSampling(d, k)
+
     for i in range(k):
-        startPoint = randomParams(d)
+        startPoint = startPositions[i]
         xHats[i] = startPoint
         fHats[i] = f(startPoint)
         elapsedBudget += 1
         # this is for minimizing not maximizing
         instances[i] = finiteDifsObject.gradDescent(f, startPoint, minSamples)[2]
+
         elapsedBudget += minSamples * numEvalsPerGrad
 
     # change True to while budget < maxBudget
@@ -160,9 +182,12 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
             points = []
             pointValues = []
             for point in instances[i]:
+                # each point is (xValue, fValue)
                 points.append(point[0])
                 pointValues.append(point[1])
-            variances[i], estMins[i] = kriging.quadEstMin(points, pointValues)
+
+
+            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues)
         
         kroneckers = getKroneckers(estMins)
         budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
@@ -175,18 +200,20 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
             samples = sampleAlloc[i]
             for j in range(samples):
                 # step from the previous point of the ith instance once
-                partials = finiteDifsObject.partials(f, instances[i][-1], numSamples[i])
+
+                partials = finiteDifsObject.partials(f, instances[i][-1][0], numSamples[i])
+
                 instances[i].append(finiteDifsObject.step(instances[i][-1], numSamples[i], partials))
                 elapsedBudget += numEvalsPerGrad
 
                 fVal = f(instances[i][-1])
                 elapsedBudget += 1
-                if fVal > fHats[i]:
+                if fVal < fHats[i]:
                     fHats[i] = fVal
                     xHats[i] = instances[i][-1]
 
                 numSamples[i] += 1
-        convergeDic[elapsedBudget] = max(fHats)
+        convergeDic[elapsedBudget] = min(fHats)
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic)
 
@@ -195,4 +222,6 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
 # or, if it is opposite, we should just have the value be unbounded
 
 # OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
-OCBA_Budget(functions.max3Parabola, 5, 1, 10000, 10, 1, 2)
+results = OCBA_Budget(functions.min3Parabola, 5, 1, 200, 10, 1, 2)
+
+print(results[2])

@@ -25,7 +25,12 @@ class finiteDifs:
         d = len(x)
         grad = [0]*d
         for dim in range(d):
+            # try:
+            #     x1 = x.copy()
+            # except AttributeError:
+            #     pass
             x1 = x.copy()
+
             x1[dim] += c_t
             x2 = x.copy()
             x2[dim] -= c_t
@@ -37,12 +42,12 @@ class finiteDifs:
 
         return np.array(optimize.approx_fprime(x, f, c_t))
 
-    def step(self, x, t, partials, a=.16):
+    def step(self, x, t, partials, a=.001):
         a_t = self.get_at(a, t)
         return np.add(x, np.multiply(partials, a_t))
 
     # x is starting point
-    def gradDescent(self, f, x, steps, a=.01, c=.2):
+    def gradDescent(self, f, x, steps, a=.001, c=.001):
         min = f(x)
         minParams = x
         samples = [(x, min)]
@@ -56,7 +61,7 @@ class finiteDifs:
                 minParams = x
         return minParams, min, samples
 
-    def gradAscent(self, f, x, steps, a=.01, c=.001):
+    def gradAscent(self, f, x, steps, a=.001, c=.001):
         max = f(x)
         maxParams = x
         samples = [(x, max)]

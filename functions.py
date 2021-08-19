@@ -62,15 +62,17 @@ def reverse_griewank_adjusted(x_adjusted):
 
 # 1D function, made manually
 # https://www.desmos.com/calculator/oj2owukcak
-def max3Parabola(x1):
-    p1 = -(x1*5 - 2)**2 + .5
-    p2 = -(x1*3 - .3)**2
-    p3 = -(x1*4 - 3)**2 + .25
+def min3Parabola(x2):
+    x1 = x2[0]
+
+    p1 = (x1*5 - 2)**2 + .5
+    p2 = (x1*3 - .3)**2
+    p3 = (x1*4 - 3)**2 + .25
     # maxes = []
     # for i in range(len(p1)):
     #     maxes.append(max([p1[i], p2[i], p3[i]]))
 
-    return max([p1, p2, p3])
+    return min([p1, p2, p3])
 
 
 def display2D(fun, x_range):

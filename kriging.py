@@ -4,56 +4,61 @@ import time
 
 
 # discountRate <= 1
-def fit_func(modelFunc, points, pointValues, numParams, discountRate = 1):
+def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRate = 1):
     d = len(points[0])
     def errorFunc(params):
         error = 0
         for pointIndex in range(len(points)):
-            error += (pointValues[pointIndex] - modelFunc(points[pointIndex], params))**2
-            error *= discountRate ** (len(points) - pointIndex - 1)
+            dif = pointValues[pointIndex] - modelFunc(points[pointIndex], params)
+            discountFactor = discountRate ** (len(points) - pointIndex - 1)
+            error += dif**2 * discountFactor
         return error
 
 
     x_0 = [1] * numParams
-    leastSquares = optimize.minimize(errorFunc, x_0)
+    leastSquares = optimize.minimize(errorFunc, x_0, bounds=paramBounds)
     optParams = list(leastSquares.x)
     # return error, function with optParams
-    return errorFunc(optParams), lambda inp: modelFunc(inp, optParams)
+    # return errorFunc(optParams), lambda inp: modelFunc(inp, optParams)
+    return optParams, errorFunc(optParams)
 
 # points is a set
-def quadFit(points, pointValues):
+def parabFit(points, pointValues):
     d = len(points[0])
-    # params should have length d + (d choose 2) + d + 1
+    # params should have length 2d + 1
     # first d params are coefs of x_i^2
-    # next (d choose 2) params are coefs of x_i*x_j
+    # next d params are coefs of x_i
     # final is added
-    def quadFunc(xPoint, params):
+    # minimum is at xPoint = [params[d], ..., params[2*d-1]]
+    # minimum = params[2*d]
+    def parabFunc(xPoint, params):
         val = params[-1]
-        paramIndex = 0
         for i in range(d):
-            val += params[i]*xPoint[i]**2
-            paramIndex += 1
-        for j in range(d):
-            for k in range(j+1, d):
-                val += params[paramIndex]*xPoint[j]*xPoint[k]
-                paramIndex += 1
-        for m in range(d):
-            val += params[paramIndex]*xPoint[m]
-            paramIndex += 1
+            val += params[i]*(xPoint[i] - params[i+d])**2
         return val
 
-    numParams = int(d + d*(d-1)/2 + d + 1)
-    return fit_func(quadFunc, points, pointValues, numParams)
+    numParams = 2*d + 1
+    aBounds = [(0, None) for i in range(d)]
+    otherBounds = [(None, None) for i in range(d+1)]
+    paramBounds = aBounds + otherBounds
+    return fit_func(parabFunc, points, pointValues, numParams, paramBounds)
 
 
 # probably a way to do this with linAlg
 # https://calculus.subwiki.org/wiki/Quadratic_function_of_multiple_variables
-def quadEstMin(points, pointValues):
-    error, quadFunc = quadFit(points, pointValues)
-    x_0 = [0]*len(points[0])
-    result = optimize.minimize(quadFunc, x_0)
-    # returns the variance, quadratic func
-    return error, quadFunc(result.x)
+def quadEstMin(points, pointValues, discountRate = 1):
+    optParams, error = parabFit(points, pointValues)
+
+    result = optParams[-1]
+    n = len(points)
+
+    # denom is for error to variance conversion
+    if discountRate==1:
+        denom = n
+    else:
+        denom = (1 - discountRate**n)/(1 - discountRate)
+
+    return result, error/denom
 
 
 def linFit(points, pointValues):
@@ -71,7 +76,7 @@ def expFit(points, pointValues):
     return
 
 # startTime = time.time()
-# print(quadFit([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
-# print(quadFit([(1,), (2,), (3,)], [0, 2, 6]))
+# print(parabFit([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
+# print(parabFit([(1,), (2,), (3,)], [0, 2, 6]))
 # print(quadEstMin([(1,2), (2,8), (3, 3), (5, 6)], [6, 72, 27, 86]))
 # print("time is " + str(time.time() - startTime))
