@@ -61,13 +61,14 @@ def reverse_griewank_adjusted(x_adjusted):
 
 
 # 1D function, made manually
-# https://www.desmos.com/calculator/oj2owukcak
+# https://www.desmos.com/calculator/dfy1vkccwa
+# accepts input in form [.5123]
 def min3Parabola(x2):
     x1 = x2[0]
 
-    p1 = (x1*5 - 2)**2 + .5
-    p2 = (x1*3 - .3)**2
-    p3 = (x1*4 - 3)**2 + .25
+    p1 = 20*(x1-1/5)*(x1-1/3)-.3
+    p2 = 50*(x1-1/3)*(x1-5/8)
+    p3 = 15*(x1-1/2)*(x1-1)+.5
     # maxes = []
     # for i in range(len(p1)):
     #     maxes.append(max([p1[i], p2[i], p3[i]]))

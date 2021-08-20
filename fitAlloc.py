@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib
+import matplotlib.pyplot as plt
 import math
 import random
 import gradDescent
@@ -152,13 +152,13 @@ def allocateSamples(budgetAlloc, batchSize):
 # using finite differences for partials, not SPSA
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
-def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
+def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad, discountRate=1, a=.02, c=.001):
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
     estMins = [None] * k
     variances = [None] * k
-    numSamples = [minSamples] * k
+    numSamples = [minSamples*numEvalsPerGrad+1] * k
 
     finiteDifsObject = gradDescent.finiteDifs()
     elapsedBudget = 0
@@ -170,13 +170,14 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
         xHats[i] = startPoint
         fHats[i] = f(startPoint)
         elapsedBudget += 1
-        # this is for minimizing not maximizing
-        instances[i] = finiteDifsObject.gradDescent(f, startPoint, minSamples)[2]
 
+        # this is for minimizing not maximizing
+        instances[i] = finiteDifsObject.gradDescent(f, startPoint, minSamples, a, c)[2]
         elapsedBudget += minSamples * numEvalsPerGrad
 
     # change True to while budget < maxBudget
     convergeDic = {}
+    sampleDic = {}
     while elapsedBudget < maxBudget:
         for i in range(k):
             points = []
@@ -187,7 +188,7 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
                 pointValues.append(point[1])
 
 
-            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues)
+            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
         
         kroneckers = getKroneckers(estMins)
         budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
@@ -202,9 +203,9 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
                 # step from the previous point of the ith instance once
 
                 partials = finiteDifsObject.partials(f, instances[i][-1][0], numSamples[i])
-
-                instances[i].append(finiteDifsObject.step(instances[i][-1], numSamples[i], partials))
-                elapsedBudget += numEvalsPerGrad
+                newX = finiteDifsObject.step(instances[i][-1][0], numSamples[i], partials)
+                instances[i].append((newX, f(newX)))
+                elapsedBudget += numEvalsPerGrad + 1
 
                 fVal = f(instances[i][-1])
                 elapsedBudget += 1
@@ -212,16 +213,51 @@ def OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad):
                     fHats[i] = fVal
                     xHats[i] = instances[i][-1]
 
-                numSamples[i] += 1
+                numSamples[i] += numEvalsPerGrad + 1
         convergeDic[elapsedBudget] = min(fHats)
+        sampleDic[elapsedBudget] = numSamples.copy()
     maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], convergeDic)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
 
+
+# for displaying how the instances move on a graph
+# colors is an array of length k,
+def displayInstances1D(f, instances, ax, colors):
+    ax.title.set_text("Instance Performance")
+
+    ax.set_xlim(-.5, 1.5)
+    ax.set_ylim(-5, 5)
+    x = list(np.linspace(-.5, 1.5, 100))
+    y = [f([x1]) for x1 in x]
+    ax.plot(x,y,'r')
+    for i in range(len(instances)):
+        instance = instances[i]
+        xArray = [i[0][0] for i in instance]
+        yArray = [i[1] for i in instance]
+        ax.plot(xArray, yArray, linewidth=3.5, color=colors[i], label="instance"+str(i))
+        firstX = instance[0][0][0]
+        firstY = instance[0][1]
+        ax.plot(firstX, firstY, marker=".", markersize=15, color=colors[i])
+
+    ax.legend(loc="upper left")
+
+# for displaying how the
+def displaySamplingHistory(samplingDic, ax, colors):
+    ax.title.set_text("Sampling History")
+    ax.set_xlabel("Total Samples")
+    ax.set_ylabel("Instance Samples")
+
+    k = len(samplingDic[next(iter(samplingDic))])
+    xArray = samplingDic.keys()
+    for i in range(k):
+        yArray = []
+        for totalBudget in samplingDic.keys():
+            yArray.append(samplingDic[totalBudget][i])
+        ax.plot(xArray, yArray, color=colors[i], label="instance"+str(i))
+
+    ax.legend(loc="upper left")
 
 # when fitting, we should make sure the function had a minimum
 # or, if it is opposite, we should just have the value be unbounded
 
-# OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
-results = OCBA_Budget(functions.min3Parabola, 5, 1, 200, 10, 1, 2)
 
-print(results[2])
