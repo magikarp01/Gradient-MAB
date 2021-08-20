@@ -3,7 +3,7 @@ import random
 import gradDescent
 import functions
 import metaMax
-import uniform
+import uniformAlloc
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import time
@@ -15,7 +15,7 @@ def compareGraphs(f, k, d, budget):
         xPos.append(metaMax.randomParams(d))
 
     metaMaxResults = metaMax.SPSABudgetGivenX(f, k, d, budget, xPos)
-    uniformResults = uniform.uniformSPSABudgetGivenX(f, k, d, budget, xPos)
+    uniformResults = uniformAlloc.uniformSPSABudgetGivenX(f, k, d, budget, xPos)
     print(metaMaxResults)
     plt.plot(*zip(*sorted(metaMaxResults[2].items())), label="metaMax")
     plt.plot(*zip(*sorted(uniformResults[2].items())), label="uniform")
@@ -38,7 +38,7 @@ def compareAverages(f, numRuns, d, k, budget):
         mV = metaMax.SPSABudget(f, k, d, budget)
         mT = time.time()-mTStart
         uTStart = time.time()
-        uV = uniform.SPSABudget(f, k, d, budget)
+        uV = uniformAlloc.SPSABudget(f, k, d, budget)
         uT = time.time() - uTStart
         metaMaxVals.append(mV[1])
         uniformVals.append(uV[1])

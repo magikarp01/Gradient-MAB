@@ -1,9 +1,13 @@
 import unittest
-import fitAlloc
 import kriging
 import gradDescent
 import functions
 import matplotlib.pyplot as plt
+import gradientAllocation
+
+import fitAlloc
+import uniformAlloc
+
 
 # class TestClass(unittest.TestCase):
 class TestClass:
@@ -42,38 +46,76 @@ class TestClass:
         budget = fitAlloc.getBudget(values, variances, kroneckers, numSamples)
         print(budget)
 
-    def test_OCBAFit(self):
-        # OCBA_Budget(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
-        k = 5
-        d = 1
-        maxBudget = 10000
-        minSamples = 10
-        batchSize = 20
-        numEvalsPerGrad = 2*d
-        results = fitAlloc.OCBA_Budget(functions.min3Parabola, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad, discountRate=.95, a=.05)
+
+    # params is [f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad]
+    def test_OCBASearch(self, sharedParams, minSamples, discountRate=.95, a=.02, c=.001):
+        # OCBASearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitAlloc.OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate, a=a, c=c)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         print("Convergence Dictionary: ", end="")
         print(results[2])
         print()
 
         instances = results[3]
-        sampleDic = results[5]
         for i in range(k):
             print(f"Instance #{i}: ", end="")
             print(instances[i])
             print()
         print("Sample Allocation: ", end="")
         print(results[4])
+        return results
+
+
+    def test_uniformSearch(self, sharedParams, a=.02, c=.001):
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = uniformAlloc.uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, a=a, c=c)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(k):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
+    def test_displayResults(self, results, colors=['b','g','r','c','y']):
+        instances = results[3]
+        sampleDic = results[5]
         fig, (ax1, ax2) = plt.subplots(2)
-        colors = ['b','g','r','c','y']
-        fitAlloc.displayInstances1D(functions.min3Parabola, instances, ax1, colors)
-        fitAlloc.displaySamplingHistory(sampleDic, ax2, colors)
+        gradientAllocation.displayInstances1D(functions.min3Parabola, instances, ax1, colors)
+        gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
         plt.show()
+
+
 
 # if __name__ == '__main__':
 #     unittest.main()
 
+f = functions.min3Parabola
+k = 5
+d = 1
+maxBudget = 2500
+batchSize = 20
+numEvalsPerGrad = 2*d
+sharedParams = [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
+
 test = TestClass()
-test.test_OCBAFit()
-
-
+minSamples = 10
+results = test.test_OCBASearch(sharedParams, minSamples, a=.001)
+# results = test.test_uniformSearch(sharedParams, a=.001)
+test.test_displayResults(results)
