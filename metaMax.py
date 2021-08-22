@@ -1,19 +1,13 @@
 import numpy as np
-import matplotlib
+import matplotlib.pyplot as plt
 import math
 import random
-from scipy.spatial import ConvexHull
 import gradDescent
+from gradientAllocation import stratifiedSampling
+from scipy.spatial import ConvexHull
 
 SPSAObject = gradDescent.SPSA()
-from tqdm import tqdm
-
-# all params are in range [0, 1)
-def randomParams(d):
-    vec = [None]*d
-    for i in range(d):
-        vec[i] = random.random()
-    return np.array(vec)
+finiteDifsObject = gradDescent.finiteDifs()
 
 
 # n is number of visits to the
@@ -85,150 +79,88 @@ def selectPoints(hSet, fSet):
     return finIndices
 
 
-# f is loss function to be evaluated
-# k is number of instances to run
-# d is num of dimensions
-# budget is number that can be allocated
-# this metaMax gets the maximum, not the minimum
-def metaMaxSPSA(f, k, d, numRounds):
+# selectedPoints is list of indices that should have samples allocated
+# uniformly allocates the batch among the selected points
+# batchSize should ideally be multiple of k
+def allocateSamples(k, selectedPoints, batchSize):
+    samplesPerInstance = batchSize // len(selectedPoints)
 
-    n = [1] * k
-    xPos = [None] * k # current position
-    xHats = [None]*k # argmax over xPos so far
-    fHats = [None]*k # max values of f, corresponding to xHats
+    results = [0]*k
+    for i in selectedPoints:
+        results[i] = samplesPerInstance
 
-    for i in range(k):
-        startPoint = randomParams(d)
-        xPos[i] = startPoint
-        xHats[i] = startPoint
-        fHats[i] = f(startPoint)
+    residue = batchSize % len(selectedPoints)
+    extras = random.sample(range(len(selectedPoints)), residue)
+    for i in extras:
+        results[selectedPoints[i]] += 1
 
-    # budget = t_r, function has already been evaluated k times
-    budget = k
+    return results
 
-    for round in tqdm(range(numRounds)):
-        # default is that the instance was not sampled
+# minSamples will be done at the start so theres enough points to fit
+# assuming we want to minimize a function
+# using finite differences for partials, not SPSA
+# maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
+# k is number of instances
+# for finding the minimum
+def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, a=.02, c=.001):
+    instances = [[] for i in range(k)]
+    xHats = [None] * k
+    fHats = [None] * k
+    numSamples = [0] * k
+    n = [1]*k
 
-        # find the hVals for this round
-        hVals = [None]*k
-        for i in range(k):
-            hVals[i] = h(n[i], budget)
+    finiteDifsObject = gradDescent.finiteDifs()
+    elapsedBudget = 0
 
-        # select the points for sampling
-        selected = selectPoints(hVals, fHats)
-
-        # update the selected points
-
-        for pointIndex in selected:
-            partials = np.negative(SPSAObject.partials(f, xPos[pointIndex], round))
-            xPos[pointIndex] = SPSAObject.step(xPos[pointIndex], round, partials)
-            n[pointIndex] += 1
-            fVal = f(xPos[pointIndex])
-            if fVal > fHats[pointIndex]:
-                fHats[pointIndex] = fVal
-                xHats[pointIndex] = xPos[pointIndex]
-            # possibly budget += 1
-
-        budget += 3*len(selected)
-
-    maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], n, budget)
-
-
-def metaMaxSPSABudget(f, k, d, maxBudget):
-    n = [1] * k
-    xPos = [None] * k  # current position
-    xHats = [None] * k  # argmax over xPos so far
-    fHats = [None] * k  # max values of f, corresponding to xHats
+    startPositions = stratifiedSampling(d, k)
 
     for i in range(k):
-        startPoint = randomParams(d)
-        xPos[i] = startPoint
+        startPoint = startPositions[i]
         xHats[i] = startPoint
         fHats[i] = f(startPoint)
+        elapsedBudget += 1
+        numSamples[i] += 1
+        instances[i].append((startPoint, fHats[i]))
 
-    # budget = t_r, function has already been evaluated k times
-    budget = k
 
-    round = -1
-
+    # change True to while budget < maxBudget
     convergeDic = {}
-    while budget < maxBudget:
-        round += 1
-        # default is that the instance was not sampled
+    sampleDic = {}
 
-        # find the hVals for this round
-        hVals = [None] * k
+    while elapsedBudget < maxBudget:
+        hVals = [0]*k
+        b = sum(n)
         for i in range(k):
-            hVals[i] = h(n[i], budget)
+            hVals[i] = h(n[i], b)
+        selectedPoints = selectPoints(hVals, fHats)
+        sampleAlloc = allocateSamples(k, selectedPoints, batchSize)
+        sampleDic[elapsedBudget] = numSamples.copy()
 
-        # select the points for sampling
-        selected = selectPoints(hVals, fHats)
+        # perform sampleAlloc[i] steps for every instance
+        # could add in multi-threading here
+        for i in range(k):
+            samples = sampleAlloc[i]
+            for j in range(samples):
+                n[i] += 1
+                oldX = instances[i][-1][0]
+                # step from the previous point of the ith instance once
+                partials = finiteDifsObject.partials(f, oldX, numSamples[i], c=c)
+                partials = np.negative(partials)
+                newX = finiteDifsObject.step(oldX, numSamples[i], partials, a=a)
+                instances[i].append((newX, f(newX)))
+                elapsedBudget += numEvalsPerGrad + 1
 
-        # update the selected points
+                fVal = f(instances[i][-1][0])
+                elapsedBudget += 1
 
-        for pointIndex in selected:
-            partials = np.negative(SPSAObject.partials(f, xPos[pointIndex], round))
-            oldXPos = xPos[pointIndex]
-            xPos[pointIndex] = SPSAObject.step(xPos[pointIndex], round, partials)
-            n[pointIndex] += 1
-            fVal = f(xPos[pointIndex])
-            if fVal > fHats[pointIndex]:
-                fHats[pointIndex] = fVal
-                xHats[pointIndex] = xPos[pointIndex]
-            else:
-                xPos[pointIndex] = oldXPos
-            # possibly budget += 1
+                if fVal < fHats[i]:
+                    fHats[i] = fVal
+                    xHats[i] = instances[i][-1]
 
-        budget += 3 * len(selected)
-        convergeDic[budget] = max(fHats)
+                convergeDic[elapsedBudget] = min(fHats)
+
+                numSamples[i] += numEvalsPerGrad + 2
+        # convergeDic[elapsedBudget] = min(fHats)
 
     maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], convergeDic)
-
-
-def metaMaxSPSABudgetGivenX(f, k, d, maxBudget, xPos):
-    n = [1] * k
-    xHats = [None] * k  # argmax over xPos so far
-    fHats = [None] * k  # max values of f, corresponding to xHats
-
-    for i in range(k):
-        startPoint = randomParams(d)
-        xHats[i] = startPoint
-        fHats[i] = f(startPoint)
-
-    # budget = t_r, function has already been evaluated k times
-    budget = k
-
-    round = -1
-
-    convergeDic = {}
-    while budget < maxBudget:
-        round += 1
-        # default is that the instance was not sampled
-
-        # find the hVals for this round
-        hVals = [None] * k
-        for i in range(k):
-            hVals[i] = h(n[i], budget)
-
-        # select the points for sampling
-        selected = selectPoints(hVals, fHats)
-
-        # update the selected points
-
-        for pointIndex in selected:
-            partials = np.negative(SPSAObject.partials(f, xPos[pointIndex], round))
-            xPos[pointIndex] = SPSAObject.step(xPos[pointIndex], round, partials)
-            n[pointIndex] += 1
-            fVal = f(xPos[pointIndex])
-            if fVal > fHats[pointIndex]:
-                fHats[pointIndex] = fVal
-                xHats[pointIndex] = xPos[pointIndex]
-            # possibly budget += 1
-
-        budget += 3 * len(selected)
-        convergeDic[budget] = max(fHats)
-
-    maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], convergeDic)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)

@@ -60,6 +60,28 @@ def reverse_griewank_adjusted(x_adjusted):
     return -griewank_adjusted(x_adjusted)
 
 
+# 1D function, made manually
+# https://www.desmos.com/calculator/dfy1vkccwa
+# accepts input in form [.5123]
+def min3Parabola(x2):
+    x1 = x2[0]
+
+    p1 = 20*(x1-1/5)*(x1-1/3)-.3
+    p2 = 50*(x1-1/3)*(x1-5/8)
+    p3 = 15*(x1-1/2)*(x1-1)+.5
+    # maxes = []
+    # for i in range(len(p1)):
+    #     maxes.append(max([p1[i], p2[i], p3[i]]))
+
+    return min([p1, p2, p3])
+
+
+def display1D(fun, x_range):
+    x = np.linspace(x_range[0], x_range[1], 10000)
+    y = [fun(i) for i in x]
+    plt.plot(x, y)
+    plt.show()
+
 def display3D(fun, range):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
