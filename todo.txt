@@ -1,1 +1,8 @@
 debug uniformAlloc and metaMax
+figure out if the initial gradient descent in fitAlloc is doing everything, if the allocation is actually making a difference
+if not, adjust the parameters of a() of gradDescent
+
+try each of the algorithms with the same starting positions
+
+for fitAlloc, only remember the past p points for regression
+(accounting for every point in regression is v slow)

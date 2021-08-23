@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import random
+
+import functions
 import gradDescent
 import kriging
 
@@ -39,24 +41,46 @@ def stratifiedSampling(d, k):
 
 # for displaying how the instances move on a graph
 # colors is an array of length k,
-def displayInstances1D(f, instances, ax, colors, yRange, fColor='b', lineWidth=3):
+def displayInstances1D(f, instances, ax, colors, fColor='b', lineWidth=3):
     ax.title.set_text("Instance Performance")
 
     ax.set_xlim(-.5, 1.5)
-    ax.set_ylim(yRange[0], yRange[1])
     x = list(np.linspace(-.5, 1.5, 1000))
     y = [f([x1]) for x1 in x]
     ax.plot(x, y, color=fColor)
     for i in range(len(instances)):
         instance = instances[i]
-        xArray = [i[0][0] for i in instance]
-        yArray = [i[1] for i in instance]
+        xArray = [p[0][0] for p in instance]
+        yArray = [p[1] for p in instance]
         ax.plot(xArray, yArray, linewidth=lineWidth, color=colors[i], label="instance" + str(i))
         firstX = instance[0][0][0]
         firstY = instance[0][1]
-        ax.plot(firstX, firstY, marker=".", markersize=15, color=colors[i])
+        ax.plot(firstX, firstY, marker=".", markersize=20, color=colors[i])
 
     ax.legend(loc="upper right", bbox_to_anchor=(1.12, 1))
+
+
+# ax = ax.add_subplot(111, projection='3d')
+def displayInstances3D(f, domain, instances, ax, colors, fColor='b', lineWidth=3, alpha=.1, showFunction=True):
+    k = len(instances)
+    ax.title.set_text("Instance Performance")
+    if showFunction:
+        functions.display3D(f, domain, ax, fColor=fColor, alpha=alpha)
+
+    for instanceIndex in range(k):
+        instance = instances[instanceIndex]
+        # xArray is array of 2D vectors
+        x1Array = [p[0][0] for p in instance]
+        x2Array = [p[0][1] for p in instance]
+        yArray = [p[1] for p in instance]
+        ax.plot(x1Array, x2Array, yArray, linewidth=lineWidth, label='instance' + str(instanceIndex), color=colors[instanceIndex])
+        firstX1 = instance[0][0][0]
+        firstX2 = instance[0][0][1]
+        firstY = instance[0][1]
+        ax.plot(firstX1, firstX2, firstY, marker=".", markersize=20, color=colors[instanceIndex])
+
+#    ax.legend(loc="upper left", bbox_to_anchor=(1.12, 1))
+    ax.legend(loc="upper left")
 
 
 # for displaying how samples are allocated

@@ -9,6 +9,7 @@ import fitAlloc
 import uniformAlloc
 import metaMax
 
+
 # class TestClass(unittest.TestCase):
 class TestClass:
 
@@ -48,7 +49,8 @@ class TestClass:
 
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
-    def test_OCBASearch(self, sharedParams, minSamples, discountRate=.95, a=.001, c=.001):
+    def test_OCBASearch(self, sharedParams, minSamples,
+                        discountRate=.95, a=.001, c=.001, startPos=False):
         # OCBASearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -56,7 +58,8 @@ class TestClass:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitAlloc.OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate, a=a, c=c)
+        results = fitAlloc.OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                      a=a, c=c, startPos=False)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         print("Convergence Dictionary: ", end="")
         print(results[2])
@@ -72,14 +75,16 @@ class TestClass:
         return results
 
 
-    def test_uniformSearch(self, sharedParams, a=.001, c=.001):
+    def test_uniformSearch(self, sharedParams,
+                           a=.001, c=.001, startPos=False):
         f = sharedParams[0]
         k = sharedParams[1]
         d = sharedParams[2]
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = uniformAlloc.uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, a=a, c=c)
+        results = uniformAlloc.uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                             a=a, c=c, startPos=startPos)
         print("Convergence Dictionary: ", end="")
         print(results[2])
         print()
@@ -94,14 +99,16 @@ class TestClass:
         return results
 
 
-    def test_metaMaxSearch(self, sharedParams, a=.001, c=.001):
+    def test_metaMaxSearch(self, sharedParams,
+                           a=.001, c=.001, startPos=False):
         f = sharedParams[0]
         k = sharedParams[1]
         d = sharedParams[2]
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = metaMax.metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, a=a, c=c)
+        results = metaMax.metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                        a=a, c=c, startPos=startPos)
         print("Convergence Dictionary: ", end="")
         print(results[2])
         print()
@@ -118,39 +125,68 @@ class TestClass:
 
 # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
 # colors is k-array with colors of function
-    def test_displayResults(self, results, fun, colors, fColor = 'b', yRange=[5, -5], lineWidth=3):
+    def test_display1DResults(self, results, fun, colors, fColor ='b', lineWidth=3):
         instances = results[3]
         sampleDic = results[5]
         convergeDic = results[2]
         fig, (ax1, ax2, ax3) = plt.subplots(3)
         plt.subplots_adjust(hspace=.5)
-        gradientAllocation.displayInstances1D(fun, instances, ax1, colors, yRange, fColor=fColor, lineWidth=lineWidth)
+        gradientAllocation.displayInstances1D(fun, instances, ax1, colors, fColor=fColor, lineWidth=lineWidth)
         gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
-        plt.show()
+
+    def test_display3DResults(self, results, fun, colors, fColor = 'b', lineWidth=3, alpha=.1, showFunction=True, fig=plt.figure()):
+        instances = results[3]
+        sampleDic = results[5]
+        convergeDic = results[2]
+        ax1 = fig.add_subplot(121, projection='3d')
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(224)
+        # fig, (ax1, ax2, ax3) = plt.subplots(3)
+        plt.subplots_adjust(hspace=.5)
+        gradientAllocation.displayInstances3D(fun, [0,1], instances, ax1, colors, fColor=fColor, lineWidth=lineWidth, alpha=alpha, showFunction=showFunction)
+        gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
+        gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-
+# """
 fun = functions.ackley_adjusted
-k = 10
-d = 1
-maxBudget = 1000
-batchSize = 50
+k = 5
+d = 2
+maxBudget = 10000
+batchSize = 100
 numEvalsPerGrad = 2*d
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 test = TestClass()
 minSamples = 10
-a = .001
-c = .00001
-results = test.test_OCBASearch(sharedParams, minSamples, a=a, c=c)
-# results = test.test_uniformSearch(sharedParams, a=a)
-# results = test.test_metaMaxSearch(sharedParams, a=a)
+a = .002
+c = .000001
+sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 
-yRange = [-5, 25]
+resultsOCBA = test.test_OCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos)
+resultsUniform = test.test_uniformSearch(sharedParams, a=a, startPos=sharedStartPos)
+resultsMetaMax = test.test_metaMaxSearch(sharedParams, a=a, startPos=sharedStartPos)
+
+yRange = [-1, 6]
 colors=['g','r','c','y','m','k','brown','orange','purple','pink']
 lineWidth = 2.5
-test.test_displayResults(results, fun, colors, fColor = 'b', yRange=yRange, lineWidth=lineWidth)
+alpha = .1
+
+figOCBA = plt.figure(100)
+figOCBA.suptitle("OCBA Allocation")
+figUniform = plt.figure(200)
+figUniform.suptitle("Uniform Allocation")
+figMetaMax = plt.figure(300)
+figMetaMax.suptitle("MetaMax Allocation")
+
+test.test_display3DResults(resultsOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figOCBA)
+test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
+test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
 
 
-# functions.display1D(lambda x:functions.ackley_adjusted([x]), (0, 1))
+plt.show()
+
+# """
+
+# functions.display3D(functions.ackley_adjusted, (0, 1))
 

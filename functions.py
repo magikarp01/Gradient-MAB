@@ -3,6 +3,7 @@ import numpy as np
 import gradDescent
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import time
 
 # x is input vector, d dimensions
 def ackley(x, a = 20, b=.2, c=2*math.pi):
@@ -20,11 +21,18 @@ def ackley(x, a = 20, b=.2, c=2*math.pi):
 
 
 # ackley_adjusted accepts input with x_i in [0, 1], transforms into [-32.768, 32.768]
-def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi):
+def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2 * math.pi):
     x = []
     for i in x_adjusted:
-        x.append((i-.5)*2*32.768)
+        # x.append((i-.5)*2*32.768)
+        x.append((i-.65)*2*32.768)
+
     return ackley(np.array(x), a, b, c)
+
+# supposed to simulate an expensive function
+def sleep_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi, sleepTime=.5):
+    time.sleep(sleepTime)
+    return ackley_adjusted(x_adjusted, a, b, c)
 
 
 # negative
@@ -52,7 +60,7 @@ def griewank(x):
 def griewank_adjusted(x_adjusted):
     x = []
     for i in x_adjusted:
-        x.append((i-.5)*2*10)
+        x.append((i-.5)*2*100)
     return griewank(np.array(x))
 
 
@@ -82,18 +90,17 @@ def display1D(fun, x_range):
     plt.plot(x, y)
     plt.show()
 
-def display3D(fun, range):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    x = y = np.arange(range[0], range[1], 0.05)
+def display3D(fun, domain, ax, fColor='b', alpha=1):
+
+    x = y = np.arange(domain[0], domain[1], 0.005)
     X, Y = np.meshgrid(x, y)
     zs = np.array([fun(np.array([x, y])) for x, y in zip(np.ravel(X), np.ravel(Y))])
     Z = zs.reshape(X.shape)
 
-    ax.plot_surface(X, Y, Z)
+    ax.plot_surface(X, Y, Z, color=fColor, alpha=alpha)
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
 
-    plt.show()
+    # plt.show()

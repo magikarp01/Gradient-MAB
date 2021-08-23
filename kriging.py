@@ -6,6 +6,7 @@ import time
 # discountRate <= 1
 def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRate = 1):
     d = len(points[0])
+
     def errorFunc(params):
         error = 0
         for pointIndex in range(len(points)):
@@ -13,7 +14,6 @@ def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRat
             discountFactor = discountRate ** (len(points) - pointIndex - 1)
             error += dif**2 * discountFactor
         return error
-
 
     x_0 = [1] * numParams
     leastSquares = optimize.minimize(errorFunc, x_0, bounds=paramBounds)
