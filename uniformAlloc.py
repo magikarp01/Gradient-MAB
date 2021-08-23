@@ -51,42 +51,76 @@ def uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
     convergeDic = {}
     sampleDic = {}
 
-    tqdmTotal = maxBudget-elapsedBudget
-    with tqdm(total=tqdmTotal) as pbar:
-        while elapsedBudget < maxBudget:
-            oldElapsedBudget = elapsedBudget
-            # print(elapsedBudget)
+    # tqdmTotal = maxBudget-elapsedBudget
+    # with tqdm(total=tqdmTotal) as pbar:
+    #     while elapsedBudget < maxBudget:
+    #         oldElapsedBudget = elapsedBudget
+    #         # print(elapsedBudget)
+    #
+    #         sampleAlloc = allocateSamples(k, batchSize)
+    #         sampleDic[elapsedBudget] = numSamples.copy()
+    #
+    #         # perform sampleAlloc[i] steps for every instance
+    #         # could add in multi-threading here
+    #         for i in range(k):
+    #             samples = sampleAlloc[i]
+    #             for j in range(samples):
+    #                 # step from the previous point of the ith instance once
+    #
+    #                 oldX = instances[i][-1][0]
+    #                 partials = finiteDifsObject.partials(f, oldX, numSamples[i], c=c)
+    #                 partials = np.negative(partials)
+    #
+    #                 newX = finiteDifsObject.step(oldX, numSamples[i], partials, a=a)
+    #                 instances[i].append((newX, f(newX)))
+    #                 elapsedBudget += numEvalsPerGrad + 1
+    #
+    #                 fVal = f(instances[i][-1][0])
+    #                 elapsedBudget += 1
+    #
+    #                 if fVal < fHats[i]:
+    #                     fHats[i] = fVal
+    #                     xHats[i] = instances[i][-1]
+    #
+    #                 convergeDic[elapsedBudget] = min(fHats)
+    #
+    #                 numSamples[i] += numEvalsPerGrad + 2
+    #         # convergeDic[elapsedBudget] = min(fHats)
+    #         pbar.update(elapsedBudget - oldElapsedBudget)
 
-            sampleAlloc = allocateSamples(k, batchSize)
-            sampleDic[elapsedBudget] = numSamples.copy()
 
-            # perform sampleAlloc[i] steps for every instance
-            # could add in multi-threading here
-            for i in range(k):
-                samples = sampleAlloc[i]
-                for j in range(samples):
-                    # step from the previous point of the ith instance once
+    while elapsedBudget < maxBudget:
+        # print(elapsedBudget)
 
-                    oldX = instances[i][-1][0]
-                    partials = finiteDifsObject.partials(f, oldX, numSamples[i], c=c)
-                    partials = np.negative(partials)
+        sampleAlloc = allocateSamples(k, batchSize)
+        sampleDic[elapsedBudget] = numSamples.copy()
 
-                    newX = finiteDifsObject.step(oldX, numSamples[i], partials, a=a)
-                    instances[i].append((newX, f(newX)))
-                    elapsedBudget += numEvalsPerGrad + 1
+        # perform sampleAlloc[i] steps for every instance
+        # could add in multi-threading here
+        for i in range(k):
+            samples = sampleAlloc[i]
+            for j in range(samples):
+                # step from the previous point of the ith instance once
 
-                    fVal = f(instances[i][-1][0])
-                    elapsedBudget += 1
+                oldX = instances[i][-1][0]
+                partials = finiteDifsObject.partials(f, oldX, numSamples[i], c=c)
+                partials = np.negative(partials)
 
-                    if fVal < fHats[i]:
-                        fHats[i] = fVal
-                        xHats[i] = instances[i][-1]
+                newX = finiteDifsObject.step(oldX, numSamples[i], partials, a=a)
+                instances[i].append((newX, f(newX)))
+                elapsedBudget += numEvalsPerGrad + 1
 
-                    convergeDic[elapsedBudget] = min(fHats)
+                fVal = f(instances[i][-1][0])
+                elapsedBudget += 1
 
-                    numSamples[i] += numEvalsPerGrad + 2
-            # convergeDic[elapsedBudget] = min(fHats)
-            pbar.update(elapsedBudget - oldElapsedBudget)
+                if fVal < fHats[i]:
+                    fHats[i] = fVal
+                    xHats[i] = instances[i][-1]
+
+                convergeDic[elapsedBudget] = min(fHats)
+
+                numSamples[i] += numEvalsPerGrad + 2
+        # convergeDic[elapsedBudget] = min(fHats)
 
 
     maxIndex = np.argmax(fHats)

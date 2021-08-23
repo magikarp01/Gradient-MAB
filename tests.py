@@ -7,7 +7,7 @@ import gradientAllocation
 
 import fitAlloc
 import uniformAlloc
-import metaMax
+import metaMaxAlloc
 
 
 # class TestClass(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestClass:
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
     def test_OCBASearch(self, sharedParams, minSamples,
-                        discountRate=.95, a=.001, c=.001, startPos=False):
+                        discountRate=.8, a=.001, c=.001, startPos=False):
         # OCBASearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -107,8 +107,8 @@ class TestClass:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = metaMax.metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                        a=a, c=c, startPos=startPos)
+        results = metaMaxAlloc.metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                             a=a, c=c, startPos=startPos)
         print("Convergence Dictionary: ", end="")
         print(results[2])
         print()
@@ -149,7 +149,7 @@ class TestClass:
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-# """
+"""
 fun = functions.ackley_adjusted
 k = 5
 d = 2
@@ -186,7 +186,7 @@ test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=
 
 plt.show()
 
-# """
+"""
 
 # functions.display3D(functions.ackley_adjusted, (0, 1))
 

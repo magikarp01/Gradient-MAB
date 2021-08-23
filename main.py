@@ -2,7 +2,7 @@ import random
 
 import gradDescent
 import functions
-import metaMax
+import metaMaxAlloc
 import uniformAlloc
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -12,9 +12,9 @@ import numpy as np
 def compareGraphs(f, k, d, budget):
     xPos = []
     for i in range(k):
-        xPos.append(metaMax.randomParams(d))
+        xPos.append(metaMaxAlloc.randomParams(d))
 
-    metaMaxResults = metaMax.SPSABudgetGivenX(f, k, d, budget, xPos)
+    metaMaxResults = metaMaxAlloc.SPSABudgetGivenX(f, k, d, budget, xPos)
     uniformResults = uniformAlloc.uniformSPSABudgetGivenX(f, k, d, budget, xPos)
     print(metaMaxResults)
     plt.plot(*zip(*sorted(metaMaxResults[2].items())), label="metaMax")
@@ -35,7 +35,7 @@ def compareAverages(f, numRuns, d, k, budget):
 
     for iteration in tqdm(range(numRuns)):
         mTStart = time.time()
-        mV = metaMax.SPSABudget(f, k, d, budget)
+        mV = metaMaxAlloc.SPSABudget(f, k, d, budget)
         mT = time.time()-mTStart
         uTStart = time.time()
         uV = uniformAlloc.SPSABudget(f, k, d, budget)
@@ -81,6 +81,6 @@ testF = lambda x: (x[0]**4 - 3*x[0]**3 - 9*x[0]**2 + 1) + (x[1]**4 - 3*x[1]**3 -
 # print(functions.reverse_ackley_adjusted(params))
 # min = finiteDifsObject.gradAscent(functions.reverse_ackley_adjusted, params, 10000,a=.1)
 # min = finiteDifsObject.gradDescent(testF, np.array([-1, -1]), 10000)
-min = metaMax.finiteDifsBudget(functions.reverse_ackley_adjusted, 100, 5, 100000, a=.01)
+min = metaMaxAlloc.finiteDifsBudget(functions.reverse_ackley_adjusted, 100, 5, 100000, a=.01)
 for r in min:
     print(r)

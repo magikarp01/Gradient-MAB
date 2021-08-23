@@ -4,15 +4,19 @@ import time
 
 
 # discountRate <= 1
-def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRate = 1):
+def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRate = .8):
     d = len(points[0])
 
-    def errorFunc(params):
+    # stop considering points when discount factor < stopConsidering
+    def errorFunc(params, stopConsidering=0.15):
         error = 0
-        for pointIndex in range(len(points)):
+        discountFactor = 1
+        for pointIndex in range(len(points)-1, -1, -1):
+            if discountFactor < stopConsidering:
+                break
             dif = pointValues[pointIndex] - modelFunc(points[pointIndex], params)
-            discountFactor = discountRate ** (len(points) - pointIndex - 1)
             error += dif**2 * discountFactor
+            discountFactor*=discountRate
         return error
 
     x_0 = [1] * numParams
