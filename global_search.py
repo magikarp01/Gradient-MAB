@@ -1,1 +1,0 @@
-# make a class that all the other search algorithms (OCBA, metaMax, uniform, thrAsc) use as parent
