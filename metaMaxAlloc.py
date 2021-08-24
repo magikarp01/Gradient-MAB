@@ -25,6 +25,10 @@ def h(n, t):
 def selectPoints(hSet, fSet):
     k = len(hSet)
 
+    # attempting to reverse for minimum rather than maximum
+    fSet = [-i for i in fSet]
+
+
     # point set shouldn't have duplicates
     naivePoints = [(hSet[i], fSet[i],) for i in range(k)]
     pointDic = {}

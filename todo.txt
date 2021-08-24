@@ -1,3 +1,6 @@
+FIX METAMAX
+Selection is based on maximum, not minimum
+
 debug uniformAlloc and metaMax
 figure out if the initial gradient descent in fitAlloc is doing everything, if the allocation is actually making a difference
 if not, adjust the parameters of a() of gradDescent

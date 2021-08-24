@@ -43,24 +43,26 @@ def reverse_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi):
     return -ackley(np.array(x), a, b, c)
 
 
-# griewank is best for ranges of [-10, 10]
+# griewank from multi-start strategies, but negative
+# accepts in [-1, 1]
 def griewank(x):
     d = len(x)
     sumSquared = 0
     prodCos = 1
     for j in range(d):
-        sumSquared += x[j]**2
-        prodCos *= math.cos(x[j] / math.sqrt(j+1))
 
-    sumSquared /= 4000
-    return sumSquared - prodCos + 1
+        sumSquared += (4 * (math.pi**2) * x[j]**2)/100
+
+        prodCos *= math.cos( 2 * math.pi * x[j] / math.sqrt(j+1))
+
+    return sumSquared - prodCos
 
 
 # accepts input in [0, 1]
 def griewank_adjusted(x_adjusted):
     x = []
     for i in x_adjusted:
-        x.append((i-.5)*2*100)
+        x.append((i-.5)*4)
     return griewank(np.array(x))
 
 

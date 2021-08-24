@@ -5,7 +5,7 @@ import functions
 import matplotlib.pyplot as plt
 import gradientAllocation
 
-import fitAlloc
+import OCBAAlloc
 import uniformAlloc
 import metaMaxAlloc
 
@@ -16,7 +16,7 @@ class TestClass:
     def test_gradDescent(self):
         fObject = gradDescent.finiteDifs()
         f = functions.min3Parabola
-        startPos = fitAlloc.randomParams(1)
+        startPos = OCBAAlloc.randomParams(1)
         minima, min, samples = fObject.gradDescent(f, startPos, 1000, a=.01)
         print(f"Starting position is {startPos}")
         print(f"Location of minima is {minima}")
@@ -32,19 +32,19 @@ class TestClass:
         print(variance)
 
     def test_stratifiedSampling(self):
-        print(fitAlloc.stratifiedSampling(3, 27))
+        print(OCBAAlloc.stratifiedSampling(3, 27))
 
     def test_kroneckers(self):
         values = [1, 2, 3, 5, 209]
-        kroneckers = fitAlloc.getKroneckers(values)
+        kroneckers = OCBAAlloc.getKroneckers(values)
         print(kroneckers)
 
     def test_budget(self):
         values = [1, 2, 3, 5, 209]
-        kroneckers = fitAlloc.getKroneckers(values)
+        kroneckers = OCBAAlloc.getKroneckers(values)
         variances = [3, 4, 1, 2, 4]
         numSamples = [10, 6, 5, 3, 8]
-        budget = fitAlloc.getBudget(values, variances, kroneckers, numSamples)
+        budget = OCBAAlloc.getBudget(values, variances, kroneckers, numSamples)
         print(budget)
 
 
@@ -58,8 +58,8 @@ class TestClass:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitAlloc.OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
-                                      a=a, c=c, startPos=False)
+        results = OCBAAlloc.OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                       a=a, c=c, startPos=False)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         print("Convergence Dictionary: ", end="")
         print(results[2])
@@ -149,9 +149,20 @@ class TestClass:
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-"""
-fun = functions.ackley_adjusted
-k = 5
+    def test_displayNDResults(self, results, colors, fig=plt.figure()):
+
+        sampleDic = results[5]
+        convergeDic = results[2]
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122)
+        # fig, (ax1, ax2, ax3) = plt.subplots(3)
+        plt.subplots_adjust(hspace=.5)
+        gradientAllocation.displaySamplingHistory(sampleDic, ax1, colors)
+        gradientAllocation.displayMinimaHistory(convergeDic, ax2)
+
+# """
+fun = functions.griewank_adjusted
+k = 10
 d = 2
 maxBudget = 10000
 batchSize = 100
@@ -183,10 +194,16 @@ test.test_display3DResults(resultsOCBA, fun, colors, fColor = 'b', lineWidth=lin
 test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
 test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
 
+# test.test_displayNDResults(resultsOCBA,colors,fig=figOCBA)
+# test.test_displayNDResults(resultsUniform,colors,fig=figUniform)
+# test.test_displayNDResults(resultsMetaMax,colors,fig=figMetaMax)
+
 
 plt.show()
 
-"""
+# """
 
-# functions.display3D(functions.ackley_adjusted, (0, 1))
-
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# functions.display3D(functions.griewank_adjusted, (0, 1), ax)
+# plt.show()

@@ -1,7 +1,10 @@
+# Results are averaged over 1008 runs
+# Parameters are in the tempOCBA function
+
 import gradientAllocation
 import tests
 import functions
-import fitAlloc
+import OCBAAlloc
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import json
@@ -16,8 +19,8 @@ def getAveOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples
                     iterations, minimum=0, discountRate=.8, a=.001, c=.001, startPos = False):
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitAlloc.OCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                        minSamples, discountRate=discountRate, a=a, c=c, startPos = startPos)
+        results = OCBAAlloc.OCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                       minSamples, discountRate=discountRate, a=a, c=c, startPos = startPos)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -91,7 +94,7 @@ def getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
 # errors, aveError = getAveOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
 #                            iterations, discountRate=discountRate, a=a, c=c)
 
-def tempOCBA(jsonNum):
+def tempOCBA(jsonNum, path):
     fun = functions.ackley_adjusted
     k = 5
     d = 2
@@ -108,15 +111,14 @@ def tempOCBA(jsonNum):
     c = .000001
     errors, aveError = getAveOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, iterations,
                                        minimum=minimum, discountRate=discountRate, a=a, c=c)
-    with open('errors' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\\errors' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(errors, fp)
 
-
-    with open('aveError' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\\aveError' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(aveError, fp)
 
 
-def tempUniform(jsonNum):
+def tempUniform(jsonNum, path):
     fun = functions.ackley_adjusted
     k = 5
     d = 2
@@ -130,14 +132,14 @@ def tempUniform(jsonNum):
     c = .000001
     errors, aveError = getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, iterations,
                                        minimum=minimum, a=a, c=c)
-    with open('errors' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\errors' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(errors, fp)
 
-    with open('aveError' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + 'aveError' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(aveError, fp)
 
 
-def tempMetaMax(jsonNum):
+def tempMetaMax(jsonNum, path):
     fun = functions.ackley_adjusted
     k = 5
     d = 2
@@ -151,33 +153,33 @@ def tempMetaMax(jsonNum):
     c = .000001
     errors, aveError = getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, iterations,
                                        minimum=minimum, a=a, c=c)
-    with open('errors' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\errors' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(errors, fp)
 
-    with open('aveError' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + 'aveError' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(aveError, fp)
 
 
 
-def multiprocessSearch(func):
+def multiprocessSearch(func, path):
     if __name__ == '__main__':
         print("ID of main process: {}".format(os.getpid()))
-        p1 = multiprocessing.Process(target=func, args=(1,))
-        p2 = multiprocessing.Process(target=func, args=(2,))
-        p3 = multiprocessing.Process(target=func, args=(3,))
-        p4 = multiprocessing.Process(target=func, args=(4,))
-        p5 = multiprocessing.Process(target=func, args=(5,))
-        p6 = multiprocessing.Process(target=func, args=(6,))
-        p7 = multiprocessing.Process(target=func, args=(7,))
-        p8 = multiprocessing.Process(target=func, args=(8,))
-        p9 = multiprocessing.Process(target=func, args=(9,))
-        p10 = multiprocessing.Process(target=func, args=(10,))
-        p11 = multiprocessing.Process(target=func, args=(11,))
-        p12 = multiprocessing.Process(target=func, args=(12,))
-        p13 = multiprocessing.Process(target=func, args=(13,))
-        p14 = multiprocessing.Process(target=func, args=(14,))
-        p15 = multiprocessing.Process(target=func, args=(15,))
-        p16 = multiprocessing.Process(target=func, args=(16,))
+        p1 = multiprocessing.Process(target=func, args=(1, path, ))
+        p2 = multiprocessing.Process(target=func, args=(2, path, ))
+        p3 = multiprocessing.Process(target=func, args=(3, path, ))
+        p4 = multiprocessing.Process(target=func, args=(4, path, ))
+        p5 = multiprocessing.Process(target=func, args=(5, path, ))
+        p6 = multiprocessing.Process(target=func, args=(6, path, ))
+        p7 = multiprocessing.Process(target=func, args=(7, path, ))
+        p8 = multiprocessing.Process(target=func, args=(8, path, ))
+        p9 = multiprocessing.Process(target=func, args=(9, path, ))
+        p10 = multiprocessing.Process(target=func, args=(10, path, ))
+        p11 = multiprocessing.Process(target=func, args=(11, path, ))
+        p12 = multiprocessing.Process(target=func, args=(12, path, ))
+        p13 = multiprocessing.Process(target=func, args=(13, path, ))
+        p14 = multiprocessing.Process(target=func, args=(14, path, ))
+        p15 = multiprocessing.Process(target=func, args=(15, path, ))
+        p16 = multiprocessing.Process(target=func, args=(16, path, ))
 
         p1.start()
         p2.start()
@@ -234,10 +236,10 @@ def multiprocessSearch(func):
         print('Process p16 is alive: {}'.format(p16.is_alive()))
 
 
-def storeAverageError(name):
+def storeAverageError(name, path):
     aveError = {}
     for i in range(1, 17):
-        with open('aveError' + str(i) + '.json') as jf:
+        with open(path + '\\aveError' + str(i) + '.json') as jf:
             subAveDic = json.load(jf)
             for sampleNum in subAveDic.keys():
                 try:
@@ -248,13 +250,13 @@ def storeAverageError(name):
     for sampleNum in aveError.keys():
         aveError[sampleNum] = aveError[sampleNum] / 16
 
-    with open(name, 'w') as fp:
+    with open(path + "\\" + name, 'w') as fp:
         json.dump(aveError, fp)
 
-def storeErrors(name):
+def storeErrors(name, path):
     errors = {}
     for i in range(1, 17):
-        with open('errors' + str(i) + '.json') as jf:
+        with open(path + '\\errors' + str(i) + '.json') as jf:
             subAveDic = json.load(jf)
             for sampleNum in subAveDic.keys():
                 try:
@@ -262,21 +264,23 @@ def storeErrors(name):
                 except:
                     errors[sampleNum] = [subAveDic[sampleNum]]
 
-    with open(name, 'w') as fp:
+    with open(path + "\\" + name, 'w') as fp:
         json.dump(errors, fp)
 
-# multiprocessSearch(tempMetaMax)
-# storeAverageError("uniformAverageError.json")
-# storeErrors("uniformErrors.json")
+
+path = "Results\\OCBAErrorFiles"
+# multiprocessSearch(tempOCBA, path)
+# storeAverageError("OCBAAverageError.json", path)
+# storeErrors("OCBAErrors.json", path)
 
 def showMinimaHistory():
-    with open('OCBAAverageError.json') as jf:
+    with open('Results/OCBAAverageError.json') as jf:
         OCBAAveError = json.load(jf)
 
-    with open('uniformAverageError.json') as jf:
+    with open('Results/uniformAverageError.json') as jf:
         uniformAveError = json.load(jf)
 
-    with open('metaMaxAverageError.json') as jf:
+    with open('Results/metaMaxAverageError.json') as jf:
         metaMaxAveError = json.load(jf)
 
     fig, ax = plt.subplots(1)
