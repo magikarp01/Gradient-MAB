@@ -1,17 +1,19 @@
 # Results are averaged over 1008 runs
 # Parameters are in the tempOCBA function
 
-import gradientAllocation
-import tests
 import functions
-import OCBAAlloc
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import json
 import multiprocessing
 import os
+
+plt.show()
+
+import OCBAAlloc
 import uniformAlloc
 import metaMaxAlloc
+plt.show()
 
 fun = functions.ackley_adjusted
 
@@ -95,7 +97,7 @@ def getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
 #                            iterations, discountRate=discountRate, a=a, c=c)
 
 def tempOCBA(jsonNum, path):
-    fun = functions.ackley_adjusted
+    fun = functions.griewank_adjusted
     k = 5
     d = 2
     maxBudget = 10000
@@ -119,7 +121,7 @@ def tempOCBA(jsonNum, path):
 
 
 def tempUniform(jsonNum, path):
-    fun = functions.ackley_adjusted
+    fun = functions.griewank_adjusted
     k = 5
     d = 2
     maxBudget = 10000
@@ -132,15 +134,15 @@ def tempUniform(jsonNum, path):
     c = .000001
     errors, aveError = getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, iterations,
                                        minimum=minimum, a=a, c=c)
-    with open(path + '\errors' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\\errors' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(errors, fp)
 
-    with open(path + 'aveError' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\\aveError' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(aveError, fp)
 
 
 def tempMetaMax(jsonNum, path):
-    fun = functions.ackley_adjusted
+    fun = functions.griewank_adjusted
     k = 5
     d = 2
     maxBudget = 10000
@@ -153,10 +155,10 @@ def tempMetaMax(jsonNum, path):
     c = .000001
     errors, aveError = getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, iterations,
                                        minimum=minimum, a=a, c=c)
-    with open(path + '\errors' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\\errors' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(errors, fp)
 
-    with open(path + 'aveError' + str(jsonNum) + '.json', 'w') as fp:
+    with open(path + '\\aveError' + str(jsonNum) + '.json', 'w') as fp:
         json.dump(aveError, fp)
 
 
@@ -268,25 +270,33 @@ def storeErrors(name, path):
         json.dump(errors, fp)
 
 
-path = "Results\\OCBAErrorFiles"
+path = "Results\\metaMaxErrorFiles"
 # multiprocessSearch(tempOCBA, path)
+
+
+
+# path = "Results\\metaMaxErrorFiles"
+# storeAverageError("metaMaxAverageError.json", path)
+# storeErrors("metaMaxErrors.json", path)
+#
+# path = "Results\\uniformErrorFiles"
+# storeAverageError("uniformAverageError.json", path)
+# storeErrors("uniformErrors.json", path)
+#
+# path = "Results\\OCBAErrorFiles"
 # storeAverageError("OCBAAverageError.json", path)
 # storeErrors("OCBAErrors.json", path)
 
-def showMinimaHistory():
-    with open('Results/OCBAAverageError.json') as jf:
+def showMinimaHistory(path):
+    with open(path + '\\OCBAAverageError.json') as jf:
         OCBAAveError = json.load(jf)
 
-    with open('Results/uniformAverageError.json') as jf:
+    with open(path + '\\uniformAverageError.json') as jf:
         uniformAveError = json.load(jf)
 
-    with open('Results/metaMaxAverageError.json') as jf:
+    with open(path + '\\metaMaxAverageError.json') as jf:
         metaMaxAveError = json.load(jf)
 
-    fig, ax = plt.subplots(1)
-    ax.title.set_text("Average Error History")
-    ax.set_xlabel("Total Samples")
-    ax.set_ylabel("Error")
 
     x1 = list(OCBAAveError.keys())
     y1 = [OCBAAveError[m] for m in x1]
@@ -301,12 +311,20 @@ def showMinimaHistory():
     x2 = [int(i) for i in x1]
     x3 = [int(i) for i in x1]
 
+    fig, ax = plt.subplots(1)
+
     ax.plot(x1, y1, label="OCBA")
     ax.plot(x2, y2, label="Uniform")
     ax.plot(x3, y3, label="MetaMax")
 
-    ax.legend(loc="upper right")
+    ax.title.set_text("Average Error History")
+    ax.set_xlabel("Total Samples")
+    ax.set_ylabel("Error")
 
+    ax.legend(loc="upper right")
+    plt.semilogx()
     plt.show()
 
-showMinimaHistory()
+plt.clf()
+showMinimaHistory("Results\\2D Griewank Results")
+

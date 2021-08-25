@@ -50,7 +50,7 @@ class TestClass:
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
     def test_OCBASearch(self, sharedParams, minSamples,
-                        discountRate=.8, a=.001, c=.001, startPos=False):
+                        discountRate=.9, a=.001, c=.001, startPos=False):
         # OCBASearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -163,13 +163,13 @@ class TestClass:
 # """
 fun = functions.griewank_adjusted
 k = 10
-d = 2
-maxBudget = 10000
-batchSize = 100
+d = 20
+maxBudget = 100000
+batchSize = 10
 numEvalsPerGrad = 2*d
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 test = TestClass()
-minSamples = 10
+minSamples = 2*d+5
 a = .002
 c = .000001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
@@ -190,15 +190,15 @@ figUniform.suptitle("Uniform Allocation")
 figMetaMax = plt.figure(300)
 figMetaMax.suptitle("MetaMax Allocation")
 
-test.test_display3DResults(resultsOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figOCBA)
-test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
-test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
-
-# test.test_displayNDResults(resultsOCBA,colors,fig=figOCBA)
-# test.test_displayNDResults(resultsUniform,colors,fig=figUniform)
-# test.test_displayNDResults(resultsMetaMax,colors,fig=figMetaMax)
-
-
+# test.test_display3DResults(resultsOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figOCBA)
+# test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
+# test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
+#
+test.test_displayNDResults(resultsOCBA,colors,fig=figOCBA)
+test.test_displayNDResults(resultsUniform,colors,fig=figUniform)
+test.test_displayNDResults(resultsMetaMax,colors,fig=figMetaMax)
+#
+#
 plt.show()
 
 # """

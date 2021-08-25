@@ -8,7 +8,7 @@ def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRat
     d = len(points[0])
 
     # stop considering points when discount factor < stopConsidering
-    def errorFunc(params, stopConsidering=0.15):
+    def errorFunc(params, stopConsidering=0.07):
         error = 0
         discountFactor = 1
         for pointIndex in range(len(points)-1, -1, -1):

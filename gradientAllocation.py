@@ -89,7 +89,7 @@ def displaySamplingHistory(samplingDic, ax, colors):
     ax.set_xlabel("Total Samples")
     ax.set_ylabel("Instance Samples")
 
-    k = len(samplingDic[next(iter(samplingDic))])
+    k = len(list(samplingDic.values())[0])
     xArray = list(samplingDic.keys())
     ax.set_xlim(left=int(xArray[0]/1.1), right=int(xArray[-1]*1.1))
 
