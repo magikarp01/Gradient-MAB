@@ -126,7 +126,7 @@ def allocateSamples(budgetAlloc, batchSize):
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 def OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-               discountRate=.8, a=.001, c=.001, startPos = False):
+               discountRate=.8, a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
@@ -134,7 +134,11 @@ def OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
     variances = [None] * k
     numSamples = [0] * k
 
-    finiteDifsObject = gradDescent.finiteDifs()
+    if useSPSA:
+        gradientDescentObject = gradDescent.SPSA()
+    else:
+        gradientDescentObject = gradDescent.finiteDifs()
+
     elapsedBudget = 0
 
     if not startPos:
@@ -151,7 +155,7 @@ def OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
         numSamples[i] += 1
 
         # this is for minimizing not maximizing
-        instances[i] = finiteDifsObject.gradDescent(f, startPoint, minSamples, a, c)[2]
+        instances[i] = gradientDescentObject.gradDescent(f, startPoint, minSamples, a, c)[2]
         elapsedBudget += minSamples * numEvalsPerGrad
         numSamples[i] += minSamples * numEvalsPerGrad
 
@@ -159,102 +163,104 @@ def OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
     convergeDic = {}
     sampleDic = {}
 
-    # tqdmTotal = maxBudget-elapsedBudget
-    # with tqdm(total=tqdmTotal) as pbar:
-    #     while elapsedBudget < maxBudget:
-    #         oldElapsedBudget = elapsedBudget
-    #         # print(elapsedBudget)
-    #
-    #
-    #         for i in range(k):
-    #             points = []
-    #             pointValues = []
-    #             for point in instances[i]:
-    #                 # each point is (xValue, fValue)
-    #                 points.append(point[0])
-    #                 pointValues.append(point[1])
-    #
-    #
-    #             estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
-    #
-    #         kroneckers = getKroneckers(estMins)
-    #         budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
-    #         # sample allocation is the actual allocations to give to each
-    #         sampleAlloc = allocateSamples(budgetAlloc, batchSize)
-    #         sampleDic[elapsedBudget] = numSamples.copy()
-    #
-    #         # perform sampleAlloc[i] steps for every instance
-    #         # could add in multi-threading here
-    #         for i in range(k):
-    #             samples = sampleAlloc[i]
-    #             for j in range(samples):
-    #                 # step from the previous point of the ith instance once
-    #
-    #                 partials = finiteDifsObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
-    #                 partials = np.negative(partials)
-    #                 newX = finiteDifsObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
-    #                 instances[i].append((newX, f(newX)))
-    #                 elapsedBudget += numEvalsPerGrad + 1
-    #
-    #                 fVal = f(instances[i][-1][0])
-    #                 elapsedBudget += 1
-    #
-    #                 if fVal < fHats[i]:
-    #                     fHats[i] = fVal
-    #                     xHats[i] = instances[i][-1]
-    #
-    #                 convergeDic[elapsedBudget] = min(fHats)
-    #
-    #                 numSamples[i] += numEvalsPerGrad + 2
-    #         # convergeDic[elapsedBudget] = min(fHats)
-    #
-    #         pbar.update(elapsedBudget - oldElapsedBudget)
-
-    while elapsedBudget < maxBudget:
-        # print(elapsedBudget)
+    if useTqdm:
+        tqdmTotal = maxBudget-elapsedBudget
+        with tqdm(total=tqdmTotal) as pbar:
+            while elapsedBudget < maxBudget:
+                oldElapsedBudget = elapsedBudget
+                # print(elapsedBudget)
 
 
-        for i in range(k):
-            points = []
-            pointValues = []
-            for point in instances[i]:
-                # each point is (xValue, fValue)
-                points.append(point[0])
-                pointValues.append(point[1])
+                for i in range(k):
+                    points = []
+                    pointValues = []
+                    for point in instances[i]:
+                        # each point is (xValue, fValue)
+                        points.append(point[0])
+                        pointValues.append(point[1])
 
 
-            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
+                    estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
 
-        kroneckers = getKroneckers(estMins)
-        budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
-        # sample allocation is the actual allocations to give to each
-        sampleAlloc = allocateSamples(budgetAlloc, batchSize)
-        sampleDic[elapsedBudget] = numSamples.copy()
+                kroneckers = getKroneckers(estMins)
+                budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
+                # sample allocation is the actual allocations to give to each
+                sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+                sampleDic[elapsedBudget] = numSamples.copy()
 
-        # perform sampleAlloc[i] steps for every instance
-        # could add in multi-threading here
-        for i in range(k):
-            samples = sampleAlloc[i]
-            for j in range(samples):
-                # step from the previous point of the ith instance once
+                # perform sampleAlloc[i] steps for every instance
+                # could add in multi-threading here
+                for i in range(k):
+                    samples = sampleAlloc[i]
+                    for j in range(samples):
+                        # step from the previous point of the ith instance once
 
-                partials = finiteDifsObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
-                partials = np.negative(partials)
-                newX = finiteDifsObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
-                instances[i].append((newX, f(newX)))
-                elapsedBudget += numEvalsPerGrad + 1
+                        partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
+                        partials = np.negative(partials)
+                        newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
+                        instances[i].append((newX, f(newX)))
+                        elapsedBudget += numEvalsPerGrad + 1
 
-                fVal = f(instances[i][-1][0])
-                elapsedBudget += 1
+                        fVal = f(instances[i][-1][0])
+                        elapsedBudget += 1
 
-                if fVal < fHats[i]:
-                    fHats[i] = fVal
-                    xHats[i] = instances[i][-1]
+                        if fVal < fHats[i]:
+                            fHats[i] = fVal
+                            xHats[i] = instances[i][-1]
 
-                convergeDic[elapsedBudget] = min(fHats)
+                        convergeDic[elapsedBudget] = min(fHats)
 
-                numSamples[i] += numEvalsPerGrad + 2
-        # convergeDic[elapsedBudget] = min(fHats)
+                        numSamples[i] += numEvalsPerGrad + 2
+                # convergeDic[elapsedBudget] = min(fHats)
+
+                pbar.update(elapsedBudget - oldElapsedBudget)
+
+    else:
+        while elapsedBudget < maxBudget:
+            # print(elapsedBudget)
+
+
+            for i in range(k):
+                points = []
+                pointValues = []
+                for point in instances[i]:
+                    # each point is (xValue, fValue)
+                    points.append(point[0])
+                    pointValues.append(point[1])
+
+
+                estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
+
+            kroneckers = getKroneckers(estMins)
+            budgetAlloc = getBudget(estMins, variances, kroneckers, numSamples)
+            # sample allocation is the actual allocations to give to each
+            sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+            sampleDic[elapsedBudget] = numSamples.copy()
+
+            # perform sampleAlloc[i] steps for every instance
+            # could add in multi-threading here
+            for i in range(k):
+                samples = sampleAlloc[i]
+                for j in range(samples):
+                    # step from the previous point of the ith instance once
+
+                    partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
+                    partials = np.negative(partials)
+                    newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
+                    instances[i].append((newX, f(newX)))
+                    elapsedBudget += numEvalsPerGrad + 1
+
+                    fVal = f(instances[i][-1][0])
+                    elapsedBudget += 1
+
+                    if fVal < fHats[i]:
+                        fHats[i] = fVal
+                        xHats[i] = instances[i][-1]
+
+                    convergeDic[elapsedBudget] = min(fHats)
+
+                    numSamples[i] += numEvalsPerGrad + 2
+            # convergeDic[elapsedBudget] = min(fHats)
 
 
 

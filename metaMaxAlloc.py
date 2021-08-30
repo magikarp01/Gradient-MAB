@@ -109,14 +109,17 @@ def allocateSamples(k, selectedPoints, batchSize):
 # k is number of instances
 # for finding the minimum
 def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                  a=.02, c=.001, startPos=False):
+                  a=.02, c=.001, startPos=False, useSPSA=False, useTqdm=False):
     instances = [[] for i in range(k)]
     xHats = [None] * k
     fHats = [None] * k
     numSamples = [0] * k
     n = [1]*k
 
-    finiteDifsObject = gradDescent.finiteDifs()
+    if useSPSA:
+        gradientDescentObject = gradDescent.SPSA()
+    else:
+        gradientDescentObject = gradDescent.finiteDifs()
     elapsedBudget = 0
 
     if not startPos:
@@ -138,13 +141,53 @@ def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
     convergeDic = {}
     sampleDic = {}
 
-    tqdmTotal = maxBudget - elapsedBudget
-    with tqdm(total=tqdmTotal) as pbar:
+    if useTqdm:
+        tqdmTotal = maxBudget - elapsedBudget
+        with tqdm(total=tqdmTotal) as pbar:
+            while elapsedBudget < maxBudget:
+                oldElapsedBudget = elapsedBudget
+
+
+                hVals = [0]*k
+                b = sum(n)
+                for i in range(k):
+                    hVals[i] = h(n[i], b)
+                selectedPoints = selectPoints(hVals, fHats)
+                sampleAlloc = allocateSamples(k, selectedPoints, batchSize)
+                sampleDic[elapsedBudget] = numSamples.copy()
+
+                # perform sampleAlloc[i] steps for every instance
+                # could add in multi-threading here
+                for i in range(k):
+                    samples = sampleAlloc[i]
+                    for j in range(samples):
+                        n[i] += 1
+                        oldX = instances[i][-1][0]
+                        # step from the previous point of the ith instance once
+                        partials = gradientDescentObject.partials(f, oldX, numSamples[i], c=c)
+                        partials = np.negative(partials)
+                        newX = gradientDescentObject.step(oldX, numSamples[i], partials, a=a)
+                        instances[i].append((newX, f(newX)))
+                        elapsedBudget += numEvalsPerGrad + 1
+
+                        fVal = f(instances[i][-1][0])
+                        elapsedBudget += 1
+
+                        if fVal < fHats[i]:
+                            fHats[i] = fVal
+                            xHats[i] = instances[i][-1]
+
+                        convergeDic[elapsedBudget] = min(fHats)
+
+                        numSamples[i] += numEvalsPerGrad + 2
+                # convergeDic[elapsedBudget] = min(fHats)
+
+                pbar.update(elapsedBudget - oldElapsedBudget)
+
+    else:
         while elapsedBudget < maxBudget:
-            oldElapsedBudget = elapsedBudget
 
-
-            hVals = [0]*k
+            hVals = [0] * k
             b = sum(n)
             for i in range(k):
                 hVals[i] = h(n[i], b)
@@ -160,9 +203,9 @@ def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
                     n[i] += 1
                     oldX = instances[i][-1][0]
                     # step from the previous point of the ith instance once
-                    partials = finiteDifsObject.partials(f, oldX, numSamples[i], c=c)
+                    partials = gradientDescentObject.partials(f, oldX, numSamples[i], c=c)
                     partials = np.negative(partials)
-                    newX = finiteDifsObject.step(oldX, numSamples[i], partials, a=a)
+                    newX = gradientDescentObject.step(oldX, numSamples[i], partials, a=a)
                     instances[i].append((newX, f(newX)))
                     elapsedBudget += numEvalsPerGrad + 1
 
@@ -177,8 +220,6 @@ def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
 
                     numSamples[i] += numEvalsPerGrad + 2
             # convergeDic[elapsedBudget] = min(fHats)
-
-            pbar.update(elapsedBudget - oldElapsedBudget)
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)

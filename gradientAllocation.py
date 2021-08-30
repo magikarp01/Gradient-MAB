@@ -83,13 +83,26 @@ def displayInstances3D(f, domain, instances, ax, colors, fColor='b', lineWidth=3
     ax.legend(loc="upper left")
 
 
+# a graph of instance values vs allocated samples
+def displayInstancesND(instances, ax, colors):
+    ax.title.set_text("Instance Performance")
+    k = len(instances)
+    for instanceIndex in range(k):
+        instance = instances[instanceIndex]
+        # xArray is array of 2D vectors
+        yArray = [p[1] for p in instance]
+        xArray = range(len(yArray))
+        ax.plot(xArray, yArray, color=colors[instanceIndex])
+
+    ax.legend(loc="upper left")
+
 # for displaying how samples are allocated
 def displaySamplingHistory(samplingDic, ax, colors):
     ax.title.set_text("Sampling History")
     ax.set_xlabel("Total Samples")
     ax.set_ylabel("Instance Samples")
 
-    k = len(samplingDic[next(iter(samplingDic))])
+    k = len(list(samplingDic.values())[0])
     xArray = list(samplingDic.keys())
     ax.set_xlim(left=int(xArray[0]/1.1), right=int(xArray[-1]*1.1))
 

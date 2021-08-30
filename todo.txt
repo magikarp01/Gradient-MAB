@@ -1,11 +1,31 @@
-FIX METAMAX
-Selection is based on maximum, not minimum
-
-debug uniformAlloc and metaMax
-figure out if the initial gradient descent in fitAlloc is doing everything, if the allocation is actually making a difference
-if not, adjust the parameters of a() of gradDescent
-
-try each of the algorithms with the same starting positions
+Figure out if higher dimensions are slower
+(steps are slower but more runs are done per step)
+alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit
 
 for fitAlloc, only remember the past p points for regression
 (accounting for every point in regression is v slow)
+(alter the kriging error function)
+
+finish requirements.txt
+
+For results, give the runs the same starting points
+
+Just to put an upper bound on fit allocation performance:
+Instead of doing fitting, try to use the actual local minima that you would reach
+
+
+Try a different form of variance:
+do typical variance, squared distance from mean
+in that case, also use value as the smallest point reached so far
+
+figure out what functions this algorithm would work well on,
+and which this algorithm would work worse on
+
+look up newtons method, inverse hessian
+
+try more functions, hopefully it works with other functions
+
+apply STAR-SPSA to the things in efficient multi start strategies,
+see if performance is better
+(could write about this)
+

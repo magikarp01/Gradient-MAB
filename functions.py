@@ -62,7 +62,7 @@ def griewank(x):
 def griewank_adjusted(x_adjusted):
     x = []
     for i in x_adjusted:
-        x.append((i-.5)*4)
+        x.append((i-.5)*2)
     return griewank(np.array(x))
 
 
