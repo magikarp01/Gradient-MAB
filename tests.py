@@ -51,8 +51,8 @@ class TestClass:
 
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
-    def test_OCBASearch(self, sharedParams, minSamples,
-                        discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+    def test_fitOCBASearch(self, sharedParams, minSamples,
+                           discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -60,8 +60,8 @@ class TestClass:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = OCBAAlloc.OCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
-                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        results = OCBAAlloc.fitOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         print("Convergence Dictionary: ", end="")
         print(results[2])
@@ -76,18 +76,16 @@ class TestClass:
         print(results[4])
         return results
 
-    def test_UCBSearch(self, sharedParams, minSamples,
-                        discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
-        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+    def test_tradOCBASearch(self, sharedParams, minSamples,
+                           a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
         d = sharedParams[2]
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = UCBAlloc.UCBSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                       discountRate=discountRate,
-                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        results = OCBAAlloc.fitOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         print("Convergence Dictionary: ", end="")
         print(results[2])
@@ -101,6 +99,60 @@ class TestClass:
         print("Sample Allocation: ", end="")
         print(results[4])
         return results
+
+
+    def test_fitUCBSearch(self, sharedParams, minSamples,
+                        discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = UCBAlloc.fitUCBSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                        discountRate=discountRate,
+                                        a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(k):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
+
+    def test_tradUCBSearch(self, sharedParams, minSamples,
+                        a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = UCBAlloc.tradUCBSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                        a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(k):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
 
     def test_uniformSearch(self, sharedParams,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
@@ -190,14 +242,14 @@ class TestClass:
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-"""
+# """
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
 k = 5
 d = 2
-maxBudget = 5000
-batchSize = 10
+maxBudget = 2500
+batchSize = 20
 numEvalsPerGrad = 2*d
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 test = TestClass()
@@ -207,8 +259,10 @@ c = .000001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 useSPSA = False
 
-resultsOCBA = test.test_OCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-resultsUCB = test.test_UCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsFitOCBA = test.test_fitOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsTradOCBA = test.test_tradOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsFitUCB = test.test_fitUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsTradUCB = test.test_tradUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 resultsUniform = test.test_uniformSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 resultsMetaMax = test.test_metaMaxSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 
@@ -217,17 +271,23 @@ colors=['g','r','c','y','m','k','brown','orange','purple','pink']
 lineWidth = 2.5
 alpha = .1
 
-figOCBA = plt.figure(100)
-figOCBA.suptitle("OCBA Allocation")
-figUCB = plt.figure(200)
-figUCB.suptitle("UCB Allocation")
-figUniform = plt.figure(300)
+figFitOCBA = plt.figure(100)
+figFitOCBA.suptitle("Fit OCBA Allocation")
+figTradOCBA = plt.figure(200)
+figTradOCBA.suptitle("Traditional OCBA Allocation")
+figFitUCB = plt.figure(300)
+figFitUCB.suptitle("Fit UCB Allocation")
+figTradUCB = plt.figure(400)
+figTradUCB.suptitle("Traditional UCB Allocation")
+figUniform = plt.figure(500)
 figUniform.suptitle("Uniform Allocation")
-figMetaMax = plt.figure(400)
+figMetaMax = plt.figure(600)
 figMetaMax.suptitle("MetaMax Allocation")
 
-test.test_display3DResults(resultsOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figOCBA)
-test.test_display3DResults(resultsUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUCB)
+test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
+test.test_display3DResults(resultsTradOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA)
+test.test_display3DResults(resultsFitUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitUCB)
+test.test_display3DResults(resultsTradUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB)
 test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
 test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
 
@@ -239,9 +299,9 @@ test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=
 #
 plt.show()
 
-"""
+# """
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-functions.display3D(functions.griewank_adjusted, (0, 1), ax)
-plt.show()
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# functions.display3D(functions.griewank_adjusted, (0, 1), ax)
+# plt.show()

@@ -103,3 +103,6 @@ class SPSA(finiteDifs):
 
         return np.array(partials)
 
+
+# class STAR_SPSA(finiteDifs):
+

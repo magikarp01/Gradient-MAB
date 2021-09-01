@@ -21,8 +21,8 @@ def getAveOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples
                     iterations, minimum=0, discountRate=.8, a=.001, c=.001, startPos = False):
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = OCBAAlloc.OCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate, a=a, c=c, startPos = startPos)
+        results = OCBAAlloc.fitOCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                          minSamples, discountRate=discountRate, a=a, c=c, startPos = startPos)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -42,8 +42,8 @@ def getAveUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                     iterations, minimum=0, discountRate=.8, a=.001, c=.001, startPos = False):
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = OCBAAlloc.OCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate, a=a, c=c, startPos = startPos)
+        results = OCBAAlloc.fitOCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                          minSamples, discountRate=discountRate, a=a, c=c, startPos = startPos)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():

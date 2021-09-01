@@ -29,3 +29,4 @@ apply STAR-SPSA to the things in efficient multi start strategies,
 see if performance is better
 (could write about this)
 
+Try adding noise to function (add random.random() * something)
