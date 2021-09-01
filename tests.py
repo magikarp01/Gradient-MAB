@@ -242,7 +242,7 @@ class TestClass:
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-# """
+"""
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
@@ -299,7 +299,7 @@ test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=
 #
 plt.show()
 
-# """
+"""
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
