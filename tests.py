@@ -248,7 +248,7 @@ fun = functions.griewank_adjusted
 
 k = 5
 d = 2
-maxBudget = 2500
+maxBudget = 5000
 batchSize = 20
 numEvalsPerGrad = 2*d
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
