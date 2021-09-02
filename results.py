@@ -319,7 +319,7 @@ def performMultiprocess():
 
         multiprocessSearch(16, 63, tempTradOCBA, sharedParams, dir + "tradOCBA.json")
 
-        multiprocessSearch(16, 63, tempFitUCB, sharedParams, dir + "fitUCB.json")
+        # multiprocessSearch(16, 63, tempFitUCB, sharedParams, dir + "fitUCB.json")
 
         multiprocessSearch(16, 63, tempTradUCB, sharedParams, dir + "tradUCB.json")
 
@@ -345,13 +345,14 @@ def performMultiprocess():
 
 
 
-def showMinimaHistory(files, names):
+def showMinimaHistory(dics, names):
     fig, ax = plt.subplots(1)
 
-    for i in range(len(files)):
-        jf = files[i]
+    for i in range(len(dics)):
+        # jf = files[i]
         name = names[i]
-        aveError = json.load(jf)
+        # aveError = json.load(jf)
+        aveError = dics[i]
         x = list(aveError.keys())
         y = [aveError[m] for m in x]
         x = [int(i) for i in x]
@@ -369,6 +370,11 @@ def showMinimaHistory(files, names):
 
 # plt.clf()
 
-files = os.listdir()
-showMinimaHistory("Results\\2D Ackley Results")
-
+path = "Results\\averageErrors"
+fileNames = os.listdir(path)
+names = [fileName[:-5] for fileName in fileNames]
+dics = []
+for fileName in fileNames:
+    with open(path + "\\" + fileName) as jf:
+        dics.append(json.load(jf))
+showMinimaHistory(dics, names)

@@ -1,3 +1,5 @@
+For results, give the runs the same starting points
+
 Figure out if higher dimensions are slower
 (steps are slower but more runs are done per step)
 alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit
@@ -8,7 +10,6 @@ for fitAlloc, only remember the past p points for regression
 
 finish requirements.txt
 
-For results, give the runs the same starting points
 
 Just to put an upper bound on fit allocation performance:
 Instead of doing fitting, try to use the actual local minima that you would reach
