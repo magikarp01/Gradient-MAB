@@ -158,86 +158,105 @@ def getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
 #                            iterations, discountRate=discountRate, a=a, c=c)
 
 def tempFitOCBA(aveErrorList, iterations, sharedParams):
-    fun = functions.griewank_adjusted
-    k = 5
-    d = 2
-    maxBudget = 5000
-    batchSize = 100
-    numEvalsPerGrad = 2 * d
-    minSamples = 10
+    fun = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
 
-    minimum = 0
-    discountRate = .8
-    a = .002
-    c = .000001
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
     errors, aveError = getAveFitOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, iterations,
                                           minimum=minimum, discountRate=discountRate, a=a, c=c)
     aveErrorList.append(aveError)
 
 
-def tempTradOCBA(aveErrorList, iterations):
-    fun = functions.griewank_adjusted
-    k = 5
-    d = 2
-    maxBudget = 5000
-    batchSize = 100
-    numEvalsPerGrad = 2 * d
-    minSamples = 10
+def tempTradOCBA(aveErrorList, iterations, sharedParams):
+    fun = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
 
-    minimum = 0
-    a = .002
-    c = .000001
+    minimum = sharedParams[7]
+    a = sharedParams[9]
+    c = sharedParams[10]
     errors, aveError = getAveTradOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, iterations,
                                           minimum=minimum, a=a, c=c)
     aveErrorList.append(aveError)
 
 
-def tempFitUCB(aveErrorList, iterations):
-    fun = functions.griewank_adjusted
-    k = 5
-    d = 2
-    maxBudget = 10000
-    batchSize = 100
-    numEvalsPerGrad = 2 * d
-    minSamples = 10
+def tempFitUCB(aveErrorList, iterations, sharedParams):
+    fun = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
 
-    minimum = 0
-    discountRate = .8
-    a = .002
-    c = .000001
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
     errors, aveError = getAveFitUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, iterations,
                                          minimum=minimum, discountRate=discountRate, a=a, c=c)
     aveErrorList.append(aveError)
 
 
-def tempUniform(aveErrorList, iterations):
-    fun = functions.griewank_adjusted
-    k = 5
-    d = 2
-    maxBudget = 10000
-    batchSize = 100
-    numEvalsPerGrad = 2 * d
+def tempTradUCB(aveErrorList, iterations, sharedParams):
+    fun = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
 
-    minimum = 0
-    a = .002
-    c = .000001
+    minimum = sharedParams[7]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    errors, aveError = getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, iterations,
+                                         minimum=minimum, a=a, c=c)
+    aveErrorList.append(aveError)
+
+
+def tempUniform(aveErrorList, iterations, sharedParams):
+    fun = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    a = sharedParams[9]
+    c = sharedParams[10]
     errors, aveError = getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, iterations,
                                        minimum=minimum, a=a, c=c)
 
     aveErrorList.append(aveError)
 
 
-def tempMetaMax(aveErrorList, iterations):
-    fun = functions.griewank_adjusted
-    k = 5
-    d = 2
-    maxBudget = 10000
-    batchSize = 100
-    numEvalsPerGrad = 2 * d
+def tempMetaMax(aveErrorList, iterations, sharedParams):
+    fun = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
 
-    minimum = 0
-    a = .002
-    c = .000001
+    minimum = sharedParams[7]
+
+    a = sharedParams[9]
+    c = sharedParams[10]
     errors, aveError = getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, iterations,
                                        minimum=minimum, a=a, c=c)
 
@@ -245,14 +264,14 @@ def tempMetaMax(aveErrorList, iterations):
 
 
 
-def multiprocessSearch(numProcesses, iterations, func, endPath):
+def multiprocessSearch(numProcesses, iterations, func, sharedParams, endPath):
     if __name__ == '__main__':
         with mp.Manager() as manager:
             aveErrorList = manager.list()
             print("ID of main process: {}".format(os.getpid()))
             processes = []
             for i in range(numProcesses):
-                processes.append(mp.Process(target=func, args=(aveErrorList, iterations)))
+                processes.append(mp.Process(target=func, args=(aveErrorList, iterations, sharedParams)))
                 processes[i].start()
 
             for i in range(numProcesses):
@@ -278,97 +297,65 @@ def multiprocessSearch(numProcesses, iterations, func, endPath):
             with open(endPath, 'w') as fp:
                 json.dump(aveError, fp)
 
-def storeAverageError(name, path):
-    aveError = {}
-    for i in range(1, 17):
-        with open(path + '\\aveError' + str(i) + '.json') as jf:
-            subAveDic = json.load(jf)
-            for sampleNum in subAveDic.keys():
-                try:
-                    aveError[sampleNum] += subAveDic[sampleNum]
-                except:
-                    aveError[sampleNum] = subAveDic[sampleNum]
 
-    for sampleNum in aveError.keys():
-        aveError[sampleNum] = aveError[sampleNum] / 16
+def performMultiprocess():
+    fun = functions.griewank_adjusted
+    k = 5
+    d = 2
+    maxBudget = 10000
+    batchSize = 100
+    numEvalsPerGrad = 2 * d
+    minSamples = 10
 
-    with open(path + "\\" + name, 'w') as fp:
-        json.dump(aveError, fp)
+    minimum = 0
+    discountRate = .8
+    a = .002
+    c = .000001
+    sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c]
 
+    if __name__ == '__main__':
+        dir = "Results\\averageErrors\\"
+        # multiprocessSearch(16, 63, tempFitOCBA, sharedParams, dir+"fitOCBA.json")
 
+        multiprocessSearch(16, 63, tempTradOCBA, sharedParams, dir + "tradOCBA.json")
 
-fun = functions.griewank_adjusted
-k = 5
-d = 2
-maxBudget = 10000
-batchSize = 20
-numEvalsPerGrad = 2 * d
-minSamples = 10
+        multiprocessSearch(16, 63, tempFitUCB, sharedParams, dir + "fitUCB.json")
 
-minimum = 0
-discountRate = .8
-a = .002
-c = .000001
-sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c]
+        multiprocessSearch(16, 63, tempTradUCB, sharedParams, dir + "tradUCB.json")
 
-if __name__ == '__main__':
-    path = "Results\\OCBAAverageError.json"
-    multiprocessSearch(4, 3, tempFitOCBA, path)
+        multiprocessSearch(16, 63, tempMetaMax, sharedParams, dir + "metaMax.json")
 
-    # path = "Results\\metaMaxErrorFiles"
-    # storeAverageError("metaMaxAverageError.json", path)
-    # storeErrors("metaMaxErrors.json", path)
-    #
-    # path = "Results\\uniformErrorFiles"
-    # storeAverageError("uniformAverageError.json", path)
-    # storeErrors("uniformErrors.json", path)
-    #
-    # path = "Results\\OCBAErrorFiles"
-    # storeAverageError("OCBAAverageError.json", path)
-    # storeErrors("OCBAErrors.json", path)
-    #
-    # path = "Results\\UCBErrorFiles"
-    # storeAverageError("UCBAverageError.json", path)
-    # storeErrors("UCBErrors.json", path)
+        multiprocessSearch(16, 63, tempUniform, sharedParams, dir + "uniform.json")
+
+        # path = "Results\\metaMaxErrorFiles"
+        # storeAverageError("metaMaxAverageError.json", path)
+        # storeErrors("metaMaxErrors.json", path)
+        #
+        # path = "Results\\uniformErrorFiles"
+        # storeAverageError("uniformAverageError.json", path)
+        # storeErrors("uniformErrors.json", path)
+        #
+        # path = "Results\\OCBAErrorFiles"
+        # storeAverageError("OCBAAverageError.json", path)
+        # storeErrors("OCBAErrors.json", path)
+        #
+        # path = "Results\\UCBErrorFiles"
+        # storeAverageError("UCBAverageError.json", path)
+        # storeErrors("UCBErrors.json", path)
 
 
-def showMinimaHistory(path):
-    with open(path + '\\OCBAAverageError.json') as jf:
-        OCBAAveError = json.load(jf)
 
-    # with open(path + '\\UCBAverageError.json') as jf:
-    #     UCBAveError = json.load(jf)
-
-    with open(path + '\\uniformAverageError.json') as jf:
-        uniformAveError = json.load(jf)
-
-    with open(path + '\\metaMaxAverageError.json') as jf:
-        metaMaxAveError = json.load(jf)
-
-
-    x1 = list(OCBAAveError.keys())
-    y1 = [OCBAAveError[m] for m in x1]
-
-    x2 = list(uniformAveError.keys())
-    y2 = [uniformAveError[m] for m in x2]
-
-    x3 = list(metaMaxAveError.keys())
-    y3 = [metaMaxAveError[m] for m in x3]
-
-    # x4 = list(UCBAveError.keys())
-    # y4 = [UCBAveError[m] for m in x4]
-
-    x1 = [int(i) for i in x1]
-    x2 = [int(i) for i in x2]
-    x3 = [int(i) for i in x3]
-    # x4 = [int(i) for i in x4]
-
+def showMinimaHistory(files, names):
     fig, ax = plt.subplots(1)
 
-    ax.plot(x1, y1, label="OCBA")
-    ax.plot(x2, y2, label="Uniform")
-    ax.plot(x3, y3, label="MetaMax")
-    # ax.plot(x4, y4, label="UCB")
+    for i in range(len(files)):
+        jf = files[i]
+        name = names[i]
+        aveError = json.load(jf)
+        x = list(aveError.keys())
+        y = [aveError[m] for m in x]
+        x = [int(i) for i in x]
+        ax.plot(x, y, label=name)
 
     ax.title.set_text("Average Error History")
     ax.set_xlabel("Total Samples")
@@ -378,6 +365,10 @@ def showMinimaHistory(path):
     # plt.semilogx()
     plt.show()
 
+
+
 # plt.clf()
-# showMinimaHistory("Results\\2D Ackley Results")
+
+files = os.listdir()
+showMinimaHistory("Results\\2D Ackley Results")
 
