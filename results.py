@@ -328,7 +328,7 @@ def performMultiprocess(numProcesses, iterPerProcess):
     numEvalsPerGrad = 2 * d
     minSamples = 10
 
-    minimum = 0
+    minimum = -1
     discountRate = .8
     a = .002
     c = .000001

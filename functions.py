@@ -55,7 +55,7 @@ def griewank(x):
 
         prodCos *= math.cos( 2 * math.pi * x[j] / math.sqrt(j+1))
 
-    return sumSquared - prodCos+1
+    return sumSquared - prodCos
 
 
 # accepts input in [0, 1]

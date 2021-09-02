@@ -10,7 +10,7 @@ batchSize = 100
 numEvalsPerGrad = 2 * d
 minSamples = 10
 
-minimum = 0
+minimum = -1
 discountRate = .8
 a = .002
 c = .000001
@@ -28,25 +28,10 @@ numEvalsPerGrad = 2
 SPSA = True
 minSamples = 10
 
-minimum = 0
+minimum = -1
 discountRate = .8
 a = .002
 c = .000001
 useSPSA = True
-}
-
-{
-fun = functions.griewank_adjusted
-k = 5
-d = 2
-maxBudget = 10000
-batchSize = 100
-numEvalsPerGrad = 2 * d
-minSamples = 10
-
-minimum = 0
-discountRate = .8
-a = .002
-c = .000001
 }
 
