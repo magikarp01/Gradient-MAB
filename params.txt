@@ -1,0 +1,52 @@
+
+k * minSamples * numEvalsPerGrad runs at the start
+
+{ to test against metaMax-100
+fun = functions.griewank_adjusted
+k = 100
+d = 2
+maxBudget = 10000
+batchSize = 100
+numEvalsPerGrad = 2 * d
+minSamples = 10
+
+minimum = 0
+discountRate = .8
+a = .002
+c = .000001
+iterations = 625
+useSPSA = True
+}
+
+{
+fun = functions.griewank_adjusted
+k = 100
+d = 10
+maxBudget = 10000
+batchSize = 10
+numEvalsPerGrad = 2
+SPSA = True
+minSamples = 10
+
+minimum = 0
+discountRate = .8
+a = .002
+c = .000001
+useSPSA = True
+}
+
+{
+fun = functions.griewank_adjusted
+k = 5
+d = 2
+maxBudget = 10000
+batchSize = 100
+numEvalsPerGrad = 2 * d
+minSamples = 10
+
+minimum = 0
+discountRate = .8
+a = .002
+c = .000001
+}
+
