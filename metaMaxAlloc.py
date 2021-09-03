@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import math
 import random
 import gradDescent
+from gradientAllocation import randomParams
 from gradientAllocation import stratifiedSampling
 from scipy.spatial import ConvexHull
 from tqdm import tqdm
@@ -114,6 +115,7 @@ def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
     xHats = [None] * k
     fHats = [None] * k
     numSamples = [0] * k
+    # n = [1]*k (why 1 and not 0?)
     n = [1]*k
 
     if useSPSA:
@@ -223,3 +225,130 @@ def metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
+
+def metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
+                          a=.02, c=.001, useSPSA=False, useTqdm=False):
+    instances = []
+    xHats = []
+    fHats = []
+    numSamples = []
+    n = []
+
+    if useSPSA:
+        gradientDescentObject = gradDescent.SPSA()
+    else:
+        gradientDescentObject = gradDescent.finiteDifs()
+    elapsedBudget = 0
+
+    convergeDic = {}
+    sampleDic = {}
+
+    round = 0
+    if useTqdm:
+        tqdmTotal = maxBudget - elapsedBudget
+        with tqdm(total=tqdmTotal) as pbar:
+
+            while elapsedBudget < maxBudget:
+                oldElapsedBudget = elapsedBudget
+
+                # make a new instance
+                newX = randomParams(d)
+                xHats.append(newX)
+                fHats.append(f(newX))
+                elapsedBudget += 1
+                numSamples.append(1)
+                instances.append([(newX, fHats[round]),])
+                n.append(1)
+                round += 1
+
+
+                hVals = [0]*round
+                b = sum(n)
+                for i in range(round):
+                    hVals[i] = h(n[i], b)
+                selectedPoints = selectPoints(hVals, fHats)
+                # there should be no batch size, every selected point should be stepped
+                sampleAlloc = allocateSamples(round, selectedPoints, len(selectedPoints))
+                sampleDic[elapsedBudget] = numSamples.copy()
+
+                # perform sampleAlloc[i] steps for every instance
+                # could add in multi-threading here
+                for i in range(round):
+                    samples = sampleAlloc[i]
+                    for j in range(samples):
+                        n[i] += 1
+                        oldX = instances[i][-1][0]
+                        # step from the previous point of the ith instance once
+                        partials = gradientDescentObject.partials(f, oldX, numSamples[i], c=c)
+                        partials = np.negative(partials)
+                        newX = gradientDescentObject.step(oldX, numSamples[i], partials, a=a)
+                        instances[i].append((newX, f(newX)))
+                        elapsedBudget += numEvalsPerGrad + 1
+
+                        fVal = f(instances[i][-1][0])
+                        elapsedBudget += 1
+
+                        if fVal < fHats[i]:
+                            fHats[i] = fVal
+                            xHats[i] = instances[i][-1]
+
+                        convergeDic[elapsedBudget] = min(fHats)
+
+                        numSamples[i] += numEvalsPerGrad + 2
+                # convergeDic[elapsedBudget] = min(fHats)
+
+                pbar.update(elapsedBudget - oldElapsedBudget)
+
+
+    else:
+        while elapsedBudget < maxBudget:
+
+            # make a new instance
+            newX = randomParams(d)
+            xHats.append(newX)
+            fHats.append(f(newX))
+            elapsedBudget += 1
+            numSamples.append(1)
+            instances.append([(newX, fHats[round]), ])
+            n.append(1)
+            round += 1
+
+            hVals = [0] * round
+            b = sum(n)
+            for i in range(round):
+                hVals[i] = h(n[i], b)
+            selectedPoints = selectPoints(hVals, fHats)
+            # there should be no batch size, every selected point should be stepped
+            sampleAlloc = allocateSamples(round, selectedPoints, len(selectedPoints))
+            sampleDic[elapsedBudget] = numSamples.copy()
+
+            # perform sampleAlloc[i] steps for every instance
+            # could add in multi-threading here
+            for i in range(round):
+                samples = sampleAlloc[i]
+                for j in range(samples):
+                    n[i] += 1
+                    oldX = instances[i][-1][0]
+                    # step from the previous point of the ith instance once
+                    partials = gradientDescentObject.partials(f, oldX, numSamples[i], c=c)
+                    partials = np.negative(partials)
+                    newX = gradientDescentObject.step(oldX, numSamples[i], partials, a=a)
+                    instances[i].append((newX, f(newX)))
+                    elapsedBudget += numEvalsPerGrad + 1
+
+                    fVal = f(instances[i][-1][0])
+                    elapsedBudget += 1
+
+                    if fVal < fHats[i]:
+                        fHats[i] = fVal
+                        xHats[i] = instances[i][-1]
+
+                    convergeDic[elapsedBudget] = min(fHats)
+
+                    numSamples[i] += numEvalsPerGrad + 2
+
+
+    maxIndex = np.argmax(fHats)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+

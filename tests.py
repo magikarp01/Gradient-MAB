@@ -1,4 +1,5 @@
 import unittest
+import random
 
 import UCBAlloc
 import kriging
@@ -201,6 +202,27 @@ class TestClass:
         print(results[4])
         return results
 
+    def test_metaMaxInfiniteSearch(self, sharedParams,
+                                   a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        numEvalsPerGrad = sharedParams[5]
+        results = metaMaxAlloc.metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
+                                                     a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(len(instances)):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
 
 # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
 # colors is k-array with colors of function
@@ -242,7 +264,6 @@ class TestClass:
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-"""
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
@@ -259,15 +280,20 @@ c = .000001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 useSPSA = False
 
+
+# """
 resultsFitOCBA = test.test_fitOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 resultsTradOCBA = test.test_tradOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 resultsFitUCB = test.test_fitUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 resultsTradUCB = test.test_tradUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 resultsUniform = test.test_uniformSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 resultsMetaMax = test.test_metaMaxSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+resultsMetaMaxInfinite = test.test_metaMaxInfiniteSearch(sharedParams, a=a, useSPSA=True)
+
 
 yRange = [-1, 6]
-colors=['g','r','c','y','m','k','brown','orange','purple','pink']
+# colors=['g','r','c','y','m','k','brown','orange','purple','pink']
+colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
 lineWidth = 2.5
 alpha = .1
 
@@ -283,6 +309,8 @@ figUniform = plt.figure(500)
 figUniform.suptitle("Uniform Allocation")
 figMetaMax = plt.figure(600)
 figMetaMax.suptitle("MetaMax Allocation")
+figMetaMaxInfinite = plt.figure(700)
+figMetaMaxInfinite.suptitle("MetaMax Infinite Allocation")
 
 test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
 test.test_display3DResults(resultsTradOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA)
@@ -290,6 +318,7 @@ test.test_display3DResults(resultsFitUCB, fun, colors, fColor = 'b', lineWidth=l
 test.test_display3DResults(resultsTradUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB)
 test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
 test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
+test.test_display3DResults(resultsMetaMaxInfinite, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMaxInfinite)
 
 # test.test_displayNDResults(resultsOCBA,colors,fig=figOCBA)
 # test.test_displayNDResults(resultsUCB,colors,fig=figUCB)
@@ -299,7 +328,7 @@ test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=
 #
 plt.show()
 
-"""
+# """
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')

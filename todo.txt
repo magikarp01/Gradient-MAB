@@ -6,6 +6,12 @@ alternatively, do work to figure out how expensive functions need to be to outwe
 
 Implement metaMax-infinity
 
+Talk to Dr. Fu about applying to contests:
+- Regeneron is deadline nov 10
+
+Talk to Dr. Fu about college rec:
+- First deadline is nov 1
+
 for fitAlloc, only remember the past p points for regression
 (accounting for every point in regression is v slow)
 (alter the kriging error function)

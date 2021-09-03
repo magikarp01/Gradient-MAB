@@ -145,6 +145,29 @@ def getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
     return errors, aveError
+
+
+def getAveMetaMaxInfiniteError(fun, d, maxBudget, numEvalsPerGrad,
+                    iterations, minimum=0, a=.001, c=.001, useSPSA=False):
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = metaMaxAlloc.metaMaxInfiniteSearch(fun, d, maxBudget, numEvalsPerGrad,
+                        a=a, c=c, useSPSA=useSPSA)
+        # ideally, every convergeDic has the same keys
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append( convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    return errors, aveError
+
+
 # fun = functions.ackley_adjusted
 # k = 5
 # d = 2
@@ -282,6 +305,22 @@ def tempMetaMax(aveErrorList, iterations, sharedParams, startPosList):
     aveErrorList.append(aveError)
 
 
+def tempMetaMaxInfinite(aveErrorList, iterations, sharedParams, startPosList):
+    fun = sharedParams[0]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    numEvalsPerGrad = sharedParams[5]
+
+    minimum = sharedParams[7]
+
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    errors, aveError = getAveMetaMaxInfiniteError(fun, d, maxBudget, numEvalsPerGrad,
+                    iterations, minimum=minimum, a=a, c=c, useSPSA=useSPSA)
+
+    aveErrorList.append(aveError)
+
 
 def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStartPos, endPath):
     if __name__ == '__main__':
@@ -355,19 +394,23 @@ def performMultiprocess(numProcesses, iterPerProcess):
         dir = "Results\\averageErrors\\"
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
 
-        print("Trad OCBA")
-        multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
+        # print("Trad OCBA")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
 
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
 
-        print("Trad UCB")
-        multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
+        # print("Trad UCB")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
+        #
+        # print("MetaMax")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
+        #
 
-        print("MetaMax")
-        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
+        print("MetaMaxInfinite")
+        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos, dir + "metaMaxInfinite.json")
 
-        print("Uniform")
-        multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
+        # print("Uniform")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
 
 
 def showMinimaHistory(dics, names):
@@ -393,15 +436,15 @@ def showMinimaHistory(dics, names):
 
 
 
-# performMultiprocess(15, 667)
+performMultiprocess(4, 60)
 
 
-path = "Results\\averageErrors\\d2GriewankSPSA"
-#fileNames = os.listdir(path)
-fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json", "uniform.json"]
-names = [fileName[:-5] for fileName in fileNames]
-dics = []
-for fileName in fileNames:
-    with open(path + "\\" + fileName) as jf:
-        dics.append(json.load(jf))
-showMinimaHistory(dics, names)
+# path = "Results\\averageErrors\\d2GriewankSPSA"
+# #fileNames = os.listdir(path)
+# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json", "uniform.json"]
+# names = [fileName[:-5] for fileName in fileNames]
+# dics = []
+# for fileName in fileNames:
+#     with open(path + "\\" + fileName) as jf:
+#         dics.append(json.load(jf))
+# showMinimaHistory(dics, names)
