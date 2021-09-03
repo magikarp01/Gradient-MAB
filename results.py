@@ -106,7 +106,7 @@ def getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamp
 
 
 def getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                    iterations, startPosList, minimum=0, a=.001, c=.001, startPos = False, useSPSA=False):
+                    iterations, startPosList, minimum=0, a=.001, c=.001, useSPSA=False):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = uniformAlloc.uniformSearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
@@ -250,7 +250,6 @@ def tempUniform(aveErrorList, iterations, sharedParams, startPosList):
     maxBudget = sharedParams[3]
     batchSize = sharedParams[4]
     numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
 
     minimum = sharedParams[7]
     a = sharedParams[9]
@@ -321,10 +320,10 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
 
 def performMultiprocess(numProcesses, iterPerProcess):
     fun = functions.griewank_adjusted
-    k = 5
+    k = 100
     d = 2
     maxBudget = 10000
-    batchSize = 100
+    batchSize = 50
     numEvalsPerGrad = 2 * d
     minSamples = 10
 
@@ -346,16 +345,23 @@ def performMultiprocess(numProcesses, iterPerProcess):
 
     if __name__ == '__main__':
         dir = "Results\\averageErrors\\"
+        with open(dir + "startingPos.json", 'w') as jf:
+            json.dump(processStartPos, jf)
+
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
 
+        # print("Trad OCBA")
         # multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
 
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
 
+        # print("Trad UCB")
         # multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
+        #
+        # print("MetaMax")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
 
-        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
-
+        print("Uniform")
         multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
 
 
@@ -380,15 +386,16 @@ def showMinimaHistory(dics, names):
     # plt.semilogx()
     plt.show()
 
-# performMultiprocess(2, 10)
 
-# plt.clf()
 
-path = "Results\\averageErrors"
-fileNames = os.listdir(path)
-names = [fileName[:-5] for fileName in fileNames]
-dics = []
-for fileName in fileNames:
-    with open(path + "\\" + fileName) as jf:
-        dics.append(json.load(jf))
-showMinimaHistory(dics, names)
+performMultiprocess(15, 62)
+
+
+# path = "Results\\averageErrors"
+# fileNames = os.listdir(path)
+# names = [fileName[:-5] for fileName in fileNames]
+# dics = []
+# for fileName in fileNames:
+#     with open(path + "\\" + fileName) as jf:
+#         dics.append(json.load(jf))
+# showMinimaHistory(dics, names)
