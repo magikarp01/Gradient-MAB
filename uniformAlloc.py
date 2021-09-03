@@ -10,7 +10,7 @@ from tqdm import tqdm
 def allocateSamples(k, batchSize):
     samplesPerInstance = batchSize // k
     results = [samplesPerInstance] * k
-    residue = samplesPerInstance % k
+    residue = batchSize % k
     extras = random.sample(range(k), residue)
     for i in extras:
         results[i] += 1

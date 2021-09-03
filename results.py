@@ -304,12 +304,13 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
                 print('Process p' + str(i+1) + ' is alive: {}'.format(processes[i].is_alive()))
 
             aveError = {}
+            aveErrorListCopy = list(aveErrorList)
             for i in range(numProcesses):
-                for sampleNum in aveErrorList[i].keys():
+                for sampleNum in aveErrorListCopy[i].keys():
                     try:
-                        aveError[sampleNum] += aveErrorList[i][sampleNum]
+                        aveError[sampleNum] += aveErrorListCopy[i][sampleNum]
                     except:
-                        aveError[sampleNum] = aveErrorList[i][sampleNum]
+                        aveError[sampleNum] = aveErrorListCopy[i][sampleNum]
 
             for sampleNum in aveError.keys():
                 aveError[sampleNum] = aveError[sampleNum] / numProcesses
@@ -321,45 +322,49 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
 def performMultiprocess(numProcesses, iterPerProcess):
     fun = functions.griewank_adjusted
     k = 100
-    d = 2
+    d = 10
     maxBudget = 10000
     batchSize = 50
-    numEvalsPerGrad = 2 * d
+    numEvalsPerGrad = 2
     minSamples = 10
 
     minimum = -1
     discountRate = .8
     a = .002
     c = .000001
-    useSPSA = False
+    useSPSA = True
 
-    processStartPos = []
-    for i in range(numProcesses):
-        startPosList = []
-        for j in range(iterPerProcess):
-            startPosList.append(gradientAllocation.stratifiedSampling(d, k))
-        processStartPos.append(startPosList)
+    # processStartPos = []
+    # for i in range(numProcesses):
+    #     startPosList = []
+    #     for j in range(iterPerProcess):
+    #         startPosList.append(gradientAllocation.stratifiedSampling(d, k))
+    #     processStartPos.append(startPosList)
+    #
+    # dir = "Results\\averageErrors\\"
+    # with open(dir + "startingPos.json", 'w') as jf:
+    #     json.dump(processStartPos, jf)
+    with open("Results/startingPos.json") as jf:
+        processStartPos = json.load(jf)
+
 
     sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                     minimum, discountRate, a, c, useSPSA]
 
     if __name__ == '__main__':
         dir = "Results\\averageErrors\\"
-        with open(dir + "startingPos.json", 'w') as jf:
-            json.dump(processStartPos, jf)
-
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
 
-        # print("Trad OCBA")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
+        print("Trad OCBA")
+        multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
 
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
 
-        # print("Trad UCB")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
-        #
-        # print("MetaMax")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
+        print("Trad UCB")
+        multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
+
+        print("MetaMax")
+        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
 
         print("Uniform")
         multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
@@ -388,14 +393,15 @@ def showMinimaHistory(dics, names):
 
 
 
-performMultiprocess(15, 62)
+# performMultiprocess(15, 667)
 
 
-# path = "Results\\averageErrors"
-# fileNames = os.listdir(path)
-# names = [fileName[:-5] for fileName in fileNames]
-# dics = []
-# for fileName in fileNames:
-#     with open(path + "\\" + fileName) as jf:
-#         dics.append(json.load(jf))
-# showMinimaHistory(dics, names)
+path = "Results\\averageErrors\\d2GriewankSPSA"
+#fileNames = os.listdir(path)
+fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json", "uniform.json"]
+names = [fileName[:-5] for fileName in fileNames]
+dics = []
+for fileName in fileNames:
+    with open(path + "\\" + fileName) as jf:
+        dics.append(json.load(jf))
+showMinimaHistory(dics, names)

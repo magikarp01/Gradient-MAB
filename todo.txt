@@ -4,6 +4,8 @@ Figure out if higher dimensions are slower
 (steps are slower but more runs are done per step)
 alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit
 
+Implement metaMax-infinity
+
 for fitAlloc, only remember the past p points for regression
 (accounting for every point in regression is v slow)
 (alter the kriging error function)
