@@ -362,28 +362,33 @@ def performMultiprocess(numProcesses, iterPerProcess):
     fun = functions.griewank_adjusted
     k = 100
     d = 10
-    maxBudget = 10000
+    maxBudget = 20000
     batchSize = 50
     numEvalsPerGrad = 2
     minSamples = 10
 
     minimum = -1
     discountRate = .8
-    a = .002
-    c = .000001
+    a = .5
+    c = .1
     useSPSA = True
 
     # processStartPos = []
-    # for i in range(numProcesses):
+    # print("Generating Starting Positions")
+    # for i in tqdm(range(numProcesses)):
     #     startPosList = []
     #     for j in range(iterPerProcess):
-    #         startPosList.append(gradientAllocation.stratifiedSampling(d, k))
+    #         randoms = [gradientAllocation.randomParams(d) for i in range(k)]
+    #         startPosList.append(randoms)
+    #
+    #         # startPosList.append(gradientAllocation.stratifiedSampling(d, k))
     #     processStartPos.append(startPosList)
     #
     # dir = "Results\\averageErrors\\"
     # with open(dir + "startingPos.json", 'w') as jf:
     #     json.dump(processStartPos, jf)
-    with open("Results/startingPos.json") as jf:
+
+    with open("Results/startingPositions/startingPos10DStratified.json.json") as jf:
         processStartPos = json.load(jf)
 
 
@@ -406,8 +411,8 @@ def performMultiprocess(numProcesses, iterPerProcess):
         # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
         #
 
-        print("MetaMaxInfinite")
-        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos, dir + "metaMaxInfinite.json")
+        # print("MetaMaxInfinite")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos, dir + "metaMaxInfinite.json")
 
         # print("Uniform")
         # multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
@@ -422,8 +427,9 @@ def showMinimaHistory(dics, names):
         # aveError = json.load(jf)
         aveError = dics[i]
         x = list(aveError.keys())
-        y = [aveError[m] for m in x]
         x = [int(i) for i in x]
+        x.sort()
+        y = [aveError[str(m)] for m in x]
         ax.plot(x, y, label=name)
 
     ax.title.set_text("Average Error History")
@@ -436,15 +442,17 @@ def showMinimaHistory(dics, names):
 
 
 
-performMultiprocess(4, 60)
+performMultiprocess(15, 667)
 
 
-# path = "Results\\averageErrors\\d2GriewankSPSA"
+# path = "Results\\averageErrors"
 # #fileNames = os.listdir(path)
-# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json", "uniform.json"]
+# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+#              "uniform.json", "metaMaxInfinite.json"]
 # names = [fileName[:-5] for fileName in fileNames]
 # dics = []
 # for fileName in fileNames:
 #     with open(path + "\\" + fileName) as jf:
 #         dics.append(json.load(jf))
+# print(dics)
 # showMinimaHistory(dics, names)

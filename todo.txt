@@ -1,10 +1,12 @@
-For results, give the runs the same starting points
-
 Figure out if higher dimensions are slower
 (steps are slower but more runs are done per step)
 alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit
 
 Implement metaMax-infinity
+
+Allow random starting positions for every algorithm
+
+
 
 Talk to Dr. Fu about applying to contests:
 - Regeneron is deadline nov 10

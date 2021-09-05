@@ -15,7 +15,7 @@ def randomParams(d):
     vec = [None] * d
     for i in range(d):
         vec[i] = random.random()
-    return np.array(vec)
+    return vec
 
 # each element has range in [0, 1]
 # returns list of k vectors, d elements per vector

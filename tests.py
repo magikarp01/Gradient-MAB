@@ -282,14 +282,19 @@ useSPSA = False
 
 
 # """
-resultsFitOCBA = test.test_fitOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-resultsTradOCBA = test.test_tradOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-resultsFitUCB = test.test_fitUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-resultsTradUCB = test.test_tradUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-resultsUniform = test.test_uniformSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
-resultsMetaMax = test.test_metaMaxSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+# resultsFitOCBA = test.test_fitOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# resultsTradOCBA = test.test_tradOCBASearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# resultsFitUCB = test.test_fitUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# resultsTradUCB = test.test_tradUCBSearch(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# resultsUniform = test.test_uniformSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+# resultsMetaMax = test.test_metaMaxSearch(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 resultsMetaMaxInfinite = test.test_metaMaxInfiniteSearch(sharedParams, a=a, useSPSA=True)
+convergeDic = resultsMetaMaxInfinite[2]
 
+convergeKeys = list(convergeDic.keys())
+for i in range(len(convergeKeys)-1):
+    if convergeDic[convergeKeys[i]] < convergeDic[convergeKeys[i+1]]:
+        print(f"{i}th key")
 
 yRange = [-1, 6]
 # colors=['g','r','c','y','m','k','brown','orange','purple','pink']
@@ -297,27 +302,27 @@ colors = [(random.random(), random.random(), random.random()) for i in range(100
 lineWidth = 2.5
 alpha = .1
 
-figFitOCBA = plt.figure(100)
-figFitOCBA.suptitle("Fit OCBA Allocation")
-figTradOCBA = plt.figure(200)
-figTradOCBA.suptitle("Traditional OCBA Allocation")
-figFitUCB = plt.figure(300)
-figFitUCB.suptitle("Fit UCB Allocation")
-figTradUCB = plt.figure(400)
-figTradUCB.suptitle("Traditional UCB Allocation")
-figUniform = plt.figure(500)
-figUniform.suptitle("Uniform Allocation")
-figMetaMax = plt.figure(600)
-figMetaMax.suptitle("MetaMax Allocation")
+# figFitOCBA = plt.figure(100)
+# figFitOCBA.suptitle("Fit OCBA Allocation")
+# figTradOCBA = plt.figure(200)
+# figTradOCBA.suptitle("Traditional OCBA Allocation")
+# figFitUCB = plt.figure(300)
+# figFitUCB.suptitle("Fit UCB Allocation")
+# figTradUCB = plt.figure(400)
+# figTradUCB.suptitle("Traditional UCB Allocation")
+# figUniform = plt.figure(500)
+# figUniform.suptitle("Uniform Allocation")
+# figMetaMax = plt.figure(600)
+# figMetaMax.suptitle("MetaMax Allocation")
 figMetaMaxInfinite = plt.figure(700)
 figMetaMaxInfinite.suptitle("MetaMax Infinite Allocation")
 
-test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
-test.test_display3DResults(resultsTradOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA)
-test.test_display3DResults(resultsFitUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitUCB)
-test.test_display3DResults(resultsTradUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB)
-test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
-test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
+# test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
+# test.test_display3DResults(resultsTradOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA)
+# test.test_display3DResults(resultsFitUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitUCB)
+# test.test_display3DResults(resultsTradUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB)
+# test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
+# test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
 test.test_display3DResults(resultsMetaMaxInfinite, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMaxInfinite)
 
 # test.test_displayNDResults(resultsOCBA,colors,fig=figOCBA)

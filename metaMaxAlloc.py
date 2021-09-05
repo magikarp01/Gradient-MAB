@@ -337,6 +337,8 @@ def metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
                     instances[i].append((newX, f(newX)))
                     elapsedBudget += numEvalsPerGrad + 1
 
+                    prevMin = min(fHats)
+
                     fVal = f(instances[i][-1][0])
                     elapsedBudget += 1
 
@@ -344,11 +346,31 @@ def metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
                         fHats[i] = fVal
                         xHats[i] = instances[i][-1]
 
+
                     convergeDic[elapsedBudget] = min(fHats)
 
                     numSamples[i] += numEvalsPerGrad + 2
 
 
+    convergeKeys = list(convergeDic.keys())
+    convergeKeys.sort()
+    for i in range(len(convergeKeys) - 1):
+        prevKey = convergeKeys[i]
+        prevVal = convergeDic[prevKey]
+        nextKey = convergeKeys[i+1]
+        nextVal = convergeDic[nextKey]
+
+        # go through all of the numbers between the two keys
+        for j in range(prevKey+1, nextKey):
+            # do linear interpolation
+            interp = (nextVal-prevVal) * (j-prevKey)/(nextKey-prevKey) + prevVal
+            convergeDic[j] = interp
+
+    sortedDic = {}
+    sortedKeys = sorted(list(convergeDic.keys()))
+    for key in sortedKeys:
+        sortedDic[key] = convergeDic[key]
+
     maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+    return (xHats[maxIndex], fHats[maxIndex], sortedDic, instances, numSamples, sampleDic)
 
