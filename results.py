@@ -362,7 +362,7 @@ def performMultiprocess(numProcesses, iterPerProcess):
     fun = functions.griewank_adjusted
     k = 100
     d = 10
-    maxBudget = 20000
+    maxBudget = 10000
     batchSize = 50
     numEvalsPerGrad = 2
     minSamples = 10
@@ -388,7 +388,7 @@ def performMultiprocess(numProcesses, iterPerProcess):
     # with open(dir + "startingPos.json", 'w') as jf:
     #     json.dump(processStartPos, jf)
 
-    with open("Results/startingPositions/startingPos10DStratified.json.json") as jf:
+    with open("Results/startingPositions/startingPos10DStratified.json") as jf:
         processStartPos = json.load(jf)
 
 
@@ -396,26 +396,29 @@ def performMultiprocess(numProcesses, iterPerProcess):
                     minimum, discountRate, a, c, useSPSA]
 
     if __name__ == '__main__':
-        dir = "Results\\averageErrors\\"
+        dir = "Results\\efficientStrategiesComp\\d10GriewankStratified\\"
+
+        # print("Fit OCBA")
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
 
-        # print("Trad OCBA")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
+        print("Trad OCBA")
+        multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
 
+        # print("Fit UCB")
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
 
-        # print("Trad UCB")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
+        print("Trad UCB")
+        multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
         #
-        # print("MetaMax")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
+        print("MetaMax")
+        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
         #
 
-        # print("MetaMaxInfinite")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos, dir + "metaMaxInfinite.json")
+        print("MetaMaxInfinite")
+        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos, dir + "metaMaxInfinite.json")
 
-        # print("Uniform")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
+        print("Uniform")
+        multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
 
 
 def showMinimaHistory(dics, names):
