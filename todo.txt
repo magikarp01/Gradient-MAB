@@ -1,15 +1,14 @@
 Finish simulations for all efficientStrategiesComp (except for d10GriewankStratified)
 Note: metaMaxInfinite is always randomly generated starting positions since there are an undeterminate number of starting positions
 
+run results when i wake up
+
 
 Figure out if higher dimensions are slower
 (steps are slower but more runs are done per step)
 alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit
 
-Implement metaMax-infinity
-
-Allow random starting positions for every algorithm
-
+Run efficientStrategies comparisons, averageErrors d10Griewank for tradOCBA and tradUCB, with a smaller minSamples (3 or something)
 
 
 Talk to Dr. Fu about applying to contests:

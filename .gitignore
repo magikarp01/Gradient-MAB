@@ -1,3 +1,7 @@
 /venv/
 /.idea/
 /Results/startingPositions/
+/Results/efficientStrategiesComp/d10GriewankStratified/startingPos.json
+/Results/efficientStrategiesComp/d2GriewankStratified/startingPos.json
+/Results/efficientStrategiesComp/d2GriewankRandom/startingPos.json
+/Results/averageErrors/d10GriewankSPSA/startingPos.json

@@ -358,37 +358,38 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
                 json.dump(aveError, fp)
 
 
-def performMultiprocess(numProcesses, iterPerProcess):
+def performMultiprocess(numProcesses, iterPerProcess, path):
     fun = functions.griewank_adjusted
-    k = 100
-    d = 2
+    k = 5
+    d = 10
     maxBudget = 10000
     batchSize = 50
     numEvalsPerGrad = 2
-    minSamples = 10
+    minSamples = 3
 
     minimum = -1
     discountRate = .8
-    a = .05
-    c = .1
+    a = .002
+    c = .000001
     useSPSA = True
+
 
     # processStartPos = []
     # print("Generating Starting Positions")
     # for i in tqdm(range(numProcesses)):
     #     startPosList = []
     #     for j in range(iterPerProcess):
-    #         randoms = [gradientAllocation.randomParams(d) for i in range(k)]
-    #         startPosList.append(randoms)
+    #         # randoms = [gradientAllocation.randomParams(d) for i in range(k)]
+    #         # startPosList.append(randoms)
     #
-    #         # startPosList.append(gradientAllocation.stratifiedSampling(d, k))
+    #         startPosList.append(gradientAllocation.stratifiedSampling(d, k))
     #     processStartPos.append(startPosList)
     #
-    # dir = "Results\\averageErrors\\"
-    # with open(dir + "startingPos.json", 'w') as jf:
+    # with open(path + "/startingPos.json", 'w') as jf:
     #     json.dump(processStartPos, jf)
 
-    with open("Results/startingPositions/startingPos2DStratified.json") as jf:
+
+    with open(path + "/startingPos.json") as jf:
         processStartPos = json.load(jf)
 
 
@@ -396,16 +397,16 @@ def performMultiprocess(numProcesses, iterPerProcess):
                     minimum, discountRate, a, c, useSPSA]
 
     if __name__ == '__main__':
-        dir = "Results\\efficientStrategiesComp\\d2GriewankStratified\\"
+        dir = path + "/"
 
-        # print("Fit OCBA")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
-
+        # # print("Fit OCBA")
+        # # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
+        #
+        # # print("Fit UCB")
+        # # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
+        #
         print("Trad OCBA")
         multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
-
-        # print("Fit UCB")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
 
         print("Trad UCB")
         multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
@@ -429,7 +430,12 @@ def showMinimaHistory(dics, names):
         name = names[i]
         # aveError = json.load(jf)
         aveError = dics[i]
-        x = list(aveError.keys())
+        try:
+
+            x = list(aveError.keys())
+
+        except:
+            pass
         x = [int(i) for i in x]
         x.sort()
         y = [aveError[str(m)] for m in x]
@@ -445,20 +451,21 @@ def showMinimaHistory(dics, names):
 
 
 
-# performMultiprocess(15, 667)
+path = "Results/averageErrors/d10GriewankSPSA"
+performMultiprocess(15, 667, path)
 
 
-path = "Results\\efficientStrategiesComp\\d10GriewankRandom"
-allFileNames = os.listdir(path)
-# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
-#              "uniform.json", "metaMaxInfinite.json"]
-fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")]
-
-names = [fileName[:-5] for fileName in fileNames]
-dics = []
-for fileName in fileNames:
-    with open(path + "\\" + fileName) as jf:
-        dics.append(json.load(jf))
-print(dics)
-showMinimaHistory(dics, names)
+# allFileNames = os.listdir(path)
+# # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+# #              "uniform.json", "metaMaxInfinite.json"]
+# fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
+#              and fileName != "startingPos.json"]
+#
+# names = [fileName[:-5] for fileName in fileNames]
+# dics = []
+# for fileName in fileNames:
+#     with open(path + "\\" + fileName) as jf:
+#         dics.append(json.load(jf))
+# # print(dics)
+# showMinimaHistory(dics, names)
 
