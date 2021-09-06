@@ -361,7 +361,7 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
 def performMultiprocess(numProcesses, iterPerProcess):
     fun = functions.griewank_adjusted
     k = 100
-    d = 10
+    d = 2
     maxBudget = 10000
     batchSize = 50
     numEvalsPerGrad = 2
@@ -369,7 +369,7 @@ def performMultiprocess(numProcesses, iterPerProcess):
 
     minimum = -1
     discountRate = .8
-    a = .5
+    a = .05
     c = .1
     useSPSA = True
 
@@ -388,7 +388,7 @@ def performMultiprocess(numProcesses, iterPerProcess):
     # with open(dir + "startingPos.json", 'w') as jf:
     #     json.dump(processStartPos, jf)
 
-    with open("Results/startingPositions/startingPos10DStratified.json") as jf:
+    with open("Results/startingPositions/startingPos2DStratified.json") as jf:
         processStartPos = json.load(jf)
 
 
@@ -396,7 +396,7 @@ def performMultiprocess(numProcesses, iterPerProcess):
                     minimum, discountRate, a, c, useSPSA]
 
     if __name__ == '__main__':
-        dir = "Results\\efficientStrategiesComp\\d10GriewankStratified\\"
+        dir = "Results\\efficientStrategiesComp\\d2GriewankStratified\\"
 
         # print("Fit OCBA")
         # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
@@ -445,17 +445,20 @@ def showMinimaHistory(dics, names):
 
 
 
-performMultiprocess(15, 667)
+# performMultiprocess(15, 667)
 
 
-# path = "Results\\averageErrors"
-# #fileNames = os.listdir(path)
+path = "Results\\efficientStrategiesComp\\d10GriewankRandom"
+allFileNames = os.listdir(path)
 # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
 #              "uniform.json", "metaMaxInfinite.json"]
-# names = [fileName[:-5] for fileName in fileNames]
-# dics = []
-# for fileName in fileNames:
-#     with open(path + "\\" + fileName) as jf:
-#         dics.append(json.load(jf))
-# print(dics)
-# showMinimaHistory(dics, names)
+fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")]
+
+names = [fileName[:-5] for fileName in fileNames]
+dics = []
+for fileName in fileNames:
+    with open(path + "\\" + fileName) as jf:
+        dics.append(json.load(jf))
+print(dics)
+showMinimaHistory(dics, names)
+

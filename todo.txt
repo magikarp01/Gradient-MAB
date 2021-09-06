@@ -1,3 +1,7 @@
+Finish simulations for all efficientStrategiesComp (except for d10GriewankStratified)
+Note: metaMaxInfinite is always randomly generated starting positions since there are an undeterminate number of starting positions
+
+
 Figure out if higher dimensions are slower
 (steps are slower but more runs are done per step)
 alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit

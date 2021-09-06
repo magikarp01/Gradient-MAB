@@ -1,0 +1,20 @@
+{ to test against efficient strategies
+fun = functions.griewank_adjusted
+k = 100
+d = 2
+maxBudget = 10000
+batchSize = 50
+numEvalsPerGrad = 2
+minSamples = 10
+
+minimum = -1
+discountRate = .8
+a = .05
+c = .1
+useSPSA = True
+}
+
+with open("Results/startingPositions/startingPos2DStratified.json") as jf:
+    processStartPos = json.load(jf)
+
+performMultiprocess(15, 667)

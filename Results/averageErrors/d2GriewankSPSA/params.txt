@@ -1,0 +1,15 @@
+fun = functions.griewank_adjusted
+k = 5
+d = 2
+maxBudget = 10000
+batchSize = 50
+numEvalsPerGrad = 2
+minSamples = 10
+
+minimum = -1
+discountRate = .8
+a = .002
+c = .000001
+useSPSA = True
+
+performMultiprocess(15, 667)
