@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 import math
 import random
 import gradDescent
-from gradientAllocation import randomParams
-from gradientAllocation import stratifiedSampling
+from gradientAllocation import randomParams, stratifiedSampling
 from scipy.spatial import ConvexHull
 from tqdm import tqdm
 
@@ -370,6 +369,12 @@ def metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
     sortedKeys = sorted(list(convergeDic.keys()))
     for key in sortedKeys:
         sortedDic[key] = convergeDic[key]
+
+    k = len(numSamples)
+    sampleKeys = list(sampleDic.keys())
+    for i in range(len(sampleKeys)):
+        remainderList = [0]*(k-i-1)
+        sampleDic[sampleKeys[i]] += remainderList
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], sortedDic, instances, numSamples, sampleDic)

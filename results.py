@@ -63,6 +63,27 @@ def getAveTradOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSam
 
     return errors, aveError
 
+def getAveTradOCBAInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                       iterations, minimum=0, a=.001, c=.001, useSPSA=False):
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = OCBAAlloc.tradOCBAInfiniteSearch(fun, d, maxBudget, batchSize, numEvalsPerGrad,
+                                          minSamples, a=a, c=c, useSPSA=useSPSA)
+        # ideally, every convergeDic has the same keys
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append( convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    return errors, aveError
+
+
 def getAveFitUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                       iterations, startPosList, minimum=0, discountRate=.8, a=.001, c=.001,useSPSA=False):
     errors = {}
@@ -90,6 +111,26 @@ def getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamp
     for iteration in tqdm(range(iterations)):
         results = UCBAlloc.tradUCBSearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
                                           minSamples, a=a, c=c, startPos = startPosList[iteration], useSPSA=useSPSA)
+        # ideally, every convergeDic has the same keys
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append( convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    return errors, aveError
+
+def getAveTradUCBInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                       iterations, minimum=0, a=.001, c=.001, useSPSA=False):
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = UCBAlloc.tradUCBInfiniteSearch(fun, d, maxBudget, batchSize, numEvalsPerGrad,
+                                          minSamples, a=a, c=c, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -227,6 +268,23 @@ def tempTradOCBA(aveErrorList, iterations, sharedParams, startPosList):
     aveErrorList.append(aveError)
 
 
+def tempTradOCBAInfinite(aveErrorList, iterations, sharedParams, startPosList):
+    fun = sharedParams[0]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    errors, aveError = getAveTradOCBAInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                       iterations, minimum=minimum, a=a, c=c, useSPSA=useSPSA)
+    aveErrorList.append(aveError)
+
+
 def tempFitUCB(aveErrorList, iterations, sharedParams, startPosList):
     fun = sharedParams[0]
     k = sharedParams[1]
@@ -263,6 +321,23 @@ def tempTradUCB(aveErrorList, iterations, sharedParams, startPosList):
     errors, aveError = getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                           iterations, startPosList,
                                          minimum=minimum, a=a, c=c, useSPSA=useSPSA)
+    aveErrorList.append(aveError)
+
+
+def tempTradUCBInfinite(aveErrorList, iterations, sharedParams, startPosList):
+    fun = sharedParams[0]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    errors, aveError = getAveTradUCBInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                       iterations, minimum=minimum, a=a, c=c, useSPSA=useSPSA)
     aveErrorList.append(aveError)
 
 
@@ -358,10 +433,28 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
                 json.dump(aveError, fp)
 
 
+def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
+    processStartPos = []
+    print("Generating Starting Positions")
+    for i in tqdm(range(numProcesses)):
+        startPosList = []
+        for j in range(iterPerProcess):
+            if random:
+                randoms = [gradientAllocation.randomParams(d) for i in range(k)]
+                startPosList.append(randoms)
+
+            else:
+                startPosList.append(gradientAllocation.stratifiedSampling(d, k))
+
+        processStartPos.append(startPosList)
+
+    with open(path + "/startingPos.json", 'w') as jf:
+        json.dump(processStartPos, jf)
+
 def performMultiprocess(numProcesses, iterPerProcess, path):
     fun = functions.griewank_adjusted
-    k = 5
-    d = 10
+    k = 10
+    d = 2
     maxBudget = 10000
     batchSize = 50
     numEvalsPerGrad = 2
@@ -369,24 +462,9 @@ def performMultiprocess(numProcesses, iterPerProcess, path):
 
     minimum = -1
     discountRate = .8
-    a = .002
+    a = .01
     c = .000001
     useSPSA = True
-
-
-    # processStartPos = []
-    # print("Generating Starting Positions")
-    # for i in tqdm(range(numProcesses)):
-    #     startPosList = []
-    #     for j in range(iterPerProcess):
-    #         # randoms = [gradientAllocation.randomParams(d) for i in range(k)]
-    #         # startPosList.append(randoms)
-    #
-    #         startPosList.append(gradientAllocation.stratifiedSampling(d, k))
-    #     processStartPos.append(startPosList)
-    #
-    # with open(path + "/startingPos.json", 'w') as jf:
-    #     json.dump(processStartPos, jf)
 
 
     with open(path + "/startingPos.json") as jf:
@@ -399,18 +477,28 @@ def performMultiprocess(numProcesses, iterPerProcess, path):
     if __name__ == '__main__':
         dir = path + "/"
 
-        # # print("Fit OCBA")
-        # # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
+        # print("Fit OCBA")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
         #
-        # # print("Fit UCB")
-        # # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
-        #
+        # print("Fit UCB")
+        # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
+
+
         print("Trad OCBA")
         multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
 
         print("Trad UCB")
         multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
         #
+
+        print("Trad OCBA Infinite")
+        multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBAInfinite, sharedParams, processStartPos,
+                           dir + "tradOCBAInfinite.json")
+
+        print("Trad UCB Infinite")
+        multiprocessSearch(numProcesses, iterPerProcess, tempTradUCBInfinite, sharedParams, processStartPos,
+                           dir + "tradUCBInfinite.json")
+
         print("MetaMax")
         multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
         #
@@ -451,21 +539,23 @@ def showMinimaHistory(dics, names):
 
 
 
-path = "Results/averageErrors/d10GriewankSPSA"
-performMultiprocess(15, 667, path)
+path = "Results/efficientStrategiesComp/d10GriewankStratified"
+
+# generateStartingPos(15, 334, 2, 10, path, random=True)
+# performMultiprocess(15, 334, path)
 
 
-# allFileNames = os.listdir(path)
-# # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
-# #              "uniform.json", "metaMaxInfinite.json"]
-# fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
-#              and fileName != "startingPos.json"]
-#
-# names = [fileName[:-5] for fileName in fileNames]
-# dics = []
-# for fileName in fileNames:
-#     with open(path + "\\" + fileName) as jf:
-#         dics.append(json.load(jf))
-# # print(dics)
-# showMinimaHistory(dics, names)
+allFileNames = os.listdir(path)
+# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+#              "uniform.json", "metaMaxInfinite.json"]
+fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
+             and fileName != "startingPos.json"]
+
+names = [fileName[:-5] for fileName in fileNames]
+dics = []
+for fileName in fileNames:
+    with open(path + "\\" + fileName) as jf:
+        dics.append(json.load(jf))
+# print(dics)
+showMinimaHistory(dics, names)
 

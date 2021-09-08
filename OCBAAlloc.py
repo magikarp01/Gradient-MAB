@@ -6,7 +6,7 @@ import gradDescent
 import kriging
 import pyDOE
 import functions
-from gradientAllocation import stratifiedSampling
+from gradientAllocation import randomParams, stratifiedSampling
 from tqdm import tqdm
 
 
@@ -411,3 +411,143 @@ def tradOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
+
+def tradOCBAInfiniteSearch(f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+            a=.001, c=.001, useSPSA=False, useTqdm=False):
+    instances = []
+    xHats = []
+    fHats = []
+    variances = []
+    numSamples = []
+
+    if useSPSA:
+        gradientDescentObject = gradDescent.SPSA()
+    else:
+        gradientDescentObject = gradDescent.finiteDifs()
+
+    elapsedBudget = 0
+
+    # change True to while budget < maxBudget
+    convergeDic = {}
+    sampleDic = {}
+
+    round = 0
+    if useTqdm:
+        tqdmTotal = maxBudget-elapsedBudget
+        with tqdm(total=tqdmTotal) as pbar:
+            while elapsedBudget < maxBudget:
+                oldElapsedBudget = elapsedBudget
+                # print(elapsedBudget)
+
+                # make a new instance
+                newX = randomParams(d)
+                xHats.append(newX)
+                fHats.append(f(newX))
+
+                instances.append(gradientDescentObject.gradDescent(f, newX, minSamples, a, c)[2])
+                elapsedBudget += 1 + minSamples*numEvalsPerGrad
+                numSamples.append(1 + minSamples*numEvalsPerGrad)
+
+                variances.append(None)
+                round += 1
+
+
+                for i in range(round):
+                    variances[i] = calcVariance([pt[1] for pt in instances[i]])
+
+                kroneckers = getKroneckers(fHats)
+                budgetAlloc = getBudget(variances, kroneckers, numSamples)
+                # sample allocation is the actual allocations to give to each
+                sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+                sampleDic[elapsedBudget] = numSamples.copy()
+
+                # perform sampleAlloc[i] steps for every instance
+                # could add in multi-threading here
+                for i in range(round):
+                    samples = sampleAlloc[i]
+                    for j in range(samples):
+                        # step from the previous point of the ith instance once
+
+                        partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
+                        partials = np.negative(partials)
+                        newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
+                        instances[i].append((newX, f(newX)))
+                        elapsedBudget += numEvalsPerGrad + 1
+
+                        fVal = f(instances[i][-1][0])
+                        elapsedBudget += 1
+
+                        if fVal < fHats[i]:
+                            fHats[i] = fVal
+                            xHats[i] = instances[i][-1]
+
+                        convergeDic[elapsedBudget] = min(fHats)
+
+                        numSamples[i] += numEvalsPerGrad + 2
+                # convergeDic[elapsedBudget] = min(fHats)
+
+                pbar.update(elapsedBudget - oldElapsedBudget)
+
+    else:
+        while elapsedBudget < maxBudget:
+            # print(elapsedBudget)
+
+            # make a new instance
+            newX = randomParams(d)
+            xHats.append(newX)
+            fHats.append(f(newX))
+
+            instances.append(gradientDescentObject.gradDescent(f, newX, minSamples, a, c)[2])
+            elapsedBudget += 1 + minSamples*numEvalsPerGrad
+            numSamples.append(1 + minSamples*numEvalsPerGrad)
+
+            variances.append(None)
+            round += 1
+
+
+            for i in range(round):
+                variances[i] = calcVariance([pt[1] for pt in instances[i]])
+
+            kroneckers = getKroneckers(fHats)
+            budgetAlloc = getBudget(variances, kroneckers, numSamples)
+            # sample allocation is the actual allocations to give to each
+            sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+            sampleDic[elapsedBudget] = numSamples.copy()
+
+            # perform sampleAlloc[i] steps for every instance
+            # could add in multi-threading here
+            for i in range(round):
+                samples = sampleAlloc[i]
+                for j in range(samples):
+                    # step from the previous point of the ith instance once
+
+                    partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
+                    partials = np.negative(partials)
+                    newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
+                    instances[i].append((newX, f(newX)))
+                    elapsedBudget += numEvalsPerGrad + 1
+
+                    fVal = f(instances[i][-1][0])
+                    elapsedBudget += 1
+
+                    if fVal < fHats[i]:
+                        fHats[i] = fVal
+                        xHats[i] = instances[i][-1]
+
+                    convergeDic[elapsedBudget] = min(fHats)
+
+                    numSamples[i] += numEvalsPerGrad + 2
+            # convergeDic[elapsedBudget] = min(fHats)
+
+
+    # fix sampleDic to have each list be the same length, unused are 0s
+    k = len(numSamples)
+    sampleKeys = list(sampleDic.keys())
+    for i in range(len(sampleKeys)):
+        remainderList = [0]*(k-i-1)
+        sampleDic[sampleKeys[i]] += remainderList
+
+    maxIndex = np.argmax(fHats)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
