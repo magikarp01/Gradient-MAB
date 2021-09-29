@@ -1,7 +1,12 @@
+Restructure programs: have all allocation methods in one file, have the multistart strategies in their own files
+
+
 Finish simulations for all efficientStrategiesComp (except for d10GriewankStratified)
 Note: metaMaxInfinite is always randomly generated starting positions since there are an undeterminate number of starting positions
 
 Change traditional UCB and OCBA to consider reward as the amount gained
+
+maybe do Thompson Sampling
 
 Read research on restless/nonstationary bandits
 
