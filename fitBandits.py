@@ -16,7 +16,8 @@ from tqdm import tqdm
 # using finite differences for partials, not SPSA
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
-def fitOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+# allocMethod is one of the getBudget methods from baiAllocations
+def fitSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, allocMethod,
                   discountRate=.8, a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
     instances = [None]*k
     xHats = [None] * k
@@ -73,10 +74,7 @@ def fitOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
 
                     estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
 
-                kroneckers = getKroneckers(estMins)
-                budgetAlloc = getBudget(variances, kroneckers, numSamples)
-                # sample allocation is the actual allocations to give to each
-                sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+                sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize)
                 sampleDic[elapsedBudget] = numSamples.copy()
 
                 # perform sampleAlloc[i] steps for every instance
@@ -122,10 +120,7 @@ def fitOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
 
                 estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
 
-            kroneckers = getKroneckers(estMins)
-            budgetAlloc = getBudget(variances, kroneckers, numSamples)
-            # sample allocation is the actual allocations to give to each
-            sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+            sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize)
             sampleDic[elapsedBudget] = numSamples.copy()
 
             # perform sampleAlloc[i] steps for every instance

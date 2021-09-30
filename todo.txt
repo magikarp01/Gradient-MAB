@@ -1,5 +1,6 @@
 Restructure programs: have all allocation methods in one file, have the multistart strategies in their own files
 
+for restlessBandits, make bai allocation methods following the papers
 
 Finish simulations for all efficientStrategiesComp (except for d10GriewankStratified)
 Note: metaMaxInfinite is always randomly generated starting positions since there are an undeterminate number of starting positions
