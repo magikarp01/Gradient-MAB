@@ -18,6 +18,47 @@ import tradBandits
 import baiAllocations
 
 # class TestClass(unittest.TestCase):
+class visualize:
+
+    def display1DResults(results, fun, colors, fColor='b', lineWidth=3):
+        instances = results[3]
+        sampleDic = results[5]
+        convergeDic = results[2]
+        fig, (ax1, ax2, ax3) = plt.subplots(3)
+        plt.subplots_adjust(hspace=.5)
+        gradientAllocation.displayInstances1D(fun, instances, ax1, colors, fColor=fColor, lineWidth=lineWidth)
+        gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
+        gradientAllocation.displayMinimaHistory(convergeDic, ax3)
+
+    def display3DResults(results, fun, colors, fColor='b', lineWidth=3, alpha=.1, showFunction=True,
+                              fig=plt.figure()):
+        instances = results[3]
+        sampleDic = results[5]
+        convergeDic = results[2]
+        ax1 = fig.add_subplot(121, projection='3d')
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(224)
+        # fig, (ax1, ax2, ax3) = plt.subplots(3)
+        plt.subplots_adjust(hspace=.5)
+        gradientAllocation.displayInstances3D(fun, [0, 1], instances, ax1, colors, fColor=fColor, lineWidth=lineWidth,
+                                              alpha=alpha, showFunction=showFunction)
+        gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
+        gradientAllocation.displayMinimaHistory(convergeDic, ax3)
+
+    def test_displayNDResults(results, colors, fig=plt.figure()):
+        instances = results[3]
+        sampleDic = results[5]
+        convergeDic = results[2]
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(224)
+        # fig, (ax1, ax2, ax3) = plt.subplots(3)
+        plt.subplots_adjust(hspace=.5)
+        gradientAllocation.displayInstancesND(instances, ax1, colors)
+        gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
+        gradientAllocation.displayMinimaHistory(convergeDic, ax3)
+
+
 class fitTests:
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
@@ -156,7 +197,7 @@ class tradTests:
                                           a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
-    def tradInfiniteOCBA(self, sharedParams, minSamples,
+    def tradInfiniteOCBA(sharedParams, minSamples,
                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         d = sharedParams[2]
@@ -179,7 +220,7 @@ class tradTests:
                                           a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
-    def tradInfiniteUCB(self, sharedParams, minSamples,
+    def tradInfiniteUCB(sharedParams, minSamples,
                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         d = sharedParams[2]
@@ -193,7 +234,7 @@ class tradTests:
 
 class otherTests:
 
-    def uniform(self, sharedParams,
+    def uniform(sharedParams,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
@@ -217,7 +258,7 @@ class otherTests:
         return results
 
 
-    def metaMax(self, sharedParams,
+    def metaMax(sharedParams,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
@@ -240,7 +281,7 @@ class otherTests:
         print(results[4])
         return results
 
-    def metaMaxInfinite(self, sharedParams,
+    def metaMaxInfinite(sharedParams,
                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         d = sharedParams[2]
@@ -264,7 +305,7 @@ class otherTests:
 
 # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
 # colors is k-array with colors of function
-    def test_display1DResults(self, results, fun, colors, fColor ='b', lineWidth=3):
+    def test_display1DResults(results, fun, colors, fColor ='b', lineWidth=3):
         instances = results[3]
         sampleDic = results[5]
         convergeDic = results[2]
@@ -274,7 +315,7 @@ class otherTests:
         gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
-    def test_display3DResults(self, results, fun, colors, fColor = 'b', lineWidth=3, alpha=.1, showFunction=True, fig=plt.figure()):
+    def test_display3DResults(results, fun, colors, fColor = 'b', lineWidth=3, alpha=.1, showFunction=True, fig=plt.figure()):
         instances = results[3]
         sampleDic = results[5]
         convergeDic = results[2]
@@ -288,7 +329,7 @@ class otherTests:
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
 
-    def test_displayNDResults(self, results, colors, fig=plt.figure()):
+    def displayNDResults(results, colors, fig=plt.figure()):
         instances = results[3]
         sampleDic = results[5]
         convergeDic = results[2]
@@ -328,66 +369,95 @@ figList = []
 resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figFitOCBA = plt.figure(1)
 figFitOCBA.suptitle("Fit OCBA Allocation")
+resultList.append(resultsFitOCBA)
+figList.append(figFitOCBA)
 
-
-resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figFitInfiniteOCBA = plt.figure(2)
-figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
+# resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
+# figFitInfiniteOCBA = plt.figure(2)
+# figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
+# resultList.append(resultsFitInfiniteOCBA)
+# figList.append(figFitInfiniteOCBA)
 
 resultsFitUCB = fitTests.fitUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figFitUCB = plt.figure(3)
 figFitUCB.suptitle("Fit UCB Allocation")
+resultList.append(resultsFitUCB)
+figList.append(figFitUCB)
 
-resultsFitInfiniteUCB = fitTests.fitInfiniteUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figFitInfiniteUCB = plt.figure(4)
-figFitInfiniteUCB.suptitle("Fit Infinite UCB Allocation")
+# resultsFitInfiniteUCB = fitTests.fitInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
+# figFitInfiniteUCB = plt.figure(4)
+# figFitInfiniteUCB.suptitle("Fit Infinite UCB Allocation")
+# resultList.append(resultsFitInfiniteUCB)
+# figList.append(figFitInfiniteUCB)
 
 
 resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figRestlessOCBA = plt.figure(5)
 figRestlessOCBA.suptitle("Restless OCBA Allocation")
+resultList.append(resultsRestlessOCBA)
+figList.append(figRestlessOCBA)
 
-resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
 figRestlessInfiniteOCBA = plt.figure(6)
 figRestlessInfiniteOCBA.suptitle("Restless Infinite OCBA Allocation")
+resultList.append(resultsRestlessInfiniteOCBA)
+figList.append(figRestlessInfiniteOCBA)
 
 resultsRestlessUCB = restlessTests.restlessUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figRestlessUCB = plt.figure(7)
 figRestlessUCB.suptitle("Restless UCB Allocation")
+resultList.append(resultsRestlessUCB)
+figList.append(figRestlessUCB)
 
-resultsRestlessInfiniteUCB = restlessTests.restlessInfiniteUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsRestlessInfiniteUCB = restlessTests.restlessInfiniteUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
 figRestlessInfiniteUCB = plt.figure(8)
 figRestlessInfiniteUCB.suptitle("Restless Infinite UCB Allocation")
+resultList.append(resultsRestlessInfiniteUCB)
+figList.append(figRestlessInfiniteUCB)
 
 
 resultsTradOCBA = tradTests.tradOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figTradOCBA = plt.figure(9)
 figTradOCBA.suptitle("Trad OCBA Allocation")
+resultList.append(resultsTradOCBA)
+figList.append(figTradOCBA)
 
-resultsTradInfiniteOCBA = tradTests.tradInfiniteOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsTradInfiniteOCBA = tradTests.tradInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 figTradInfiniteOCBA = plt.figure(10)
 figTradInfiniteOCBA.suptitle("Trad Infinite OCBA Allocation")
+resultList.append(resultsTradInfiniteOCBA)
+figList.append(figTradInfiniteOCBA)
 
 resultsTradUCB = tradTests.tradUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figTradUCB = plt.figure(11)
 figTradUCB.suptitle("Trad UCB Allocation")
+resultList.append(resultsTradUCB)
+figList.append(figTradUCB)
 
-resultsTradInfiniteUCB = tradTests.tradInfiniteUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+resultsTradInfiniteUCB = tradTests.tradInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 figTradInfiniteUCB = plt.figure(12)
 figTradInfiniteUCB.suptitle("Trad Infinite UCB Allocation")
+resultList.append(resultsTradInfiniteUCB)
+figList.append(figTradInfiniteUCB)
 
 
 resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 figUniform = plt.figure(13)
 figUniform.suptitle("Uniform Allocation")
+resultList.append(resultsUniform)
+figList.append(figUniform)
 
 resultsMetaMax = otherTests.metaMax(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 figMetaMax = plt.figure(14)
 figMetaMax.suptitle("MetaMax Allocation")
+resultList.append(resultsMetaMax)
+figList.append(figMetaMax)
 
 resultsMetaMaxInfinite = otherTests.metaMaxInfinite(sharedParams, a=a, useSPSA=True)
 figMetaMaxInfinite = plt.figure(15)
 figMetaMaxInfinite.suptitle("MetaMax Infinite Allocation")
+resultList.append(resultsMetaMaxInfinite)
+figList.append(figMetaMaxInfinite)
 
 # convergeDic = resultsMetaMaxInfinite[2]
 
@@ -397,21 +467,25 @@ figMetaMaxInfinite.suptitle("MetaMax Infinite Allocation")
 #         print(f"{i}th key")
 
 yRange = [-1, 6]
-colors=['g','r','c','y','m','k','brown','orange','purple','pink']
-# colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
+# colors=['g','r','c','y','m','k','brown','orange','purple','pink']
+colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
 lineWidth = 2.5
 alpha = .1
 
 
+# testing = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+for i in range(len(resultList)):
+    visualize.display3DResults(resultList[i], fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figList[i])
+
 # test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
 # test.test_display3DResults(resultsRestlessOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figRestlessOCBA)
-test.test_display3DResults(resultsTradOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA)
-test.test_display3DResults(resultsTradOCBA1, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA1)
+# test.test_display3DResults(resultsTradOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA)
+# test.test_display3DResults(resultsTradOCBA1, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBA1)
 
 # test.test_display3DResults(resultsTradOCBAInfinite, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradOCBAInfinite)
 # test.test_display3DResults(resultsFitUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitUCB)
-test.test_display3DResults(resultsTradUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB)
-test.test_display3DResults(resultsTradUCB1, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB1)
+# test.test_display3DResults(resultsTradUCB, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB)
+# test.test_display3DResults(resultsTradUCB1, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCB1)
 
 # test.test_display3DResults(resultsTradUCBInfinite, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCBInfinite)
 

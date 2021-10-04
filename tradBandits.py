@@ -144,6 +144,7 @@ def tradInfiniteSearch(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad,
         elapsedBudget += 1 + minSamples*numEvalsPerGrad
         numSamples.append(1 + minSamples*numEvalsPerGrad)
 
+        variances.append(None)
         round += 1
 
         for i in range(round):

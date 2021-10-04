@@ -114,7 +114,6 @@ def restlessInfiniteSearch(allocMethod, discountFactor, windowLength, f, d, maxB
     instances = []
     xHats = []
     fHats = []
-    variances = []
     numSamples = []
 
     if useSPSA:
@@ -145,7 +144,6 @@ def restlessInfiniteSearch(allocMethod, discountFactor, windowLength, f, d, maxB
         elapsedBudget += 1 + minSamples*numEvalsPerGrad
         numSamples.append(1 + minSamples*numEvalsPerGrad)
 
-        variances.append(None)
         round += 1
 
         valueHistory = []
