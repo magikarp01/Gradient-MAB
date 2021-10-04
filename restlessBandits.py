@@ -109,7 +109,7 @@ def restlessSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
 
 
-def restlessInfinitySearch(allocMethod, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+def restlessInfiniteSearch(allocMethod, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
             a=.001, c=.001, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
     instances = []
     xHats = []

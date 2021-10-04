@@ -18,45 +18,10 @@ import tradBandits
 import baiAllocations
 
 # class TestClass(unittest.TestCase):
-class TestClass:
-
-    def test_gradDescent(self):
-        fObject = gradDescent.finiteDifs()
-        f = functions.min3Parabola
-        startPos = OCBAAlloc.randomParams(1)
-        minima, min, samples = fObject.gradDescent(f, startPos, 1000, a=.01)
-        print(f"Starting position is {startPos}")
-        print(f"Location of minima is {minima}")
-        print(f"Minimum is {min}")
-        print(f"Samples are: ", end="")
-        print(samples)
-
-    def test_quadFit(self):
-        points = [(1,), (2,), (3,), (4,)]
-        pointValues = [-1, -4, -9, -16]
-        result, variance = kriging.quadEstMin(points, pointValues)
-        print(result)
-        print(variance)
-
-    def test_stratifiedSampling(self):
-        print(OCBAAlloc.stratifiedSampling(3, 27))
-
-    def test_kroneckers(self):
-        values = [1, 2, 3, 5, 209]
-        kroneckers = OCBAAlloc.getKroneckers(values)
-        print(kroneckers)
-
-    def test_budget(self):
-        values = [1, 2, 3, 5, 209]
-        kroneckers = OCBAAlloc.getKroneckers(values)
-        variances = [3, 4, 1, 2, 4]
-        numSamples = [10, 6, 5, 3, 8]
-        budget = OCBAAlloc.getBudget(values, variances, kroneckers, numSamples)
-        print(budget)
-
+class fitTests:
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
-    def test_fitOCBASearch(self, sharedParams, minSamples,
+    def fitOCBA(sharedParams, minSamples,
                            discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
@@ -68,21 +33,63 @@ class TestClass:
         results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
                                           a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
-        print("Convergence Dictionary: ", end="")
-        print(results[2])
-        print()
-
-        instances = results[3]
-        for i in range(k):
-            print(f"Instance #{i}: ", end="")
-            print(instances[i])
-            print()
-        print("Sample Allocation: ", end="")
-        print(results[4])
+        # print("Convergence Dictionary: ", end="")
+        # print(results[2])
+        # print()
+        #
+        # instances = results[3]
+        # for i in range(k):
+        #     print(f"Instance #{i}: ", end="")
+        #     print(instances[i])
+        #     print()
+        # print("Sample Allocation: ", end="")
+        # print(results[4])
         return results
 
+    def fitInfiniteOCBA(sharedParams, minSamples,
+                           discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                          a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def fitUCB(sharedParams, minSamples,
+                     discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                       minSamples, discountRate=discountRate,
+                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def fitInfiniteOCBA(sharedParams, minSamples,
+                           discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                          a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+class restlessTests:
+
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
-    def test_restlessOCBASearch(self, sharedParams, discountFactor, windowLength, minSamples,
+    def restlessOCBA(sharedParams, discountFactor, windowLength, minSamples,
                                 a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
@@ -108,14 +115,14 @@ class TestClass:
         print(results[4])
         return results
 
-    def test_restlessInfiniteOCBASearch(self, sharedParams, discountFactor, windowLength, minSamples,
+    def restlessInfiniteOCBA(sharedParams, discountFactor, windowLength, minSamples,
                                     a=.001, c=.001, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         d = sharedParams[2]
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = restlessBandits.restlessInfinitySearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+        results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
                                                          f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                                    a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         print("Convergence Dictionary: ", end="")
@@ -131,7 +138,59 @@ class TestClass:
         print(results[4])
         return results
 
-    def test_tradOCBASearch(self, sharedParams, minSamples,
+    def restlessUCB(sharedParams, discountFactor, windowLength, minSamples,
+                                a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                 f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(k):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
+    def restlessInfiniteUCB(sharedParams, discountFactor, windowLength, minSamples,
+                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                         f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                   a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(len(instances)):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
+
+class tradTests:
+
+    def tradOCBA(sharedParams, minSamples,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
@@ -155,7 +214,29 @@ class TestClass:
         print(results[4])
         return results
 
-    def test_tradOCBASearch1(self, sharedParams, minSamples,
+    def tradInfiniteOCBA(self, sharedParams, minSamples,
+                                   a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = OCBAAlloc.tradOCBAInfiniteSearch(f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                     a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(len(instances)):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
+    def tradUCB(sharedParams, minSamples,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
@@ -163,7 +244,7 @@ class TestClass:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = OCBAAlloc.tradOCBASearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+        results = tradBandits.tradSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                           a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         print("Convergence Dictionary: ", end="")
@@ -179,8 +260,7 @@ class TestClass:
         print(results[4])
         return results
 
-
-    def test_tradOCBAInfiniteSearch(self, sharedParams, minSamples,
+    def tradInfiniteUCB(self, sharedParams, minSamples,
                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         d = sharedParams[2]
@@ -203,111 +283,9 @@ class TestClass:
         return results
 
 
+class otherTests:
 
-    def test_fitUCBSearch(self, sharedParams, minSamples,
-                        discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
-        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
-        f = sharedParams[0]
-        k = sharedParams[1]
-        d = sharedParams[2]
-        maxBudget = sharedParams[3]
-        batchSize = sharedParams[4]
-        numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate,
-                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
-        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
-        print("Convergence Dictionary: ", end="")
-        print(results[2])
-        print()
-
-        instances = results[3]
-        for i in range(k):
-            print(f"Instance #{i}: ", end="")
-            print(instances[i])
-            print()
-        print("Sample Allocation: ", end="")
-        print(results[4])
-        return results
-
-
-    def test_tradUCBSearch(self, sharedParams, minSamples,
-                        a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
-        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
-        f = sharedParams[0]
-        k = sharedParams[1]
-        d = sharedParams[2]
-        maxBudget = sharedParams[3]
-        batchSize = sharedParams[4]
-        numEvalsPerGrad = sharedParams[5]
-        results = tradBandits.tradSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
-        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
-        print("Convergence Dictionary: ", end="")
-        print(results[2])
-        print()
-
-        instances = results[3]
-        for i in range(k):
-            print(f"Instance #{i}: ", end="")
-            print(instances[i])
-            print()
-        print("Sample Allocation: ", end="")
-        print(results[4])
-        return results
-
-
-    def test_tradUCBSearch1(self, sharedParams, minSamples,
-                        a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
-        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
-        f = sharedParams[0]
-        k = sharedParams[1]
-        d = sharedParams[2]
-        maxBudget = sharedParams[3]
-        batchSize = sharedParams[4]
-        numEvalsPerGrad = sharedParams[5]
-        results = UCBAlloc.tradUCBSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                        a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
-        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
-        print("Convergence Dictionary: ", end="")
-        print(results[2])
-        print()
-
-        instances = results[3]
-        for i in range(k):
-            print(f"Instance #{i}: ", end="")
-            print(instances[i])
-            print()
-        print("Sample Allocation: ", end="")
-        print(results[4])
-        return results
-
-
-    def test_tradUCBInfiniteSearch(self, sharedParams, minSamples,
-                                   a=.001, c=.001, useTqdm=True, useSPSA=False):
-        f = sharedParams[0]
-        d = sharedParams[2]
-        maxBudget = sharedParams[3]
-        batchSize = sharedParams[4]
-        numEvalsPerGrad = sharedParams[5]
-        results = UCBAlloc.tradUCBInfiniteSearch(f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                     a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
-        print("Convergence Dictionary: ", end="")
-        print(results[2])
-        print()
-
-        instances = results[3]
-        for i in range(len(instances)):
-            print(f"Instance #{i}: ", end="")
-            print(instances[i])
-            print()
-        print("Sample Allocation: ", end="")
-        print(results[4])
-        return results
-
-
-
-    def test_uniformSearch(self, sharedParams,
+    def uniform(self, sharedParams,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
@@ -331,7 +309,7 @@ class TestClass:
         return results
 
 
-    def test_metaMaxSearch(self, sharedParams,
+    def metaMax(self, sharedParams,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
@@ -354,7 +332,7 @@ class TestClass:
         print(results[4])
         return results
 
-    def test_metaMaxInfiniteSearch(self, sharedParams,
+    def metaMaxInfinite(self, sharedParams,
                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         d = sharedParams[2]
