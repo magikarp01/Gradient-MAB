@@ -111,14 +111,14 @@ class OCBA:
 
         return intParts
 
-    def getBudget(values, variances, numSamples, batchSize):
+    def getBudget(values, variances, numSamples, batchSize, c):
         return OCBA.allocateSamples( OCBA.budgetCalc(values,variances,numSamples), batchSize)
 
 
 class UCB:
     # problem: c is too small without quadEstMin, all samples go to one thing
     # c should include the upper bound on the value
-    def budgetCalc(values, variances, numSamples, c=math.sqrt(2)):
+    def budgetCalc(values, numSamples, c=math.sqrt(2)):
         # reverse since lower is better
         values = [-i for i in values]
 
@@ -146,8 +146,8 @@ class UCB:
     def allocateSamples(budgetAlloc, batchSize):
         return [i * batchSize for i in budgetAlloc]
 
-    def getBudget(values, variances, numSamples, batchSize):
-        return UCB.allocateSamples(UCB.budgetCalc(values, variances, numSamples), batchSize)
+    def getBudget(values, variances, numSamples, batchSize, c):
+        return UCB.allocateSamples(UCB.budgetCalc(values, numSamples, c), batchSize)
 
 
 # has functionality for both discount and sliding window
@@ -199,7 +199,7 @@ class discountedUCB:
         return [i * batchSize for i in budgetAlloc]
 
     # just a wrapper function to fit in
-    def getBudget(valueHistory, batchSize, c=math.sqrt(2), discountFactor = .9, windowLength = -1):
+    def getBudget(valueHistory, batchSize, c, numSamples, discountFactor, windowLength):
         return discountedUCB.allocateSamples(discountedUCB.discountUCBs(valueHistory, c=c, discountFactor = discountFactor, windowLength = windowLength), batchSize)
 
 
@@ -335,7 +335,7 @@ class discountedOCBA:
 
         return intParts
 
-    def getBudget(valueHistory, batchSize, numSamples, discountFactor = .9, windowLength = -1):
+    def getBudget(valueHistory, batchSize, c, numSamples, discountFactor, windowLength):
         return discountedOCBA.allocateSamples(
             discountedOCBA.budgetCalc(valueHistory, discountFactor, windowLength, numSamples), batchSize)
 

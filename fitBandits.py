@@ -16,9 +16,9 @@ from tqdm import tqdm
 # using finite differences for partials, not SPSA
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
-# allocMethod is one of the getBudget methods from baiAllocations
-def fitSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, allocMethod,
-                  discountRate=.8, a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
+# allocMethod is one of the getBudget methods from baiAllocations, works with OCBA and UCB
+def fitSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                  discountRate=.8, a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad=math.sqrt(2)):
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
@@ -74,7 +74,7 @@ def fitSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, allocM
 
                     estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
 
-                sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize)
+                sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize, UCBPad)
                 sampleDic[elapsedBudget] = numSamples.copy()
 
                 # perform sampleAlloc[i] steps for every instance
@@ -120,7 +120,7 @@ def fitSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, allocM
 
                 estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
 
-            sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize)
+            sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize, UCBPad)
             sampleDic[elapsedBudget] = numSamples.copy()
 
             # perform sampleAlloc[i] steps for every instance
@@ -151,3 +151,4 @@ def fitSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, allocM
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
