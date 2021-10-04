@@ -20,6 +20,13 @@ class OCBA:
 
         return kroneckers
 
+    def calcVariance(values):
+        numer = 0
+        avg = sum(values) / len(values)
+        for fVal in values:
+            numer += (fVal - avg) ** 2
+        return numer / (len(values) + 1)
+
     def budgetCalc(values, variances, numSamples):
         kroneckers = OCBA.getKroneckers(values)
         numInstances = len(variances)

@@ -17,12 +17,11 @@ from tqdm import tqdm
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
-def tradSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, allocMethod,
-                  discountRate=.8, a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
-    instances = [None]*k
+def tradSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
+    instances = [None] * k
     xHats = [None] * k
     fHats = [None] * k
-    estMins = [None] * k
     variances = [None] * k
     numSamples = [0] * k
 
@@ -56,12 +55,11 @@ def tradSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, alloc
     sampleDic = {}
 
     if useTqdm:
-        tqdmTotal = maxBudget-elapsedBudget
+        tqdmTotal = maxBudget - elapsedBudget
         with tqdm(total=tqdmTotal) as pbar:
             while elapsedBudget < maxBudget:
                 oldElapsedBudget = elapsedBudget
                 # print(elapsedBudget)
-
 
                 for i in range(k):
                     points = []
@@ -71,10 +69,11 @@ def tradSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, alloc
                         points.append(point[0])
                         pointValues.append(point[1])
 
+                    variances[i] = baiAllocations.OCBA.calcVariance([pt[1] for pt in instances[i]])
 
-                    estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
 
-                sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize)
+                # sample allocation is the actual allocations to give to each
+                sampleAlloc = allocMethod(fHats, variances, numSamples, batchSize, UCBPad)
                 sampleDic[elapsedBudget] = numSamples.copy()
 
                 # perform sampleAlloc[i] steps for every instance
@@ -106,8 +105,6 @@ def tradSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, alloc
 
     else:
         while elapsedBudget < maxBudget:
-            # print(elapsedBudget)
-
 
             for i in range(k):
                 points = []
@@ -117,10 +114,10 @@ def tradSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, alloc
                     points.append(point[0])
                     pointValues.append(point[1])
 
+                variances[i] = baiAllocations.OCBA.calcVariance([pt[1] for pt in instances[i]])
 
-                estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
-
-            sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize)
+            # sample allocation is the actual allocations to give to each
+            sampleAlloc = allocMethod(fHats, variances, numSamples, batchSize, UCBPad)
             sampleDic[elapsedBudget] = numSamples.copy()
 
             # perform sampleAlloc[i] steps for every instance
@@ -146,8 +143,6 @@ def tradSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, alloc
                     convergeDic[elapsedBudget] = min(fHats)
 
                     numSamples[i] += numEvalsPerGrad + 2
-            # convergeDic[elapsedBudget] = min(fHats)
-
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
