@@ -18,7 +18,6 @@ def restlessSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
-    variances = [None] * k
     numSamples = [0] * k
 
     if useSPSA:
@@ -52,106 +51,161 @@ def restlessSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget
 
     if useTqdm:
         tqdmTotal = maxBudget-elapsedBudget
-        with tqdm(total=tqdmTotal) as pbar:
-            while elapsedBudget < maxBudget:
-                oldElapsedBudget = elapsedBudget
-                # print(elapsedBudget)
+        pbar = tqdm(total=tqdmTotal)
+    while elapsedBudget < maxBudget:
+        oldElapsedBudget = elapsedBudget
+        # print(elapsedBudget)
 
-                valueHistory = []
+        valueHistory = []
 
-                for i in range(k):
-                    improvements = []
-                    for t in range(len(instances[i])-1):
-                        improvement = instances[i][t+1][1] - instances[i][t][1]
-                        # improvement depends on step size: divide by step size
-                        # improvement should be negative, since in baiAllocations negative values = better
-                        improvement /= gradientDescentObject.get_ct(c, t)
+        for i in range(k):
+            improvements = []
+            for t in range(len(instances[i])-1):
+                improvement = instances[i][t+1][1] - instances[i][t][1]
+                # improvement depends on step size: divide by step size
+                # improvement should be negative, since in baiAllocations negative values = better
+                improvement /= gradientDescentObject.get_ct(c, t)
 
-                        if improvement > 0:
-                            improvement = 0
-                        improvements.append(improvement)
+                if improvement > 0:
+                    improvement = 0
+                improvements.append(improvement)
 
-                    valueHistory.append(improvements)
+            valueHistory.append(improvements)
 
-                # sample allocation is the actual allocations to give to each
-                sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
-                sampleDic[elapsedBudget] = numSamples.copy()
+        # sample allocation is the actual allocations to give to each
+        sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
+        sampleDic[elapsedBudget] = numSamples.copy()
 
-                # perform sampleAlloc[i] steps for every instance
-                # could add in multi-threading here
-                for i in range(k):
-                    samples = sampleAlloc[i]
-                    for j in range(samples):
-                        # step from the previous point of the ith instance once
+        # perform sampleAlloc[i] steps for every instance
+        # could add in multi-threading here
+        for i in range(k):
+            samples = sampleAlloc[i]
+            for j in range(samples):
+                # step from the previous point of the ith instance once
 
-                        partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
-                        partials = np.negative(partials)
-                        newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
-                        instances[i].append((newX, f(newX)))
-                        elapsedBudget += numEvalsPerGrad + 1
+                partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
+                partials = np.negative(partials)
+                newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
+                instances[i].append((newX, f(newX)))
+                elapsedBudget += numEvalsPerGrad + 1
 
-                        fVal = f(instances[i][-1][0])
-                        elapsedBudget += 1
+                fVal = f(instances[i][-1][0])
+                elapsedBudget += 1
 
-                        if fVal < fHats[i]:
-                            fHats[i] = fVal
-                            xHats[i] = instances[i][-1]
+                if fVal < fHats[i]:
+                    fHats[i] = fVal
+                    xHats[i] = instances[i][-1]
 
-                        convergeDic[elapsedBudget] = min(fHats)
+                convergeDic[elapsedBudget] = min(fHats)
 
-                        numSamples[i] += numEvalsPerGrad + 2
-                # convergeDic[elapsedBudget] = min(fHats)
+                numSamples[i] += numEvalsPerGrad + 2
+        # convergeDic[elapsedBudget] = min(fHats)
 
-                pbar.update(elapsedBudget - oldElapsedBudget)
+        if useTqdm:
+            pbar.update(elapsedBudget - oldElapsedBudget)
 
-    else:
-        while elapsedBudget < maxBudget:
-            # print(elapsedBudget)
-
-            valueHistory = []
-
-            for i in range(k):
-                improvements = []
-                for t in range(len(instances[i]) - 1):
-                    improvement = instances[i][t + 1][1] - instances[i][t][1]
-                    # improvement depends on step size: divide by step size
-                    improvement /= gradientDescentObject.get_ct(c, t)
-
-                    if improvement < 0:
-                        improvement = 0
-                    improvements.append(improvement)
-
-                valueHistory.append(improvement)
-
-            # sample allocation is the actual allocations to give to each
-            sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
-            sampleDic[elapsedBudget] = numSamples.copy()
-
-            # perform sampleAlloc[i] steps for every instance
-            # could add in multi-threading here
-            for i in range(k):
-                samples = sampleAlloc[i]
-                for j in range(samples):
-                    # step from the previous point of the ith instance once
-
-                    partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
-                    partials = np.negative(partials)
-                    newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
-                    instances[i].append((newX, f(newX)))
-                    elapsedBudget += numEvalsPerGrad + 1
-
-                    fVal = f(instances[i][-1][0])
-                    elapsedBudget += 1
-
-                    if fVal < fHats[i]:
-                        fHats[i] = fVal
-                        xHats[i] = instances[i][-1]
-
-                    convergeDic[elapsedBudget] = min(fHats)
-
-                    numSamples[i] += numEvalsPerGrad + 2
-            # convergeDic[elapsedBudget] = min(fHats)
 
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
+
+def restlessInfinitySearch(allocMethod, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+            a=.001, c=.001, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
+    instances = []
+    xHats = []
+    fHats = []
+    variances = []
+    numSamples = []
+
+    if useSPSA:
+        gradientDescentObject = gradDescent.SPSA()
+    else:
+        gradientDescentObject = gradDescent.finiteDifs()
+
+    elapsedBudget = 0
+
+    # change True to while budget < maxBudget
+    convergeDic = {}
+    sampleDic = {}
+
+    round = 0
+    if useTqdm:
+        tqdmTotal = maxBudget-elapsedBudget
+        pbar = tqdm(total=tqdmTotal)
+    while elapsedBudget < maxBudget:
+        oldElapsedBudget = elapsedBudget
+        # print(elapsedBudget)
+
+        # make a new instance
+        newX = randomParams(d)
+        xHats.append(newX)
+        fHats.append(f(newX))
+
+        instances.append(gradientDescentObject.gradDescent(f, newX, minSamples, a, c)[2])
+        elapsedBudget += 1 + minSamples*numEvalsPerGrad
+        numSamples.append(1 + minSamples*numEvalsPerGrad)
+
+        variances.append(None)
+        round += 1
+
+        valueHistory = []
+
+        for i in range(round):
+            improvements = []
+            for t in range(len(instances[i])-1):
+                improvement = instances[i][t+1][1] - instances[i][t][1]
+                # improvement depends on step size: divide by step size
+                # improvement should be negative, since in baiAllocations negative values = better
+                improvement /= gradientDescentObject.get_ct(c, t)
+
+                if improvement > 0:
+                    improvement = 0
+                improvements.append(improvement)
+
+            valueHistory.append(improvements)
+
+        # sample allocation is the actual allocations to give to each
+        sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
+        sampleDic[elapsedBudget] = numSamples.copy()
+
+        # perform sampleAlloc[i] steps for every instance
+        # could add in multi-threading here
+        for i in range(round):
+            samples = sampleAlloc[i]
+            for j in range(samples):
+                # step from the previous point of the ith instance once
+
+                partials = gradientDescentObject.partials(f, instances[i][-1][0], numSamples[i], c=c)
+                partials = np.negative(partials)
+                newX = gradientDescentObject.step(instances[i][-1][0], numSamples[i], partials, a=a)
+                instances[i].append((newX, f(newX)))
+                elapsedBudget += numEvalsPerGrad + 1
+
+                fVal = f(instances[i][-1][0])
+                elapsedBudget += 1
+
+                if fVal < fHats[i]:
+                    fHats[i] = fVal
+                    xHats[i] = instances[i][-1]
+
+                convergeDic[elapsedBudget] = min(fHats)
+
+                numSamples[i] += numEvalsPerGrad + 2
+        # convergeDic[elapsedBudget] = min(fHats)
+
+        if useTqdm:
+            pbar.update(elapsedBudget - oldElapsedBudget)
+
+
+    # fix sampleDic to have each list be the same length, unused are 0s
+    k = len(numSamples)
+    sampleKeys = list(sampleDic.keys())
+    for i in range(len(sampleKeys)):
+        remainderList = [0]*(k-i-1)
+        sampleDic[sampleKeys[i]] += remainderList
+
+    maxIndex = np.argmax(fHats)
+    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
+
 

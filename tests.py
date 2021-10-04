@@ -108,6 +108,29 @@ class TestClass:
         print(results[4])
         return results
 
+    def test_restlessInfiniteOCBASearch(self, sharedParams, discountFactor, windowLength, minSamples,
+                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessInfinitySearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                         f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                   a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        print("Convergence Dictionary: ", end="")
+        print(results[2])
+        print()
+
+        instances = results[3]
+        for i in range(len(instances)):
+            print(f"Instance #{i}: ", end="")
+            print(instances[i])
+            print()
+        print("Sample Allocation: ", end="")
+        print(results[4])
+        return results
+
     def test_tradOCBASearch(self, sharedParams, minSamples,
                            a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
