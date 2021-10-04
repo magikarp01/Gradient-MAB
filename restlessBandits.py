@@ -10,8 +10,11 @@ from gradientAllocation import randomParams, stratifiedSampling
 from tqdm import tqdm
 
 
-def restlessSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-            a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
+# UCBPad should depend on maximum bound of reward function, currently way too big
+# should ask Dr. Fu what UCBPad would be good
+
+def restlessSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+            a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad=math.sqrt(2)):
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
@@ -54,21 +57,24 @@ def restlessSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, 
                 oldElapsedBudget = elapsedBudget
                 # print(elapsedBudget)
 
+                valueHistory = []
 
                 for i in range(k):
-                    points = []
-                    pointValues = []
-                    for point in instances[i]:
-                        # each point is (xValue, fValue)
-                        points.append(point[0])
-                        pointValues.append(point[1])
+                    improvements = []
+                    for t in range(len(instances[i])-1):
+                        improvement = instances[i][t+1][1] - instances[i][t][1]
+                        # improvement depends on step size: divide by step size
+                        # improvement should be negative, since in baiAllocations negative values = better
+                        improvement /= gradientDescentObject.get_ct(c, t)
 
-                    variances[i] = calcVariance([pt[1] for pt in instances[i]])
+                        if improvement > 0:
+                            improvement = 0
+                        improvements.append(improvement)
 
-                kroneckers = getKroneckers(fHats)
-                budgetAlloc = getBudget(variances, kroneckers, numSamples)
+                    valueHistory.append(improvements)
+
                 # sample allocation is the actual allocations to give to each
-                sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+                sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
                 sampleDic[elapsedBudget] = numSamples.copy()
 
                 # perform sampleAlloc[i] steps for every instance
@@ -102,22 +108,23 @@ def restlessSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, 
         while elapsedBudget < maxBudget:
             # print(elapsedBudget)
 
+            valueHistory = []
 
             for i in range(k):
-                points = []
-                pointValues = []
-                for point in instances[i]:
-                    # each point is (xValue, fValue)
-                    points.append(point[0])
-                    pointValues.append(point[1])
+                improvements = []
+                for t in range(len(instances[i]) - 1):
+                    improvement = instances[i][t + 1][1] - instances[i][t][1]
+                    # improvement depends on step size: divide by step size
+                    improvement /= gradientDescentObject.get_ct(c, t)
 
+                    if improvement < 0:
+                        improvement = 0
+                    improvements.append(improvement)
 
-                variances[i] = calcVariance([pt[1] for pt in instances[i]])
+                valueHistory.append(improvement)
 
-            kroneckers = getKroneckers(fHats)
-            budgetAlloc = getBudget(variances, kroneckers, numSamples)
             # sample allocation is the actual allocations to give to each
-            sampleAlloc = allocateSamples(budgetAlloc, batchSize)
+            sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
             sampleDic[elapsedBudget] = numSamples.copy()
 
             # perform sampleAlloc[i] steps for every instance
@@ -145,6 +152,6 @@ def restlessSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, 
                     numSamples[i] += numEvalsPerGrad + 2
             # convergeDic[elapsedBudget] = min(fHats)
 
-
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+
