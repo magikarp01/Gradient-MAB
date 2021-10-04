@@ -2,6 +2,8 @@ Restructure programs: have all allocation methods in one file, have the multista
 
 for restlessBandits, make bai allocation methods following the papers
 
+For UCB, c should be multiplied by the upper bound on the value
+
 Finish simulations for all efficientStrategiesComp (except for d10GriewankStratified)
 Note: metaMaxInfinite is always randomly generated starting positions since there are an undeterminate number of starting positions
 
