@@ -344,7 +344,8 @@ class otherTests:
 
 
 # fun = functions.ackley_adjusted
-fun = functions.griewank_adjusted
+# fun = functions.griewank_adjusted
+fun = functions.ackley_adjusted
 
 k = 5
 d = 2

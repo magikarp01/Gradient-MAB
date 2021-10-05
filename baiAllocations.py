@@ -154,6 +154,8 @@ class UCB:
         return [i * batchSize for i in budgetAlloc]
 
     def getBudget(values, variances, numSamples, batchSize, c):
+        pooledVar = sum(variances)/len(variances)
+        c *= math.sqrt(pooledVar)
         return UCB.allocateSamples(UCB.budgetCalc(values, numSamples, c), batchSize)
 
 
@@ -205,8 +207,29 @@ class discountedUCB:
     def allocateSamples(budgetAlloc, batchSize):
         return [i * batchSize for i in budgetAlloc]
 
-    # just a wrapper function to fit in
+    def weightedVariance(prevValues, discountFactor, windowLength):
+        weightedMean = discountedOCBA.weightedMean(prevValues, discountFactor, windowLength)
+        variance = 0
+
+        for i in range(windowLength):
+            numer = (prevValues[len(prevValues) - i - 1] - weightedMean)**2
+            numer *= (discountFactor ** i)
+            variance += numer
+
+        denom = (1 - discountFactor ** windowLength) / (1 - discountFactor)
+        variance /= denom
+
+        return variance
+
+
     def getBudget(valueHistory, batchSize, c, numSamples, discountFactor, windowLength):
+        variances = [discountedUCB.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in
+                     range(len(valueHistory))]
+        pooledVar = sum(variances)/len(variances)
+
+        # 2 * B from the 2006 UCB discounted paper
+        c *= 2 * math.sqrt(pooledVar)
+
         return discountedUCB.allocateSamples(discountedUCB.discountUCBs(valueHistory, c=c, discountFactor = discountFactor, windowLength = windowLength), batchSize)
 
 
