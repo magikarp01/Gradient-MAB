@@ -64,7 +64,6 @@ class fitTests:
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
     def fitOCBA(sharedParams, minSamples,
                            discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
-        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
         d = sharedParams[2]
@@ -96,7 +95,7 @@ class fitTests:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+        results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
                                           a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
@@ -123,9 +122,10 @@ class fitTests:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+        results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
                                           a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
+
 
 class restlessTests:
 
