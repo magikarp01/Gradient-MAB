@@ -1,0 +1,83 @@
+Decide what UCBPad should be (For UCB, c should be multiplied by the upper bound on the value)
+
+Improvement is taken as reward: should it be divided by step size?
+Or should it just be div
+
+Finish simulations for all efficientStrategiesComp (except for d10GriewankStratified)
+Note: metaMaxInfinite is always randomly generated starting positions since there are an undeterminate number of starting positions
+
+Change traditional UCB and OCBA to consider reward as the amount gained
+
+maybe do Thompson Sampling
+
+Read research on restless/nonstationary bandits
+
+run results when i wake up
+
+
+Figure out if higher dimensions are slower
+(steps are slower but more runs are done per step)
+alternatively, do work to figure out how expensive functions need to be to outweigh the cost of OCBAFit
+
+Run efficientStrategies comparisons, averageErrors d10Griewank for tradOCBA and tradUCB, with a smaller minSamples (3 or something)
+
+
+Talk to Dr. Fu about applying to contests:
+- Regeneron is deadline nov 10
+
+Talk to Dr. Fu about college rec:
+- First deadline is nov 1
+
+for fitAlloc, only remember the past p points for regression
+(accounting for every point in regression is v slow)
+(alter the kriging error function)
+
+
+Just to put an upper bound on fit allocation performance:
+Instead of doing fitting, try to use the actual local minima that you would reach
+
+
+figure out what functions this algorithm would work well on,
+and which this algorithm would work worse on
+
+look up newtons method, inverse hessian
+
+
+apply STAR-SPSA to the things in efficient multi start strategies,
+see if performance is better
+(could write about this)
+
+Try adding noise to function (add random.random() * something)
+
+try more functions other than griewank, try some nondeterministic functions
+
+read papers by Jiaqiao Hu:
+- Q. Fan and J. Hu. ``Adaptive Simulation Budget Allocation for Determining the Best Design,'' Proceedings of the 2013 Winter Simulation Conference, 2013.
+- E. Zhou and J. Hu. ``Combining Gradient-based Optimization with Stochastic Search,'' Proceedings of the 2012 Winter Simulation Conference, pp. 1-12, 2012.
+- all of the optimization papers
+
+try algorithms from
+https://drive.google.com/file/d/1U-sSzQfgNUiJv6aVh13H4P_9zlZ8ZgiC/view
+as alternatives to griewank
+
+
+writing paper
+
+Writing the paper:
+- what do I need to put in the paper?
+- my plan:
+- explain comparison to multi-armed bandit problem, why to use BAI approaches
+- explain motivation for the two different kinds of algorithms (fitting and traditional)
+- give pseudocode
+- give parameters, results
+-
+
+Topics of the paper:
+- stratified sampling
+- the comparison to MAB/BAI
+- the strategies used to convert this problem into BAI (fit, traditional)
+- potentially STAR-SA for
+
+
+
+
