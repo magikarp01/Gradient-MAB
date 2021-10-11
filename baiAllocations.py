@@ -210,6 +210,8 @@ class discountedUCB:
     def weightedVariance(prevValues, discountFactor, windowLength):
         weightedMean = discountedOCBA.weightedMean(prevValues, discountFactor, windowLength)
         variance = 0
+        if windowLength > len(prevValues):
+            windowLength = len(prevValues)
 
         for i in range(windowLength):
             numer = (prevValues[len(prevValues) - i - 1] - weightedMean)**2
@@ -235,6 +237,8 @@ class discountedUCB:
 
 class discountedOCBA:
     def weightedMean(prevValues, discountFactor, windowLength):
+        if windowLength > len(prevValues):
+            windowLength = len(prevValues)
         denom = (1 - discountFactor ** windowLength)/(1-discountFactor)
         empAverage = 0
         for i in range(windowLength):
@@ -244,7 +248,8 @@ class discountedOCBA:
     def weightedVariance(prevValues, discountFactor, windowLength):
         weightedMean = discountedOCBA.weightedMean(prevValues, discountFactor, windowLength)
         variance = 0
-
+        if windowLength > len(prevValues):
+            windowLength = len(prevValues)
         for i in range(windowLength):
             numer = (prevValues[len(prevValues) - i - 1] - weightedMean)**2
             numer *= (discountFactor ** i)

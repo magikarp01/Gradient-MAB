@@ -1,5 +1,3 @@
-Restructure programs: have all allocation methods in one file, have the multistart strategies in their own files
-
 Decide what UCBPad should be (For UCB, c should be multiplied by the upper bound on the value)
 
 Improvement is taken as reward: should it be divided by step size?

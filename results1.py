@@ -614,22 +614,22 @@ def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
 
 
 
-def performMultiprocess(numProcesses, iterPerProcess, path, methods):
-    fun = functions.griewank_adjusted
-    k = 10
-    d = 2
-    maxBudget = 5000
-    batchSize = 50
-    numEvalsPerGrad = 2
-    minSamples = 3
+def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
+    fun = params[0]
+    k = params[1]
+    d = params[2]
+    maxBudget = params[3]
+    batchSize = params[4]
+    numEvalsPerGrad = params[5]
+    minSamples = params[6]
 
-    minimum = -1
-    discountRate = .9
-    a = .01
-    c = .000001
-    useSPSA = True
-    discountFactor = .9
-    slidingWindow = 15
+    minimum = params[7]
+    discountRate = params[8]
+    a = params[9]
+    c = params[10]
+    useSPSA = params[11]
+    discountFactor = params[12]
+    slidingWindow = params[13]
 
 
     with open(path + "/startingPos.json") as jf:
@@ -747,27 +747,48 @@ def showMinimaHistory(dics, names):
 
 
 path = "Results/tests"
+numProcesses = 8
+iterPerProcess = 100
 
-# generateStartingPos(4, 10, 2, 10, path, random=True)
+fun = functions.griewank_adjusted
+k = 10
+d = 5
+maxBudget = 5000
+batchSize = 50
+numEvalsPerGrad = 2
+minSamples = 10
+
+minimum = -1
+discountRate = .9
+a = .01
+c = .000001
+useSPSA = True
+discountFactor = .9
+slidingWindow = 15
+params = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
+
+# generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False)
 
 
+"""
 #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-methods = [False,   False,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True]
-performMultiprocess(4, 10, path, methods)
+methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
 
+performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
+"""
 
-#
-# allFileNames = os.listdir(path)
-# # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
-# #              "uniform.json", "metaMaxInfinite.json"]
-# fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
-#              and fileName != "startingPos.json"]
-#
-# names = [fileName[:-5] for fileName in fileNames]
-# dics = []
-# for fileName in fileNames:
-#     with open(path + "\\" + fileName) as jf:
-#         dics.append(json.load(jf))
-# # print(dics)
-# showMinimaHistory(dics, names)
+# """
+allFileNames = os.listdir(path)
+# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+#              "uniform.json", "metaMaxInfinite.json"]
+fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
+             and fileName != "startingPos.json"]
 
+names = [fileName[:-5] for fileName in fileNames]
+dics = []
+for fileName in fileNames:
+    with open(path + "\\" + fileName) as jf:
+        dics.append(json.load(jf))
+# print(dics)
+showMinimaHistory(dics, names)
+# """
