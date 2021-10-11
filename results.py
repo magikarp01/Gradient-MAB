@@ -539,12 +539,12 @@ def showMinimaHistory(dics, names):
 
 
 
-path = "Results/efficientStrategiesComp/d10GriewankStratified"
+path = "Results/tests/old"
 
-# generateStartingPos(15, 334, 2, 10, path, random=True)
-# performMultiprocess(15, 334, path)
+# generateStartingPos(2, 10, 2, 10, path, random=True)
+performMultiprocess(2, 10, path)
 
-
+"""
 allFileNames = os.listdir(path)
 # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
 #              "uniform.json", "metaMaxInfinite.json"]
@@ -558,4 +558,4 @@ for fileName in fileNames:
         dics.append(json.load(jf))
 # print(dics)
 showMinimaHistory(dics, names)
-
+"""

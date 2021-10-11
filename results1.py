@@ -43,7 +43,7 @@ def tempFitOCBA(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize,
-                                               numEvalsPerGrad, minSamples, discountRate=discountRate, startPos=startPosList[iteration],
+                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
                                                a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -618,7 +618,7 @@ def performMultiprocess(numProcesses, iterPerProcess, path, methods):
     fun = functions.griewank_adjusted
     k = 10
     d = 2
-    maxBudget = 10000
+    maxBudget = 5000
     batchSize = 50
     numEvalsPerGrad = 2
     minSamples = 3
@@ -751,8 +751,8 @@ path = "Results/tests"
 # generateStartingPos(4, 10, 2, 10, path, random=True)
 
 
-#         [fo,  foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-methods = [True,True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True]
+#         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
+methods = [False,   False,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True,   True]
 performMultiprocess(4, 10, path, methods)
 
 
