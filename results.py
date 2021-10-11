@@ -12,27 +12,40 @@ import gradientAllocation
 
 plt.show()
 
-import OCBAAlloc
-import UCBAlloc
+import baiAllocations
+import fitBandits
+import restlessBandits
+import tradBandits
 import uniformAlloc
 import metaMaxAlloc
 plt.show()
 
 fun = functions.ackley_adjusted
 
-def getAveFitOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                       iterations, startPosList,
-                       minimum=0, discountRate=.8, a=.001, c=.001, useSPSA=False):
+def tempFitOCBA(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = OCBAAlloc.fitOCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          minSamples, discountRate=discountRate, a=a, c=c, useSPSA=useSPSA,
-                                          startPos=startPosList[iteration])
-        # ideally, every convergeDic has the same keys
+        results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize,
+                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                               a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -40,20 +53,33 @@ def getAveFitOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamp
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
-def getAveTradOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                       iterations, startPosList, minimum=0, a=.001, c=.001, useSPSA=False):
+def tempFitInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = OCBAAlloc.tradOCBASearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          minSamples, a=a, c=c, startPos = startPosList[iteration],
-                                           useSPSA=useSPSA)
+        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad,
+                                       minSamples, discountRate=discountRate,
+                                       a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -61,19 +87,33 @@ def getAveTradOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSam
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
-def getAveTradOCBAInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                       iterations, minimum=0, a=.001, c=.001, useSPSA=False):
+def tempFitUCB(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = OCBAAlloc.tradOCBAInfiniteSearch(fun, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          minSamples, a=a, c=c, useSPSA=useSPSA)
+        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                       minSamples, discountRate=discountRate,
+                                       a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -81,21 +121,32 @@ def getAveTradOCBAInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, m
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
+def tempFitInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
 
-def getAveFitUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                      iterations, startPosList, minimum=0, discountRate=.8, a=.001, c=.001,useSPSA=False):
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = UCBAlloc.fitUCBSearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          minSamples, discountRate=discountRate, a=a, c=c,
-                                        startPos = startPosList[iteration], useSPSA=useSPSA)
-        # ideally, every convergeDic has the same keys
+        results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize,
+                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                               a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -103,19 +154,36 @@ def getAveFitUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSampl
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
-def getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                      iterations, startPosList, minimum=0, a=.001, c=.001, startPos = False, useSPSA=False):
+
+def tempRestlessOCBA(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = UCBAlloc.tradUCBSearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          minSamples, a=a, c=c, startPos = startPosList[iteration], useSPSA=useSPSA)
-        # ideally, every convergeDic has the same keys
+        results = restlessBandits.restlessSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                 f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                 a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -123,19 +191,35 @@ def getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamp
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
-def getAveTradUCBInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                       iterations, minimum=0, a=.001, c=.001, useSPSA=False):
+
+def tempRestlessInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = UCBAlloc.tradUCBInfiniteSearch(fun, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          minSamples, a=a, c=c, useSPSA=useSPSA)
-        # ideally, every convergeDic has the same keys
+        results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                         f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                         a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -143,20 +227,35 @@ def getAveTradUCBInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, mi
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
 
-def getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                    iterations, startPosList, minimum=0, a=.001, c=.001, useSPSA=False):
+def tempRestlessUCB(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = uniformAlloc.uniformSearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                        a=a, c=c, startPos = startPosList[iteration], useSPSA=useSPSA)
-        # ideally, every convergeDic has the same keys
+        results = restlessBandits.restlessSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
+                                                 f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                          a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -164,20 +263,35 @@ def getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
 
-def getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                    iterations, startPosList, minimum=0, a=.001, c=.001, startPos = False, useSPSA=False):
+def tempRestlessInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = metaMaxAlloc.metaMaxSearch(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                        a=a, c=c, startPos = startPosList[iteration], useSPSA=useSPSA)
-        # ideally, every convergeDic has the same keys
+        results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
+                                                         f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                   a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -185,20 +299,33 @@ def getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
 
-def getAveMetaMaxInfiniteError(fun, d, maxBudget, numEvalsPerGrad,
-                    iterations, minimum=0, a=.001, c=.001, useSPSA=False):
+def tempTradOCBA(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = metaMaxAlloc.metaMaxInfiniteSearch(fun, d, maxBudget, numEvalsPerGrad,
-                        a=a, c=c, useSPSA=useSPSA)
-        # ideally, every convergeDic has the same keys
+        results = tradBandits.tradSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                          a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
-                errors[s].append( convergeDic[s] - minimum)
+                errors[s].append(convergeDic[s] - minimum)
             except:
                 errors[s] = [convergeDic[s] - minimum]
 
@@ -206,8 +333,206 @@ def getAveMetaMaxInfiniteError(fun, d, maxBudget, numEvalsPerGrad,
     for s in errors.keys():
         aveError[s] = float(sum(errors[s])) / len(errors[s])
 
-    return errors, aveError
+    aveErrorList.append(aveError)
 
+
+def tempTradInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = tradBandits.tradInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                     a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+
+def tempTradUCB(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = tradBandits.tradSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                          a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+
+def tempTradInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = tradBandits.tradInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                     a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+
+def tempUniform(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = uniformAlloc.uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                             a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+def tempMetaMax(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = metaMaxAlloc.metaMaxSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                             a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+def tempMetaMaxInfinite(aveErrorList, iterations, sharedParams, startPosList):
+    f = sharedParams[0]
+    k = sharedParams[1]
+    d = sharedParams[2]
+    maxBudget = sharedParams[3]
+    batchSize = sharedParams[4]
+    numEvalsPerGrad = sharedParams[5]
+    minSamples = sharedParams[6]
+
+    minimum = sharedParams[7]
+    discountRate = sharedParams[8]
+    a = sharedParams[9]
+    c = sharedParams[10]
+    useSPSA = sharedParams[11]
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = metaMaxAlloc.metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
+                                                     a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
 
 # fun = functions.ackley_adjusted
 # k = 5
@@ -228,173 +553,6 @@ def getAveMetaMaxInfiniteError(fun, d, maxBudget, numEvalsPerGrad,
 # errors, aveError = getAveOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
 #                            iterations, discountRate=discountRate, a=a, c=c, useSPSA=useSPSA)
 
-def tempFitOCBA(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    k = sharedParams[1]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
-
-    minimum = sharedParams[7]
-    discountRate = sharedParams[8]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-
-    errors, aveError = getAveFitOCBAError(fun, k, d, maxBudget, batchSize,
-                                          numEvalsPerGrad, minSamples, iterations, startPosList,
-                                          minimum=minimum, discountRate=discountRate, a=a, c=c, useSPSA=useSPSA)
-    aveErrorList.append(aveError)
-
-
-def tempTradOCBA(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    k = sharedParams[1]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
-
-    minimum = sharedParams[7]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveTradOCBAError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                           iterations, startPosList,
-                                          minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-    aveErrorList.append(aveError)
-
-
-def tempTradOCBAInfinite(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
-
-    minimum = sharedParams[7]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveTradOCBAInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                       iterations, minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-    aveErrorList.append(aveError)
-
-
-def tempFitUCB(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    k = sharedParams[1]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
-
-    minimum = sharedParams[7]
-    discountRate = sharedParams[8]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveFitUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                         iterations, startPosList,
-                                         minimum=minimum, discountRate=discountRate, a=a, c=c, useSPSA=useSPSA)
-    aveErrorList.append(aveError)
-
-
-def tempTradUCB(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    k = sharedParams[1]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
-
-    minimum = sharedParams[7]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveTradUCBError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          iterations, startPosList,
-                                         minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-    aveErrorList.append(aveError)
-
-
-def tempTradUCBInfinite(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-    minSamples = sharedParams[6]
-
-    minimum = sharedParams[7]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveTradUCBInfiniteError(fun, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                       iterations, minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-    aveErrorList.append(aveError)
-
-
-def tempUniform(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    k = sharedParams[1]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-
-    minimum = sharedParams[7]
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveUniformError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          iterations, startPosList,
-                                       minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-
-    aveErrorList.append(aveError)
-
-
-def tempMetaMax(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    k = sharedParams[1]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    batchSize = sharedParams[4]
-    numEvalsPerGrad = sharedParams[5]
-
-    minimum = sharedParams[7]
-
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveMetaMaxError(fun, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                          iterations, startPosList,
-                                       minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-
-    aveErrorList.append(aveError)
-
-
-def tempMetaMaxInfinite(aveErrorList, iterations, sharedParams, startPosList):
-    fun = sharedParams[0]
-    d = sharedParams[2]
-    maxBudget = sharedParams[3]
-    numEvalsPerGrad = sharedParams[5]
-
-    minimum = sharedParams[7]
-
-    a = sharedParams[9]
-    c = sharedParams[10]
-    useSPSA = sharedParams[11]
-    errors, aveError = getAveMetaMaxInfiniteError(fun, d, maxBudget, numEvalsPerGrad,
-                    iterations, minimum=minimum, a=a, c=c, useSPSA=useSPSA)
-
-    aveErrorList.append(aveError)
 
 
 def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStartPos, endPath):
@@ -451,20 +609,24 @@ def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
     with open(path + "/startingPos.json", 'w') as jf:
         json.dump(processStartPos, jf)
 
-def performMultiprocess(numProcesses, iterPerProcess, path):
-    fun = functions.griewank_adjusted
-    k = 10
-    d = 2
-    maxBudget = 10000
-    batchSize = 50
-    numEvalsPerGrad = 2
-    minSamples = 3
 
-    minimum = -1
-    discountRate = .8
-    a = .01
-    c = .000001
-    useSPSA = True
+
+def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
+    fun = params[0]
+    k = params[1]
+    d = params[2]
+    maxBudget = params[3]
+    batchSize = params[4]
+    numEvalsPerGrad = params[5]
+    minSamples = params[6]
+
+    minimum = params[7]
+    discountRate = params[8]
+    a = params[9]
+    c = params[10]
+    useSPSA = params[11]
+    discountFactor = params[12]
+    slidingWindow = params[13]
 
 
     with open(path + "/startingPos.json") as jf:
@@ -472,42 +634,85 @@ def performMultiprocess(numProcesses, iterPerProcess, path):
 
 
     sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                    minimum, discountRate, a, c, useSPSA]
+                    minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
 
     if __name__ == '__main__':
         dir = path + "/"
 
-        # print("Fit OCBA")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos, dir+"fitOCBA.json")
-        #
-        # print("Fit UCB")
-        # multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos, dir + "fitUCB.json")
+        if methods[0]:
+            print("FitOCBA")
+            multiprocessSearch(numProcesses, iterPerProcess, tempFitOCBA, sharedParams, processStartPos,
+                               dir + "FitOCBA.json")
 
+        if methods[1]:
+            print("FitInfiniteOCBA")
+            multiprocessSearch(numProcesses, iterPerProcess, tempFitInfiniteOCBA, sharedParams, processStartPos,
+                               dir + "FitInfiniteOCBA.json")
 
-        print("Trad OCBA")
-        multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos, dir + "tradOCBA.json")
+        if methods[2]:
+            print("FitUCB")
+            multiprocessSearch(numProcesses, iterPerProcess, tempFitUCB, sharedParams, processStartPos,
+                               dir + "FitUCB.json")
 
-        print("Trad UCB")
-        multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos, dir + "tradUCB.json")
-        #
+        if methods[3]:
+            print("FitInfiniteUCB")
+            multiprocessSearch(numProcesses, iterPerProcess, tempFitInfiniteUCB, sharedParams, processStartPos,
+                               dir + "FitInfiniteUCB.json")
 
-        print("Trad OCBA Infinite")
-        multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBAInfinite, sharedParams, processStartPos,
-                           dir + "tradOCBAInfinite.json")
+        if methods[4]:
+            print("RestlessOCBA")
+            multiprocessSearch(numProcesses, iterPerProcess, tempRestlessOCBA, sharedParams, processStartPos,
+                               dir + "RestlessOCBA.json")
 
-        print("Trad UCB Infinite")
-        multiprocessSearch(numProcesses, iterPerProcess, tempTradUCBInfinite, sharedParams, processStartPos,
-                           dir + "tradUCBInfinite.json")
+        if methods[5]:
+            print("RestlessInfiniteOCBA")
+            multiprocessSearch(numProcesses, iterPerProcess, tempRestlessInfiniteOCBA, sharedParams, processStartPos,
+                               dir + "RestlessInfiniteOCBA.json")
 
-        print("MetaMax")
-        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos, dir + "metaMax.json")
-        #
+        if methods[6]:
+            print("RestlessUCB")
+            multiprocessSearch(numProcesses, iterPerProcess, tempRestlessUCB, sharedParams, processStartPos,
+                               dir + "RestlessUCB.json")
 
-        print("MetaMaxInfinite")
-        multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos, dir + "metaMaxInfinite.json")
+        if methods[7]:
+            print("RestlessInfiniteUCB")
+            multiprocessSearch(numProcesses, iterPerProcess, tempRestlessInfiniteUCB, sharedParams, processStartPos,
+                               dir + "RestlessInfiniteUCB.json")
 
-        print("Uniform")
-        multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos, dir + "uniform.json")
+        if methods[8]:
+            print("TradOCBA")
+            multiprocessSearch(numProcesses, iterPerProcess, tempTradOCBA, sharedParams, processStartPos,
+                               dir + "TradOCBA.json")
+
+        if methods[9]:
+            print("TradInfiniteOCBA")
+            multiprocessSearch(numProcesses, iterPerProcess, tempTradInfiniteOCBA, sharedParams, processStartPos,
+                               dir + "TradInfiniteOCBA.json")
+
+        if methods[10]:
+            print("TradUCB")
+            multiprocessSearch(numProcesses, iterPerProcess, tempTradUCB, sharedParams, processStartPos,
+                               dir + "TradUCB.json")
+
+        if methods[11]:
+            print("TradInfiniteUCB")
+            multiprocessSearch(numProcesses, iterPerProcess, tempTradInfiniteUCB, sharedParams, processStartPos,
+                               dir + "TradInfiniteUCB.json")
+
+        if methods[12]:
+            print("Uniform")
+            multiprocessSearch(numProcesses, iterPerProcess, tempUniform, sharedParams, processStartPos,
+                               dir + "Uniform.json")
+
+        if methods[13]:
+            print("MetaMax")
+            multiprocessSearch(numProcesses, iterPerProcess, tempMetaMax, sharedParams, processStartPos,
+                               dir + "MetaMax.json")
+
+        if methods[14]:
+            print("MetaMaxInfinite")
+            multiprocessSearch(numProcesses, iterPerProcess, tempMetaMaxInfinite, sharedParams, processStartPos,
+                               dir + "MetaMaxInfinite.json")
 
 
 def showMinimaHistory(dics, names):
@@ -538,13 +743,38 @@ def showMinimaHistory(dics, names):
     plt.show()
 
 
+path = "Results/tests"
+numProcesses = 8
+iterPerProcess = 100
 
-path = "Results/tests/old"
+fun = functions.griewank_adjusted
+k = 10
+d = 5
+maxBudget = 5000
+batchSize = 50
+numEvalsPerGrad = 2
+minSamples = 10
 
-# generateStartingPos(2, 10, 2, 10, path, random=True)
-performMultiprocess(2, 10, path)
+minimum = -1
+discountRate = .9
+a = .01
+c = .000001
+useSPSA = True
+discountFactor = .9
+slidingWindow = 15
+params = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
+
+# generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False)
+
 
 """
+#         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
+methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+
+performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
+"""
+
+# """
 allFileNames = os.listdir(path)
 # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
 #              "uniform.json", "metaMaxInfinite.json"]
@@ -558,4 +788,4 @@ for fileName in fileNames:
         dics.append(json.load(jf))
 # print(dics)
 showMinimaHistory(dics, names)
-"""
+# """

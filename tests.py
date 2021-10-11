@@ -1,14 +1,12 @@
 import unittest
 import random
 
-import UCBAlloc
 import kriging
 import gradDescent
 import functions
 import matplotlib.pyplot as plt
 import gradientAllocation
 
-import OCBAAlloc
 import uniformAlloc
 import metaMaxAlloc
 
@@ -344,8 +342,8 @@ class otherTests:
 
 
 # fun = functions.ackley_adjusted
-# fun = functions.griewank_adjusted
-fun = functions.ackley_adjusted
+fun = functions.griewank_adjusted
+# fun = functions.ackley_adjusted
 
 k = 5
 d = 2
@@ -372,93 +370,93 @@ figFitOCBA = plt.figure(1)
 figFitOCBA.suptitle("Fit OCBA Allocation")
 resultList.append(resultsFitOCBA)
 figList.append(figFitOCBA)
-
+#
 # resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 # figFitInfiniteOCBA = plt.figure(2)
 # figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
 # resultList.append(resultsFitInfiniteOCBA)
 # figList.append(figFitInfiniteOCBA)
-
-resultsFitUCB = fitTests.fitUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figFitUCB = plt.figure(3)
-figFitUCB.suptitle("Fit UCB Allocation")
-resultList.append(resultsFitUCB)
-figList.append(figFitUCB)
-
+#
+# resultsFitUCB = fitTests.fitUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figFitUCB = plt.figure(3)
+# figFitUCB.suptitle("Fit UCB Allocation")
+# resultList.append(resultsFitUCB)
+# figList.append(figFitUCB)
+#
 # resultsFitInfiniteUCB = fitTests.fitInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 # figFitInfiniteUCB = plt.figure(4)
 # figFitInfiniteUCB.suptitle("Fit Infinite UCB Allocation")
 # resultList.append(resultsFitInfiniteUCB)
 # figList.append(figFitInfiniteUCB)
+#
+# resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figRestlessOCBA = plt.figure(5)
+# figRestlessOCBA.suptitle("Restless OCBA Allocation")
+# resultList.append(resultsRestlessOCBA)
+# figList.append(figRestlessOCBA)
+#
+# resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
+# figRestlessInfiniteOCBA = plt.figure(6)
+# figRestlessInfiniteOCBA.suptitle("Restless Infinite OCBA Allocation")
+# resultList.append(resultsRestlessInfiniteOCBA)
+# figList.append(figRestlessInfiniteOCBA)
+#
+# resultsRestlessUCB = restlessTests.restlessUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figRestlessUCB = plt.figure(7)
+# figRestlessUCB.suptitle("Restless UCB Allocation")
+# resultList.append(resultsRestlessUCB)
+# figList.append(figRestlessUCB)
+#
+# resultsRestlessInfiniteUCB = restlessTests.restlessInfiniteUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
+# figRestlessInfiniteUCB = plt.figure(8)
+# figRestlessInfiniteUCB.suptitle("Restless Infinite UCB Allocation")
+# resultList.append(resultsRestlessInfiniteUCB)
+# figList.append(figRestlessInfiniteUCB)
+#
+#
+# resultsTradOCBA = tradTests.tradOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figTradOCBA = plt.figure(9)
+# figTradOCBA.suptitle("Trad OCBA Allocation")
+# resultList.append(resultsTradOCBA)
+# figList.append(figTradOCBA)
+#
+# resultsTradInfiniteOCBA = tradTests.tradInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
+# figTradInfiniteOCBA = plt.figure(10)
+# figTradInfiniteOCBA.suptitle("Trad Infinite OCBA Allocation")
+# resultList.append(resultsTradInfiniteOCBA)
+# figList.append(figTradInfiniteOCBA)
+#
+# resultsTradUCB = tradTests.tradUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figTradUCB = plt.figure(11)
+# figTradUCB.suptitle("Trad UCB Allocation")
+# resultList.append(resultsTradUCB)
+# figList.append(figTradUCB)
+#
+# resultsTradInfiniteUCB = tradTests.tradInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
+# figTradInfiniteUCB = plt.figure(12)
+# figTradInfiniteUCB.suptitle("Trad Infinite UCB Allocation")
+# resultList.append(resultsTradInfiniteUCB)
+# figList.append(figTradInfiniteUCB)
+#
+#
+# resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+# figUniform = plt.figure(13)
+# figUniform.suptitle("Uniform Allocation")
+# resultList.append(resultsUniform)
+# figList.append(figUniform)
+#
+# resultsMetaMax = otherTests.metaMax(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+# figMetaMax = plt.figure(14)
+# figMetaMax.suptitle("MetaMax Allocation")
+# resultList.append(resultsMetaMax)
+# figList.append(figMetaMax)
+#
+# resultsMetaMaxInfinite = otherTests.metaMaxInfinite(sharedParams, a=a, useSPSA=True)
+# figMetaMaxInfinite = plt.figure(15)
+# figMetaMaxInfinite.suptitle("MetaMax Infinite Allocation")
+# resultList.append(resultsMetaMaxInfinite)
+# figList.append(figMetaMaxInfinite)
 
-
-resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figRestlessOCBA = plt.figure(5)
-figRestlessOCBA.suptitle("Restless OCBA Allocation")
-resultList.append(resultsRestlessOCBA)
-figList.append(figRestlessOCBA)
-
-resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
-figRestlessInfiniteOCBA = plt.figure(6)
-figRestlessInfiniteOCBA.suptitle("Restless Infinite OCBA Allocation")
-resultList.append(resultsRestlessInfiniteOCBA)
-figList.append(figRestlessInfiniteOCBA)
-
-resultsRestlessUCB = restlessTests.restlessUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figRestlessUCB = plt.figure(7)
-figRestlessUCB.suptitle("Restless UCB Allocation")
-resultList.append(resultsRestlessUCB)
-figList.append(figRestlessUCB)
-
-resultsRestlessInfiniteUCB = restlessTests.restlessInfiniteUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
-figRestlessInfiniteUCB = plt.figure(8)
-figRestlessInfiniteUCB.suptitle("Restless Infinite UCB Allocation")
-resultList.append(resultsRestlessInfiniteUCB)
-figList.append(figRestlessInfiniteUCB)
-
-
-resultsTradOCBA = tradTests.tradOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figTradOCBA = plt.figure(9)
-figTradOCBA.suptitle("Trad OCBA Allocation")
-resultList.append(resultsTradOCBA)
-figList.append(figTradOCBA)
-
-resultsTradInfiniteOCBA = tradTests.tradInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
-figTradInfiniteOCBA = plt.figure(10)
-figTradInfiniteOCBA.suptitle("Trad Infinite OCBA Allocation")
-resultList.append(resultsTradInfiniteOCBA)
-figList.append(figTradInfiniteOCBA)
-
-resultsTradUCB = tradTests.tradUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figTradUCB = plt.figure(11)
-figTradUCB.suptitle("Trad UCB Allocation")
-resultList.append(resultsTradUCB)
-figList.append(figTradUCB)
-
-resultsTradInfiniteUCB = tradTests.tradInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
-figTradInfiniteUCB = plt.figure(12)
-figTradInfiniteUCB.suptitle("Trad Infinite UCB Allocation")
-resultList.append(resultsTradInfiniteUCB)
-figList.append(figTradInfiniteUCB)
-
-
-resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
-figUniform = plt.figure(13)
-figUniform.suptitle("Uniform Allocation")
-resultList.append(resultsUniform)
-figList.append(figUniform)
-
-resultsMetaMax = otherTests.metaMax(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
-figMetaMax = plt.figure(14)
-figMetaMax.suptitle("MetaMax Allocation")
-resultList.append(resultsMetaMax)
-figList.append(figMetaMax)
-
-resultsMetaMaxInfinite = otherTests.metaMaxInfinite(sharedParams, a=a, useSPSA=True)
-figMetaMaxInfinite = plt.figure(15)
-figMetaMaxInfinite.suptitle("MetaMax Infinite Allocation")
-resultList.append(resultsMetaMaxInfinite)
-figList.append(figMetaMaxInfinite)
 
 # convergeDic = resultsMetaMaxInfinite[2]
 
