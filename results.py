@@ -746,13 +746,13 @@ def showMinimaHistory(dics, names):
 
 path = "Results/tests/test2"
 
-if __name__ == '__main__':
-    orig_stdout = sys.stdout
-    orig_stderr = sys.stderr
-    f = open(path+'/consoleOutput.txt', 'w')
-    g = open(path+'/consoleOutput.txt', 'w')
-    sys.stdout = f
-    sys.stderr = g
+# if __name__ == '__main__':
+#     orig_stdout = sys.stdout
+#     orig_stderr = sys.stderr
+#     f = open(path+'/consoleOutput.txt', 'w')
+#     g = open(path+'/consoleOutput.txt', 'w')
+#     sys.stdout = f
+#     sys.stderr = g
 
 
 numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
