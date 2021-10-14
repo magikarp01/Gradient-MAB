@@ -1,4 +1,5 @@
-{ to test against efficient strategies
+numProcesses = 15
+iterPerProcess = 667
 fun = functions.griewank_adjusted
 k = 100
 d = 2
@@ -12,9 +13,6 @@ discountRate = .8
 a = .05
 c = .1
 useSPSA = True
-}
-
-with open("Results/startingPositions/startingPos2DStratified.json") as jf:
-    processStartPos = json.load(jf)
-
-performMultiprocess(15, 667)
+discountFactor = .9
+slidingWindow = 10
+randomPos = False

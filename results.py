@@ -9,16 +9,16 @@ import multiprocessing as mp
 import os
 
 import gradientAllocation
-
-plt.show()
-
+import paramPickler
 import baiAllocations
 import fitBandits
 import restlessBandits
 import tradBandits
 import uniformAlloc
 import metaMaxAlloc
-plt.show()
+
+import sys
+
 
 fun = functions.ackley_adjusted
 
@@ -715,6 +715,7 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
                                dir + "MetaMaxInfinite.json")
 
 
+
 def showMinimaHistory(dics, names):
     fig, ax = plt.subplots(1)
 
@@ -743,38 +744,31 @@ def showMinimaHistory(dics, names):
     plt.show()
 
 
-path = "Results/tests"
-numProcesses = 8
-iterPerProcess = 100
+path = "Results/tests/test2"
 
-fun = functions.griewank_adjusted
-k = 10
-d = 5
-maxBudget = 5000
-batchSize = 50
-numEvalsPerGrad = 2
-minSamples = 10
-
-minimum = -1
-discountRate = .9
-a = .01
-c = .000001
-useSPSA = True
-discountFactor = .9
-slidingWindow = 15
-params = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
-
-# generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False)
+if __name__ == '__main__':
+    orig_stdout = sys.stdout
+    orig_stderr = sys.stderr
+    f = open(path+'/consoleOutput.txt', 'w')
+    g = open(path+'/consoleOutput.txt', 'w')
+    sys.stdout = f
+    sys.stderr = g
 
 
-"""
+numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
+d = params[2]
+k = params[1]
+# generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
+
+
+# """
 #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
 methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
 
 performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
-"""
-
 # """
+
+"""
 allFileNames = os.listdir(path)
 # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
 #              "uniform.json", "metaMaxInfinite.json"]
@@ -789,3 +783,4 @@ for fileName in fileNames:
 # print(dics)
 showMinimaHistory(dics, names)
 # """
+
