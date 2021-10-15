@@ -288,66 +288,72 @@ class discountedOCBA:
             if kroneckers[minIndex] == 0:
                 optimalInstances.append(minIndex)
 
+        startInstance = -1
         for instanceIndex in range(numInstances):
             if instanceIndex not in optimalInstances:
                 if variances[instanceIndex] != 0 and kroneckers[instanceIndex] != 0:
                     startInstance = instanceIndex
                     break
-        try:
-            denom = variances[startInstance] / (kroneckers[startInstance] ** 2)
-        except:  # happens when all of the nonoptimal moves have zero variance
-            varFlag = False
-        ratios = [0] * numInstances
 
-        for instanceIndex in range(numInstances):
-            if instanceIndex in optimalInstances:
-                continue
-            elif instanceIndex == startInstance:
-                ratios[instanceIndex] = 1
-                continue
-            else:
-                ratio = variances[instanceIndex] / (kroneckers[instanceIndex] ** 2)
-                try:
-                    ratio /= denom
-                except:  # happens when all of the nonoptimal moves have zero variance, only one possible move
-                    budget = [0] * numInstances
-                    totBudget = 0
-                    for action in range(numInstances):
-                        totBudget += numSamples[action]
-                    averageAlloc = (totBudget + 1) / len(optimalInstances)
-                    for x in optimalInstances:
-                        budget[x] = averageAlloc
+        if startInstance != -1:
+            try:
+                denom = variances[startInstance] / (kroneckers[startInstance] ** 2)
+            except:  # happens when all of the nonoptimal moves have zero variance
+                varFlag = False
+            ratios = [0] * numInstances
 
-                    return budget
+            for instanceIndex in range(numInstances):
+                if instanceIndex in optimalInstances:
+                    continue
+                elif instanceIndex == startInstance:
+                    ratios[instanceIndex] = 1
+                    continue
+                else:
+                    ratio = variances[instanceIndex] / (kroneckers[instanceIndex] ** 2)
+                    try:
+                        ratio /= denom
+                    except:  # happens when all of the nonoptimal moves have zero variance, only one possible move
+                        budget = [0] * numInstances
+                        totBudget = 0
+                        for action in range(numInstances):
+                            totBudget += numSamples[action]
+                        averageAlloc = (totBudget + 1) / len(optimalInstances)
+                        for x in optimalInstances:
+                            budget[x] = averageAlloc
 
-                ratios[instanceIndex] = ratio
+                        return budget
 
-        # set up calculation for the proportion of the budget for optimal actions
-        tempSum = 0  # sum of N^2/stdev
-        for action in range(numInstances):
-            if ratios[action] != 0:
-                tempSum += ratios[action] ** 2 / variances[action]  # stuff cancels
-        tempSum = math.sqrt(tempSum)
+                    ratios[instanceIndex] = ratio
 
-        for action in optimalInstances:  # not sure if optimalProportion might be different for multiple optimal actions
-            ratios[action] = math.sqrt(variances[action]) * tempSum
-
-        # calculate the actual budgets from the proportions
-        total = 0
-        budget = [0] * numInstances
-        totBudget = 0
-        for action in range(numInstances):
-            total += ratios[action]
-            totBudget += numSamples[action]
-
-        try:
-            scale = (totBudget + 1) / total
+            # set up calculation for the proportion of the budget for optimal actions
+            tempSum = 0  # sum of N^2/stdev
             for action in range(numInstances):
-                budget[action] = scale * ratios[action]
-        except:
-            uniform = (totBudget + 1) / numInstances
+                if ratios[action] != 0:
+                    tempSum += ratios[action] ** 2 / variances[action]  # stuff cancels
+            tempSum = math.sqrt(tempSum)
+
+            for action in optimalInstances:  # not sure if optimalProportion might be different for multiple optimal actions
+                ratios[action] = math.sqrt(variances[action]) * tempSum
+
+            # calculate the actual budgets from the proportions
+            total = 0
+            budget = [0] * numInstances
+            totBudget = 0
             for action in range(numInstances):
-                budget[action] = uniform
+                total += ratios[action]
+                totBudget += numSamples[action]
+
+            try:
+                scale = (totBudget + 1) / total
+                for action in range(numInstances):
+                    budget[action] = scale * ratios[action]
+            except:
+                uniform = (totBudget + 1) / numInstances
+                for action in range(numInstances):
+                    budget[action] = uniform
+
+        else:
+            budget = [1] * numInstances
 
         return budget
 

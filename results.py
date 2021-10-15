@@ -744,7 +744,15 @@ def showMinimaHistory(dics, names):
     plt.show()
 
 
-path = "Results/tests/test2"
+# paths = ['Results/efficientStrategiesComp/d2GriewankRandom', 'Results/efficientStrategiesComp/d2GriewankStratified',
+#          'Results/efficientStrategiesComp/d10GriewankRandom', 'Results/efficientStrategiesComp/d10GriewankStratified']
+
+paths = ['Results/efficientStrategiesComp/d10GriewankRandom', 'Results/efficientStrategiesComp/d10GriewankStratified']
+
+# paths = ['Results/tests/test1', 'Results/tests/test2']
+
+# path = "Results/efficientStrategiesComp/d2GriewankRandom"
+# path = "Results/tests/test2"
 
 # if __name__ == '__main__':
 #     orig_stdout = sys.stdout
@@ -755,20 +763,29 @@ path = "Results/tests/test2"
 #     sys.stderr = g
 
 
-numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
-d = params[2]
-k = params[1]
-# generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
-
-
-# """
-#         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-
-performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
-# """
-
 """
+if __name__ == '__main__':
+    for path in paths:
+        print(f"Path is {path}")
+        numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
+        d = params[2]
+        k = params[1]
+        generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
+        print()
+
+        #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
+        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        # methods = [False ,  False,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+
+
+        performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
+
+        for i in range(5):
+            print()
+# """
+
+# """
+path =  'Results/efficientStrategiesComp/d2GriewankStratified'
 allFileNames = os.listdir(path)
 # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
 #              "uniform.json", "metaMaxInfinite.json"]

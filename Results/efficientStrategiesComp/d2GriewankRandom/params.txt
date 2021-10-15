@@ -1,7 +1,7 @@
 # to test against efficient strategies
 
 numProcesses = 15
-iterPerProcess = 667
+iterPerProcess = 334
 fun = functions.griewank_adjusted
 k = 100
 d = 2

@@ -1,5 +1,5 @@
-numProcesses = 8
-iterPerProcess = 100
+numProcesses = 4
+iterPerProcess = 20
 fun = functions.griewank_adjusted
 k = 10
 d = 5
@@ -14,3 +14,4 @@ c = .000001
 useSPSA = True
 discountFactor = .9
 slidingWindow = 15
+randomPos = False
