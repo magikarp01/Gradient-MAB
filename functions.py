@@ -21,13 +21,14 @@ def ackley(x, a = 20, b=.2, c=2*math.pi):
 
 
 # ackley_adjusted accepts input with x_i in [0, 1], transforms into [-32.768, 32.768]
-def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2 * math.pi):
+# error is stdev of a random error term, drawn gaussian
+def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2 * math.pi, error=0):
     x = []
     for i in x_adjusted:
         # x.append((i-.5)*2*32.768)
         x.append((i-.65)*2*32.768)
 
-    return ackley(np.array(x), a, b, c)
+    return ackley(np.array(x), a, b, c)+np.random.normal(0,error)
 
 # supposed to simulate an expensive function
 def sleep_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi, sleepTime=.5):
@@ -59,11 +60,11 @@ def griewank(x):
 
 
 # accepts input in [0, 1]
-def griewank_adjusted(x_adjusted):
+def griewank_adjusted(x_adjusted, error=0):
     x = []
     for i in x_adjusted:
         x.append((i-.5)*2)
-    return griewank(np.array(x))
+    return griewank(np.array(x))+np.random.normal(0,error)
 
 
 def reverse_griewank_adjusted(x_adjusted):

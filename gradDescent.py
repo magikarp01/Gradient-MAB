@@ -37,10 +37,11 @@ class finiteDifs:
             numer = f(x1) - f(x2)
             grad[dim] = numer/(2*c_t)
 
+        grad /= ((grad**2).sum*()**.5)
         return np.array(grad)
 
 
-        return np.array(optimize.approx_fprime(x, f, c_t))
+#        return np.array(optimize.approx_fprime(x, f, c_t))
 
     def step(self, x, t, partials, a=.001):
         a_t = self.get_at(a, t)

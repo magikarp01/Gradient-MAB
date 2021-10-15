@@ -744,14 +744,14 @@ def showMinimaHistory(dics, names):
     plt.show()
 
 
-# paths = ['Results/efficientStrategiesComp/d2GriewankRandom', 'Results/efficientStrategiesComp/d2GriewankStratified',
-#          'Results/efficientStrategiesComp/d10GriewankRandom', 'Results/efficientStrategiesComp/d10GriewankStratified']
+# paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
+#          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-paths = ['Results/efficientStrategiesComp/d10GriewankRandom', 'Results/efficientStrategiesComp/d10GriewankStratified']
+paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
 # paths = ['Results/tests/test1', 'Results/tests/test2']
 
-# path = "Results/efficientStrategiesComp/d2GriewankRandom"
+# path = "Results/efficientStrategiesComp/d2Random"
 # path = "Results/tests/test2"
 
 # if __name__ == '__main__':
