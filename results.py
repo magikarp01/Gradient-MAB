@@ -747,9 +747,9 @@ def showMinimaHistory(dics, names):
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
+# paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-# paths = ['Results/tests/test1', 'Results/tests/test2']
+paths = ['Results/tests/test1', 'Results/tests/test2']
 
 # path = "Results/efficientStrategiesComp/d2Random"
 # path = "Results/tests/test2"
@@ -774,8 +774,8 @@ if __name__ == '__main__':
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        # methods = [False ,  False,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False, True]
 
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -785,7 +785,7 @@ if __name__ == '__main__':
 # """
 
 # """
-path =  'Results/efficientStrategiesComp/d2GriewankStratified'
+path =  'Results/tests/test1'
 allFileNames = os.listdir(path)
 # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
 #              "uniform.json", "metaMaxInfinite.json"]

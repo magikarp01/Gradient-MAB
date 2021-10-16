@@ -353,18 +353,27 @@ def metaMaxInfiniteSearch(f, d, maxBudget, numEvalsPerGrad,
 
     convergeKeys = list(convergeDic.keys())
     convergeKeys.sort()
+    newConvergeDic = {}
     for i in range(len(convergeKeys) - 1):
+
         prevKey = convergeKeys[i]
         prevVal = convergeDic[prevKey]
         nextKey = convergeKeys[i+1]
         nextVal = convergeDic[nextKey]
 
+        newConvergeDic[prevKey] = prevVal
+
+        if nextKey > maxBudget:
+            break
+
         # go through all of the numbers between the two keys
         for j in range(prevKey+1, nextKey):
             # do linear interpolation
             interp = (nextVal-prevVal) * (j-prevKey)/(nextKey-prevKey) + prevVal
-            convergeDic[j] = interp
+            newConvergeDic[j] = interp
 
+    convergeDic = newConvergeDic
+    sortedDic = {}
     sortedDic = {}
     sortedKeys = sorted(list(convergeDic.keys()))
     for key in sortedKeys:
