@@ -747,8 +747,12 @@ def showMinimaHistory(dics, names):
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
-         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified']
+# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
+#          'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified']
+
+paths = ['Results/origComp/griewank/d2Random', 'Results/origComp/griewank/d2Stratified',
+        'Results/origComp/griewank/d5Random', 'Results/origComp/griewank/d5Stratified',
+        'Results/origComp/griewank/d10Random', 'Results/origComp/griewank/d10Stratified']
 
 # paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
@@ -777,8 +781,8 @@ if __name__ == '__main__':
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False, True]
+        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  False , False]
+        # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
 
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)

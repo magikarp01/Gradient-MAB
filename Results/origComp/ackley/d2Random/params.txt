@@ -10,7 +10,7 @@ minSamples = 10
 
 minimum = 0
 discountRate = .8
-a = .1
+a = .01
 c = .0001
 useSPSA = True
 discountFactor = .9
