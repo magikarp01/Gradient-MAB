@@ -572,8 +572,8 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
             print("All processes finished execution!")
 
             # check if processes are alive
-            for i in range(numProcesses):
-                print('Process p' + str(i+1) + ' is alive: {}'.format(processes[i].is_alive()))
+            # for i in range(numProcesses):
+            #     print('Process p' + str(i+1) + ' is alive: {}'.format(processes[i].is_alive()))
 
             aveError = {}
             aveErrorListCopy = list(aveErrorList)
@@ -747,9 +747,12 @@ def showMinimaHistory(dics, names):
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
+paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
+         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified']
+
 # paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-paths = ['Results/tests/test1', 'Results/tests/test2']
+# paths = ['Results/tests/test1', 'Results/tests/test2']
 
 # path = "Results/efficientStrategiesComp/d2Random"
 # path = "Results/tests/test2"
@@ -774,8 +777,8 @@ if __name__ == '__main__':
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False, True]
+        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False, True]
 
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -785,19 +788,20 @@ if __name__ == '__main__':
 # """
 
 # """
-path =  'Results/tests/test1'
-allFileNames = os.listdir(path)
-# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
-#              "uniform.json", "metaMaxInfinite.json"]
-fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
-             and fileName != "startingPos.json"]
+# path =  'Results/tests/test1'
+for path in paths:
+    allFileNames = os.listdir(path)
+    # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+    #              "uniform.json", "metaMaxInfinite.json"]
+    fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
+                 and fileName != "startingPos.json"]
 
-names = [fileName[:-5] for fileName in fileNames]
-dics = []
-for fileName in fileNames:
-    with open(path + "\\" + fileName) as jf:
-        dics.append(json.load(jf))
-# print(dics)
-showMinimaHistory(dics, names)
+    names = [fileName[:-5] for fileName in fileNames]
+    dics = []
+    for fileName in fileNames:
+        with open(path + "\\" + fileName) as jf:
+            dics.append(json.load(jf))
+    # print(dics)
+    showMinimaHistory(dics, names)
 # """
 
