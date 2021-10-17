@@ -31,7 +31,6 @@ def fitSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
     else:
         gradientDescentObject = gradDescent.finiteDifs()
 
-    elapsedBudget = 0
 
     if not startPos:
         startPositions = stratifiedSampling(d, k)
@@ -43,17 +42,18 @@ def fitSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         startPoint = startPositions[i]
         xHats[i] = startPoint
         fHats[i] = f(startPoint)
-        elapsedBudget += 1
+        # elapsedBudget += 1
         numSamples[i] += 1
 
         # this is for minimizing not maximizing
         instances[i] = gradientDescentObject.gradDescent(f, startPoint, minSamples, a, c)[2]
-        elapsedBudget += minSamples * numEvalsPerGrad
+        # elapsedBudget += minSamples * numEvalsPerGrad
         numSamples[i] += minSamples * numEvalsPerGrad
 
     # change True to while budget < maxBudget
     convergeDic = {}
     sampleDic = {}
+    elapsedBudget = 0
 
     if useTqdm:
         tqdmTotal = maxBudget-elapsedBudget

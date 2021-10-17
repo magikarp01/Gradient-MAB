@@ -716,7 +716,7 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
 
 
 
-def showMinimaHistory(dics, names):
+def showMinimaHistory(dics, names, title):
     fig, ax = plt.subplots(1)
 
     for i in range(len(dics)):
@@ -735,7 +735,7 @@ def showMinimaHistory(dics, names):
         y = [aveError[str(m)] for m in x]
         ax.plot(x, y, label=name)
 
-    ax.title.set_text("Average Error History")
+    ax.title.set_text(title)
     ax.set_xlabel("Total Samples")
     ax.set_ylabel("Error")
 
@@ -753,6 +753,12 @@ def showMinimaHistory(dics, names):
 paths = ['Results/origComp/griewank/d2Random', 'Results/origComp/griewank/d2Stratified',
         'Results/origComp/griewank/d5Random', 'Results/origComp/griewank/d5Stratified',
         'Results/origComp/griewank/d10Random', 'Results/origComp/griewank/d10Stratified']
+
+# paths = ['Results/origComp/griewank/d5Stratified',
+#         'Results/origComp/griewank/d10Stratified']
+
+# paths = ['Results/origComp/griewank/d10Random', 'Results/origComp/griewank/d10Stratified']
+
 
 # paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
@@ -777,12 +783,12 @@ if __name__ == '__main__':
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
         d = params[2]
         k = params[1]
-        generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
+        # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  False , False]
-        # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
+        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  False , False]
+        methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
 
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -805,7 +811,8 @@ for path in paths:
     for fileName in fileNames:
         with open(path + "\\" + fileName) as jf:
             dics.append(json.load(jf))
-    # print(dics)
-    showMinimaHistory(dics, names)
+    print(dics)
+    title = path
+    showMinimaHistory(dics, names, title)
 # """
 

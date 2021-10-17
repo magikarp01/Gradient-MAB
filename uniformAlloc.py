@@ -35,7 +35,6 @@ def uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
     else:
         gradientDescentObject = gradDescent.finiteDifs()
 
-    elapsedBudget = 0
 
     if not startPos:
         startPositions = stratifiedSampling(d, k)
@@ -47,13 +46,14 @@ def uniformSearch(f, k, d, maxBudget, batchSize, numEvalsPerGrad,
         startPoint = startPositions[i]
         xHats[i] = startPoint
         fHats[i] = f(startPoint)
-        elapsedBudget += 1
+        # elapsedBudget += 1
         numSamples[i] += 1
         instances[i].append((startPoint, fHats[i]))
 
     # change True to while budget < maxBudget
     convergeDic = {}
     sampleDic = {}
+    elapsedBudget = 0
 
     if useTqdm:
         tqdmTotal = maxBudget-elapsedBudget
