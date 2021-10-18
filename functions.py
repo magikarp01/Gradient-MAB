@@ -70,6 +70,28 @@ def griewank_adjusted(x_adjusted, error=0):
 def reverse_griewank_adjusted(x_adjusted):
     return -griewank_adjusted(x_adjusted)
 
+# evaluated on x from [-500, 500], min of f is 0 at x = (420.9687, 420.9687)
+def rastrigin(x):
+    d = len(x)
+    sumSin = 0
+    for i in range(d):
+        sumSin += x[i]**2 - 10*math.cos(2 * math.pi * x[i])
+
+    return 10*d + sumSin
+
+def rastrigin_altered(x):
+    d = len(x)
+    parabSum = 0
+    for i in range(d):
+        parabSum += (x[i]/1.5)**2 * 10
+    return rastrigin(x) + parabSum
+
+# accepts input in [0, 1]
+def rastrigin_adjusted(x_adjusted, error=0):
+    x = []
+    for i in x_adjusted:
+        x.append((i-.5)*5)
+    return rastrigin_altered(x) + np.random.normal(0, error)
 
 # 1D function, made manually
 # https://www.desmos.com/calculator/dfy1vkccwa

@@ -48,6 +48,8 @@ def readParams(loc):
         fun = functions.griewank_adjusted
     elif valDic["fun"] == "functions.ackley_adjusted":
         fun = functions.ackley_adjusted
+    elif valDic["fun"] == "functions.rastrigin_adjusted":
+        fun = functions.rastrigin_adjusted
 
     k = int(valDic["k"])
     d = int(valDic["d"])

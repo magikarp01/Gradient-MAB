@@ -342,8 +342,9 @@ class otherTests:
 
 
 # fun = functions.ackley_adjusted
-fun = functions.griewank_adjusted
+# fun = functions.griewank_adjusted
 # fun = functions.ackley_adjusted
+fun = functions.rastrigin_adjusted
 
 k = 5
 d = 2
@@ -352,7 +353,7 @@ batchSize = 20
 numEvalsPerGrad = 2
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 minSamples = 2*d+5
-a = .01
+a = .001
 c = .000001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 useSPSA = True
@@ -465,6 +466,7 @@ figList.append(figFitOCBA)
 #     if convergeDic[convergeKeys[i]] < convergeDic[convergeKeys[i+1]]:
 #         print(f"{i}th key")
 
+# """
 yRange = [-1, 6]
 # colors=['g','r','c','y','m','k','brown','orange','purple','pink']
 colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
@@ -502,7 +504,9 @@ plt.show()
 
 # """
 
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# functions.display3D(functions.griewank_adjusted, (0, 1), ax)
-# plt.show()
+"""
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+functions.display3D(functions.rastrigin_adjusted, (0, 1), ax)
+plt.show()
+# """
