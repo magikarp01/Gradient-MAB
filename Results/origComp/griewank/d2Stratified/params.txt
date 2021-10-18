@@ -10,9 +10,9 @@ minSamples = 10
 
 minimum = -1
 discountRate = .9
-a = .1
-c = .0001
+a = .01
+c = .00001
 useSPSA = True
 discountFactor = .9
-slidingWindow = 10
+slidingWindow = 15
 randomPos = False

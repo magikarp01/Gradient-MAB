@@ -716,7 +716,7 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
 
 
 
-def showMinimaHistory(dics, names, title):
+def showMinimaHistory(dics, names, title, colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen']):
     fig, ax = plt.subplots(1)
 
     for i in range(len(dics)):
@@ -733,7 +733,7 @@ def showMinimaHistory(dics, names, title):
         x = [int(i) for i in x]
         x.sort()
         y = [aveError[str(m)] for m in x]
-        ax.plot(x, y, label=name)
+        ax.plot(x, y, label=name, color = colors[i])
 
     ax.title.set_text(title)
     ax.set_xlabel("Total Samples")
@@ -747,17 +747,13 @@ def showMinimaHistory(dics, names, title):
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
-#          'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified']
+paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
+        'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
+        'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified']
 
-paths = ['Results/origComp/griewank/d2Random', 'Results/origComp/griewank/d2Stratified',
-        'Results/origComp/griewank/d5Random', 'Results/origComp/griewank/d5Stratified',
-        'Results/origComp/griewank/d10Random', 'Results/origComp/griewank/d10Stratified']
-
-# paths = ['Results/origComp/griewank/d5Stratified',
-#         'Results/origComp/griewank/d10Stratified']
-
-# paths = ['Results/origComp/griewank/d10Random', 'Results/origComp/griewank/d10Stratified']
+# paths = ['Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
+#         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
+#         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified']
 
 
 # paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
@@ -776,19 +772,19 @@ paths = ['Results/origComp/griewank/d2Random', 'Results/origComp/griewank/d2Stra
 #     sys.stderr = g
 
 
-"""
+# """
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
         d = params[2]
         k = params[1]
-        # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
+        generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  False , False]
-        methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
+        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
 
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -797,7 +793,7 @@ if __name__ == '__main__':
             print()
 # """
 
-# """
+"""
 # path =  'Results/tests/test1'
 for path in paths:
     allFileNames = os.listdir(path)
