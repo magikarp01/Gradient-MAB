@@ -716,8 +716,8 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
 
 
 
-def showMinimaHistory(dics, names, title, colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen']):
-    fig, ax = plt.subplots(1)
+def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen']):
+    plt.figure(figNum)
 
     for i in range(len(dics)):
         # jf = files[i]
@@ -733,22 +733,30 @@ def showMinimaHistory(dics, names, title, colors=['blue', 'orange', 'green', 're
         x = [int(i) for i in x]
         x.sort()
         y = [aveError[str(m)] for m in x]
-        ax.plot(x, y, label=name, color = colors[i])
+        plt.plot(x, y, label=name, color = colors[i])
 
-    ax.title.set_text(title)
-    ax.set_xlabel("Total Samples")
-    ax.set_ylabel("Error")
+    plt.title(title)
+    plt.xlabel("Total Samples")
+    plt.ylabel("Error")
 
-    ax.legend(loc="upper right")
+    plt.legend(loc="upper right")
     # plt.semilogx()
-    plt.show()
+    # plt.show()
 
 
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
-#         'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
+paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
+        'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
+        'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
+        'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
+        'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
+        'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
+        'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
+        'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified']
+
+# paths = ['Results/origComp/ackley/d5Stratified',
 #         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
 #         'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
 #         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
@@ -756,15 +764,6 @@ def showMinimaHistory(dics, names, title, colors=['blue', 'orange', 'green', 're
 #         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
 #         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
 #         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
-
-paths = ['Results/origComp/ackley/d5Stratified',
-        'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
-        'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
-        'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
-        'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
-        'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
-        'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
-        'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
 
 # paths = ['Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
 #         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
@@ -808,6 +807,10 @@ if __name__ == '__main__':
             print()
 # """
 
+figDic = {}
+for i in range(len(paths)):
+    figDic[paths[i]] = i
+
 # """
 # path =  'Results/tests/test1'
 for path in paths:
@@ -823,7 +826,7 @@ for path in paths:
         with open(path + "\\" + fileName) as jf:
             dics.append(json.load(jf))
     print(dics)
-    title = path
-    showMinimaHistory(dics, names, title)
+    showMinimaHistory(dics, names, path, figDic[path])
+plt.show()
 # """
 

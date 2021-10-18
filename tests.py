@@ -366,6 +366,7 @@ slidingWindow = 15
 resultList = []
 figList = []
 
+"""
 resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figFitOCBA = plt.figure(1)
 figFitOCBA.suptitle("Fit OCBA Allocation")
@@ -466,7 +467,7 @@ figList.append(figFitOCBA)
 #     if convergeDic[convergeKeys[i]] < convergeDic[convergeKeys[i+1]]:
 #         print(f"{i}th key")
 
-# """
+
 yRange = [-1, 6]
 # colors=['g','r','c','y','m','k','brown','orange','purple','pink']
 colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
@@ -504,9 +505,13 @@ plt.show()
 
 # """
 
-"""
+
+# """
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 functions.display3D(functions.rastrigin_adjusted, (0, 1), ax)
+# functions.display3D(functions.griewank_adjusted, (0, 1), ax)
+# functions.display3D(functions.ackley_adjusted, (0, 1), ax)
+
 plt.show()
 # """
