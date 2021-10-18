@@ -1,5 +1,5 @@
 numProcesses = 15
-iterPerProcess = 334
+iterPerProcess = 167
 fun = functions.griewank_adjusted
 k = 5
 d = 2

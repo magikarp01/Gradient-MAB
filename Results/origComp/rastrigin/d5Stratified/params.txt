@@ -1,0 +1,18 @@
+numProcesses = 15
+iterPerProcess = 167
+fun = functions.rastrigin_adjusted
+k = 10
+d = 5
+maxBudget = 10000
+batchSize = 20
+numEvalsPerGrad = 2
+minSamples = 10
+
+minimum = -1
+discountRate = .9
+a = .01
+c = .00001
+useSPSA = True
+discountFactor = .9
+slidingWindow = 15
+randomPos = False

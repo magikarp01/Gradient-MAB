@@ -1,5 +1,5 @@
 numProcesses = 15
-iterPerProcess = 334
+iterPerProcess = 167
 fun = functions.ackley_adjusted
 k = 100
 d = 10
