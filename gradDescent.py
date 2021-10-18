@@ -37,7 +37,7 @@ class finiteDifs:
             numer = f(x1) - f(x2)
             grad[dim] = numer/(2*c_t)
 
-        grad /= ((grad**2).sum*()**.5)
+        # grad /= ((grad**2).sum*()**.5)
         return np.array(grad)
 
 

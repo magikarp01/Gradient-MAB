@@ -747,8 +747,17 @@ def showMinimaHistory(dics, names, title, colors=['blue', 'orange', 'green', 're
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
-        'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
+# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
+#         'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
+#         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
+#         'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
+#         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
+#         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
+#         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
+#         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
+#         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
+
+paths = ['Results/origComp/ackley/d5Stratified',
         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
         'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
@@ -778,7 +787,7 @@ paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratifi
 #     sys.stderr = g
 
 
-# """
+"""
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
@@ -799,7 +808,7 @@ if __name__ == '__main__':
             print()
 # """
 
-"""
+# """
 # path =  'Results/tests/test1'
 for path in paths:
     allFileNames = os.listdir(path)
