@@ -25,8 +25,8 @@ def ackley(x, a = 20, b=.2, c=2*math.pi):
 def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2 * math.pi, error=0):
     x = []
     for i in x_adjusted:
-        # x.append((i-.5)*2*32.768)
-        x.append((i-.65)*2*32.768)
+        x.append((i-.5)*2*32.768)
+        # x.append((i-.5)*2*5)
 
     return ackley(np.array(x), a, b, c)+np.random.normal(0,error)
 
@@ -108,9 +108,9 @@ def display1D(fun, x_range):
     plt.plot(x, y)
     plt.show()
 
-def display3D(fun, domain, ax, fColor='b', alpha=1):
+def display3D(fun, domain, ax, fColor='b', alpha=1, fineness = .005):
 
-    x = y = np.arange(domain[0], domain[1], 0.005)
+    x = y = np.arange(domain[0], domain[1], fineness)
     X, Y = np.meshgrid(x, y)
     zs = np.array([fun(np.array([x, y])) for x, y in zip(np.ravel(X), np.ravel(Y))])
     Z = zs.reshape(X.shape)

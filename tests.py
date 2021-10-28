@@ -344,7 +344,7 @@ class otherTests:
 # fun = functions.ackley_adjusted
 # fun = functions.griewank_adjusted
 # fun = functions.ackley_adjusted
-fun = functions.rastrigin_adjusted
+fun = functions.griewank_adjusted
 
 k = 5
 d = 2
@@ -353,7 +353,7 @@ batchSize = 20
 numEvalsPerGrad = 2
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 minSamples = 2*d+5
-a = .001
+a = .01
 c = .000001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 useSPSA = True
@@ -367,11 +367,11 @@ resultList = []
 figList = []
 
 """
-resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figFitOCBA = plt.figure(1)
-figFitOCBA.suptitle("Fit OCBA Allocation")
-resultList.append(resultsFitOCBA)
-figList.append(figFitOCBA)
+# resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figFitOCBA = plt.figure(1)
+# figFitOCBA.suptitle("Fit OCBA Allocation")
+# resultList.append(resultsFitOCBA)
+# figList.append(figFitOCBA)
 #
 # resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 # figFitInfiniteOCBA = plt.figure(2)
@@ -391,23 +391,23 @@ figList.append(figFitOCBA)
 # resultList.append(resultsFitInfiniteUCB)
 # figList.append(figFitInfiniteUCB)
 #
-# resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-# figRestlessOCBA = plt.figure(5)
-# figRestlessOCBA.suptitle("Restless OCBA Allocation")
-# resultList.append(resultsRestlessOCBA)
-# figList.append(figRestlessOCBA)
+resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+figRestlessOCBA = plt.figure(5)
+figRestlessOCBA.suptitle("Restless OCBA Allocation")
+resultList.append(resultsRestlessOCBA)
+figList.append(figRestlessOCBA)
 #
-# resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
-# figRestlessInfiniteOCBA = plt.figure(6)
-# figRestlessInfiniteOCBA.suptitle("Restless Infinite OCBA Allocation")
-# resultList.append(resultsRestlessInfiniteOCBA)
-# figList.append(figRestlessInfiniteOCBA)
+resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
+figRestlessInfiniteOCBA = plt.figure(6)
+figRestlessInfiniteOCBA.suptitle("Restless Infinite OCBA Allocation")
+resultList.append(resultsRestlessInfiniteOCBA)
+figList.append(figRestlessInfiniteOCBA)
 #
-# resultsRestlessUCB = restlessTests.restlessUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-# figRestlessUCB = plt.figure(7)
-# figRestlessUCB.suptitle("Restless UCB Allocation")
-# resultList.append(resultsRestlessUCB)
-# figList.append(figRestlessUCB)
+resultsRestlessUCB = restlessTests.restlessUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+figRestlessUCB = plt.figure(7)
+figRestlessUCB.suptitle("Restless UCB Allocation")
+resultList.append(resultsRestlessUCB)
+figList.append(figRestlessUCB)
 #
 # resultsRestlessInfiniteUCB = restlessTests.restlessInfiniteUCB(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
 # figRestlessInfiniteUCB = plt.figure(8)
@@ -428,11 +428,11 @@ figList.append(figFitOCBA)
 # resultList.append(resultsTradInfiniteOCBA)
 # figList.append(figTradInfiniteOCBA)
 #
-# resultsTradUCB = tradTests.tradUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-# figTradUCB = plt.figure(11)
-# figTradUCB.suptitle("Trad UCB Allocation")
-# resultList.append(resultsTradUCB)
-# figList.append(figTradUCB)
+resultsTradUCB = tradTests.tradUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+figTradUCB = plt.figure(11)
+figTradUCB.suptitle("Trad UCB Allocation")
+resultList.append(resultsTradUCB)
+figList.append(figTradUCB)
 #
 # resultsTradInfiniteUCB = tradTests.tradInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 # figTradInfiniteUCB = plt.figure(12)
@@ -441,11 +441,11 @@ figList.append(figFitOCBA)
 # figList.append(figTradInfiniteUCB)
 #
 #
-# resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
-# figUniform = plt.figure(13)
-# figUniform.suptitle("Uniform Allocation")
-# resultList.append(resultsUniform)
-# figList.append(figUniform)
+resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+figUniform = plt.figure(13)
+figUniform.suptitle("Uniform Allocation")
+resultList.append(resultsUniform)
+figList.append(figUniform)
 #
 # resultsMetaMax = otherTests.metaMax(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 # figMetaMax = plt.figure(14)
@@ -491,7 +491,7 @@ for i in range(len(resultList)):
 
 # test.test_display3DResults(resultsTradUCBInfinite, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figTradUCBInfinite)
 
-# test.test_display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
+# visualize.display3DResults(resultsUniform, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figUniform)
 # test.test_display3DResults(resultsMetaMax, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMax)
 # test.test_display3DResults(resultsMetaMaxInfinite, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figMetaMaxInfinite)
 
@@ -507,11 +507,21 @@ plt.show()
 
 
 # """
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+fig1 = plt.figure(1)
+ax = fig1.add_subplot(111, projection='3d')
+fig1.suptitle("Griewank Function")
+functions.display3D(functions.griewank_adjusted, (0, 1), ax)
+
+fig2 = plt.figure(2)
+ax = fig2.add_subplot(111, projection='3d')
+fig2.suptitle("Ackley Function")
+functions.display3D(functions.ackley_adjusted, (0, 1), ax)
+
+fig2 = plt.figure(3)
+ax = fig2.add_subplot(111, projection='3d')
+fig2.suptitle("Rastrigin Function")
 functions.display3D(functions.rastrigin_adjusted, (0, 1), ax)
-# functions.display3D(functions.griewank_adjusted, (0, 1), ax)
-# functions.display3D(functions.ackley_adjusted, (0, 1), ax)
+
 
 plt.show()
 # """

@@ -724,12 +724,8 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
         name = names[i]
         # aveError = json.load(jf)
         aveError = dics[i]
-        try:
+        x = list(aveError.keys())
 
-            x = list(aveError.keys())
-
-        except:
-            pass
         x = [int(i) for i in x]
         x.sort()
         y = [aveError[str(m)] for m in x]
@@ -743,6 +739,40 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.semilogx()
     # plt.show()
 
+# funcDics is 2d array, 6 arrays of the results
+# names is metaMax, metaMaxInfinite, etc
+# titles has 6 titles for each
+def displayResults(funcDics, figNum, names, wholeTitle,
+                   titles=['d2Random', 'd2Stratified', 'd5Random', 'd5Stratified', 'd10Random', 'd10Stratified'],
+                   colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen']):
+    plt.figure(figNum)
+    plt.suptitle(wholeTitle)
+    colorMap = {}
+    for c in range(len(names)):
+        colorMap[names[c]] = colors[c]
+
+    for i in range(6):
+        plt.subplot(3, 2, i+1)
+        plt.title(titles[i])
+        plt.xlabel("Total Samples")
+        plt.ylabel("Error")
+
+        dics = funcDics[titles[i]]
+
+        for j in range(len(names)):
+            aveError = dics[j]
+            name = names[j]
+            x = list(aveError.keys())
+
+            x = [int(val) for val in x]
+            x.sort()
+            y = [aveError[str(m)] for m in x]
+            plt.plot(x, y, label=name, color = colorMap[name])
+
+    plt.legend(loc='upper right', bbox_to_anchor=(0, -0.1, 1, 1),
+               bbox_transform=plt.gcf().transFigure)
+
+    plt.subplots_adjust(left=.07, right=.82, hspace=.75, wspace=.15)
 
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
@@ -812,21 +842,45 @@ for i in range(len(paths)):
     figDic[paths[i]] = i
 
 # """
-# path =  'Results/tests/test1'
-for path in paths:
-    allFileNames = os.listdir(path)
-    # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
-    #              "uniform.json", "metaMaxInfinite.json"]
+
+path = 'Results/origComp/ackley'
+direcs = os.listdir(path)
+funcDics = {}
+for folder in direcs:
+    direcPath = path + '/' + folder
+
+    allFileNames = os.listdir(direcPath)
     fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
-                 and fileName != "startingPos.json"]
+             and fileName != "startingPos.json"]
 
     names = [fileName[:-5] for fileName in fileNames]
     dics = []
     for fileName in fileNames:
-        with open(path + "\\" + fileName) as jf:
+        with open(direcPath + "/" + fileName) as jf:
             dics.append(json.load(jf))
-    print(dics)
-    showMinimaHistory(dics, names, path, figDic[path])
+
+    print(names)
+    funcDics[folder] = dics
+
+names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB', 'TradInfiniteOCBA', 'TradInfiniteUCB', 'TradOCBA', 'TradUCB', 'Uniform']
+displayResults(funcDics, 1, names, "Ackley Function")
 plt.show()
+
+"""
+allFileNames = os.listdir(path)
+# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+#              "uniform.json", "metaMaxInfinite.json"]
+fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
+             and fileName != "startingPos.json"]
+
+names = [fileName[:-5] for fileName in fileNames]
+dics = []
+for fileName in fileNames:
+    with open(path + "\\" + fileName) as jf:
+        dics.append(json.load(jf))
+print(dics)
+showMinimaHistory(dics, names, path, figDic[path])
+plt.show()
+
 # """
 
