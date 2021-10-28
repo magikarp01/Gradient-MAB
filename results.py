@@ -39,9 +39,9 @@ def tempFitOCBA(aveErrorList, iterations, sharedParams, startPosList):
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize,
+        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize,
                                                numEvalsPerGrad, minSamples, discountRate=discountRate,
-                                               a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+                                               a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
@@ -72,7 +72,7 @@ def tempFitInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad,
+        results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad,
                                        minSamples, discountRate=discountRate,
                                        a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
@@ -777,14 +777,18 @@ def displayResults(funcDics, figNum, names, wholeTitle,
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
 
-paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
-        'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
-        'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
-        'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
-        'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
-        'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
-        'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
-        'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified']
+# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
+#         'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
+#         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
+#         'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
+#         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
+#         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
+#         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
+#         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified']
+
+# paths = ['Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
+
+paths = ['Results/origComp/griewank/d5Random', 'Results/origComp/griewank/d5Stratified']
 
 # paths = ['Results/origComp/ackley/d5Stratified',
 #         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
@@ -816,19 +820,24 @@ paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratifi
 #     sys.stderr = g
 
 
-"""
+# """
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
         d = params[2]
         k = params[1]
-        generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
+        # make batch size much bigger
+        numProcesses = 1
+        iterPerProcess = 10
+        params[4] = 50
+        # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
         # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
+        methods = [False ,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False, False]
 
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -841,7 +850,7 @@ figDic = {}
 for i in range(len(paths)):
     figDic[paths[i]] = i
 
-# """
+"""
 
 path = 'Results/origComp/ackley'
 direcs = os.listdir(path)
@@ -865,6 +874,7 @@ for folder in direcs:
 names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB', 'TradInfiniteOCBA', 'TradInfiniteUCB', 'TradOCBA', 'TradUCB', 'Uniform']
 displayResults(funcDics, 1, names, "Ackley Function")
 plt.show()
+"""
 
 """
 allFileNames = os.listdir(path)

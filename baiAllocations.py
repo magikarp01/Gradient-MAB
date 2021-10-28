@@ -156,7 +156,7 @@ class UCB:
     def getBudget(values, variances, numSamples, batchSize, c):
         pooledVar = sum(variances)/len(variances)
         c *= math.sqrt(pooledVar)
-        return UCB.allocateSamples(UCB.budgetCalc(values, numSamples, c), batchSize)
+        return UCB.allocateSamples(UCB.budgetCalc(values, numSamples, c=c), batchSize)
 
 
 # has functionality for both discount and sliding window

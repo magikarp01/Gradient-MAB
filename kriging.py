@@ -8,7 +8,7 @@ def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRat
     d = len(points[0])
 
     # stop considering points when discount factor < stopConsidering
-    def errorFunc(params, stopConsidering=0.07):
+    def errorFunc(params, stopConsidering=0.2):
         error = 0
         discountFactor = 1
         for pointIndex in range(len(points)-1, -1, -1):
@@ -20,7 +20,7 @@ def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRat
         return error
 
     x_0 = [1] * numParams
-    leastSquares = optimize.minimize(errorFunc, x_0, bounds=paramBounds)
+    leastSquares = optimize.minimize(errorFunc, x_0, bounds=paramBounds, options={'maxiter':100})
     optParams = list(leastSquares.x)
     # return error, function with optParams
     # return errorFunc(optParams), lambda inp: modelFunc(inp, optParams)
