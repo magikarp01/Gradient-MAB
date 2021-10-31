@@ -276,11 +276,7 @@ class discountedOCBA:
 
         return kroneckers
 
-    def budgetCalc(valueHistory, discountFactor, windowLength, numSamples):
-        values = [discountedOCBA.weightedMean(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
-        variances = [discountedOCBA.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
-
-        kroneckers = OCBA.getKroneckers(values)
+    def budgetCalcSimple(values, variances, kroneckers, discountFactor, windowLength, numSamples):
         numInstances = len(variances)
 
         optimalInstances = []
@@ -356,6 +352,16 @@ class discountedOCBA:
             budget = [1] * numInstances
 
         return budget
+
+    def fitBudgetCalc(values, variances, discountFactor, windowLength, numSamples):
+
+    def budgetCalc(valueHistory, discountFactor, windowLength, numSamples):
+        values = [discountedOCBA.weightedMean(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
+        variances = [discountedOCBA.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
+
+        kroneckers = OCBA.getKroneckers(values)
+
+        return discountedOCBA.budgetCalcSimple(values, variances, kroneckers, )
 
     # allocate samples given a budget allocation with fractions and a whole number batch size
     # returns array of integers

@@ -17,8 +17,8 @@ from tqdm import tqdm
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations, works with OCBA and UCB
-def fitSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                  discountRate=.9, a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad=math.sqrt(2)):
+def fitSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+            a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad=math.sqrt(2)):
     instances = [None]*k
     xHats = [None] * k
     fHats = [None] * k
@@ -63,7 +63,6 @@ def fitSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         oldElapsedBudget = elapsedBudget
         # print(elapsedBudget)
 
-
         for i in range(k):
             points = []
             pointValues = []
@@ -73,9 +72,9 @@ def fitSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
                 pointValues.append(point[1])
 
 
-            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
+            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountFactor)
 
-        sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize, UCBPad)
+        sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
         sampleDic[elapsedBudget] = numSamples.copy()
 
         # perform sampleAlloc[i] steps for every instance

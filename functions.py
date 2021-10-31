@@ -22,7 +22,7 @@ def ackley(x, a = 20, b=.2, c=2*math.pi):
 
 # ackley_adjusted accepts input with x_i in [0, 1], transforms into [-32.768, 32.768]
 # error is stdev of a random error term, drawn gaussian
-def ackley_adjusted(x_adjusted, a = 20, b=.2, c=2 * math.pi, error=0):
+def ackley_adjusted(x_adjusted, a = 20, b=.2, c=math.pi/4, error=0):
     x = []
     for i in x_adjusted:
         x.append((i-.5)*2*32.768)
@@ -40,7 +40,7 @@ def sleep_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi, sleepTime=.5):
 def reverse_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi):
     x = []
     for i in x_adjusted:
-        x.append((i-.5)*2*32.768)
+        x.append((i-.5)*2*8.192)
     return -ackley(np.array(x), a, b, c)
 
 

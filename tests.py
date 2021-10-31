@@ -366,7 +366,7 @@ slidingWindow = 15
 resultList = []
 figList = []
 
-# """
+"""
 resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 figFitOCBA = plt.figure(1)
 figFitOCBA.suptitle("Fit OCBA Allocation")
@@ -506,7 +506,7 @@ plt.show()
 # """
 
 
-"""
+# """
 fig1 = plt.figure(1)
 ax = fig1.add_subplot(111, projection='3d')
 fig1.suptitle("Griewank Function")
