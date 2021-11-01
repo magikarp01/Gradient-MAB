@@ -353,7 +353,7 @@ class discountedOCBA:
 
         return budget
 
-    def fitBudgetCalc(values, variances, discountFactor, windowLength, numSamples):
+    # def fitBudgetCalc(values, variances, discountFactor, windowLength, numSamples):
 
     def budgetCalc(valueHistory, discountFactor, windowLength, numSamples):
         values = [discountedOCBA.weightedMean(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
@@ -361,7 +361,7 @@ class discountedOCBA:
 
         kroneckers = OCBA.getKroneckers(values)
 
-        return discountedOCBA.budgetCalcSimple(values, variances, kroneckers, )
+        return discountedOCBA.budgetCalcSimple(values, variances, kroneckers, discountFactor, windowLength, numSamples)
 
     # allocate samples given a budget allocation with fractions and a whole number batch size
     # returns array of integers

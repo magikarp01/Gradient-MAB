@@ -39,9 +39,9 @@ def tempFitOCBA(aveErrorList, iterations, sharedParams, startPosList):
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize,
-                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
-                                               a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
+                                       minSamples, discountRate=discountRate,
+                                       a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
@@ -72,9 +72,9 @@ def tempFitInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate,
-                                       a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+        results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize,
+                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                               a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -716,7 +716,7 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, methods):
 
 
 
-def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen']):
+def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen', 'bisque', 'lime', 'lightcoral', 'gold']):
     plt.figure(figNum)
 
     for i in range(len(dics)):
@@ -724,8 +724,12 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
         name = names[i]
         # aveError = json.load(jf)
         aveError = dics[i]
-        x = list(aveError.keys())
+        try:
 
+            x = list(aveError.keys())
+
+        except:
+            pass
         x = [int(i) for i in x]
         x.sort()
         y = [aveError[str(m)] for m in x]
@@ -739,40 +743,6 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.semilogx()
     # plt.show()
 
-# funcDics is 2d array, 6 arrays of the results
-# names is metaMax, metaMaxInfinite, etc
-# titles has 6 titles for each
-def displayResults(funcDics, figNum, names, wholeTitle,
-                   titles=['d2Random', 'd2Stratified', 'd5Random', 'd5Stratified', 'd10Random', 'd10Stratified'],
-                   colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen']):
-    plt.figure(figNum)
-    plt.suptitle(wholeTitle)
-    colorMap = {}
-    for c in range(len(names)):
-        colorMap[names[c]] = colors[c]
-
-    for i in range(6):
-        plt.subplot(3, 2, i+1)
-        plt.title(titles[i])
-        plt.xlabel("Total Samples")
-        plt.ylabel("Error")
-
-        dics = funcDics[titles[i]]
-
-        for j in range(len(names)):
-            aveError = dics[j]
-            name = names[j]
-            x = list(aveError.keys())
-
-            x = [int(val) for val in x]
-            x.sort()
-            y = [aveError[str(m)] for m in x]
-            plt.plot(x, y, label=name, color = colorMap[name])
-
-    plt.legend(loc='upper right', bbox_to_anchor=(0, -0.1, 1, 1),
-               bbox_transform=plt.gcf().transFigure)
-
-    plt.subplots_adjust(left=.07, right=.82, hspace=.75, wspace=.15)
 
 # paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
 #          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
@@ -784,18 +754,13 @@ def displayResults(funcDics, figNum, names, wholeTitle,
 #         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
 #         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
 #         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
-#         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified']
+#         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
+#         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
 
-# paths = ['Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
+paths = ['Results/origComp/rastrigin/d10Random']
 
-paths = ['Results/origComp/griewank/d5Random', 'Results/origComp/griewank/d5Stratified']
 
-# paths = ['Results/origComp/ackley/d5Stratified',
-#         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
-#         'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
-#         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
-#         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
-#         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
+# paths = ['Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
 #         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
 #         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
 
@@ -825,20 +790,18 @@ if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
+        # numProcesses = 15
+        # iterPerProcess = 10
+        # params[9] = .001
         d = params[2]
         k = params[1]
-        # make batch size much bigger
-        numProcesses = 1
-        iterPerProcess = 10
-        params[4] = 50
         # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        methods = [False ,  False,  False,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
         # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
-        methods = [False ,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False, False]
-
+        # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
 
@@ -846,51 +809,28 @@ if __name__ == '__main__':
             print()
 # """
 
+
+
+"""
 figDic = {}
 for i in range(len(paths)):
     figDic[paths[i]] = i
 
-"""
-
-path = 'Results/origComp/ackley'
-direcs = os.listdir(path)
-funcDics = {}
-for folder in direcs:
-    direcPath = path + '/' + folder
-
-    allFileNames = os.listdir(direcPath)
+# path =  'Results/tests/test1'
+for path in paths:
+    allFileNames = os.listdir(path)
+    # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
+    #              "uniform.json", "metaMaxInfinite.json"]
     fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
-             and fileName != "startingPos.json"]
+                 and fileName != "startingPos.json"]
 
     names = [fileName[:-5] for fileName in fileNames]
     dics = []
     for fileName in fileNames:
-        with open(direcPath + "/" + fileName) as jf:
+        with open(path + "\\" + fileName) as jf:
             dics.append(json.load(jf))
-
-    print(names)
-    funcDics[folder] = dics
-
-names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB', 'TradInfiniteOCBA', 'TradInfiniteUCB', 'TradOCBA', 'TradUCB', 'Uniform']
-displayResults(funcDics, 1, names, "Ackley Function")
+    print(dics)
+    showMinimaHistory(dics, names, path, figDic[path])
 plt.show()
-"""
-
-"""
-allFileNames = os.listdir(path)
-# fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",
-#              "uniform.json", "metaMaxInfinite.json"]
-fileNames = [fileName for fileName in allFileNames if fileName.endswith(".json")
-             and fileName != "startingPos.json"]
-
-names = [fileName[:-5] for fileName in fileNames]
-dics = []
-for fileName in fileNames:
-    with open(path + "\\" + fileName) as jf:
-        dics.append(json.load(jf))
-print(dics)
-showMinimaHistory(dics, names, path, figDic[path])
-plt.show()
-
 # """
 
