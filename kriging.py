@@ -3,20 +3,24 @@ import time
 
 
 
-# discountRate <= 1
-def fit_func(modelFunc, points, pointValues, numParams, paramBounds, discountRate = .8):
+# fitDiscount <= 1
+
+# max number of points should be sliding window
+def fit_func(modelFunc, points, pointValues, numParams, paramBounds, fitDiscount = .9):
+
     d = len(points[0])
 
-    # stop considering points when discount factor < stopConsidering
-    def errorFunc(params, stopConsidering=0.2):
+    if (len(points) <= 2 *d + 2):
+        raise Exception("Number of points is too small!")
+
+    # stop considering points when fitDiscount < stopConsidering
+    def errorFunc(params):
         error = 0
-        discountFactor = 1
+        totalDiscount = 1
         for pointIndex in range(len(points)-1, -1, -1):
-            if discountFactor < stopConsidering:
-                break
             dif = pointValues[pointIndex] - modelFunc(points[pointIndex], params)
-            error += dif**2 * discountFactor
-            discountFactor*=discountRate
+            error += dif**2 * totalDiscount
+            totalDiscount*=fitDiscount
         return error
 
     x_0 = [1] * numParams
@@ -50,17 +54,17 @@ def parabFit(points, pointValues):
 
 # probably a way to do this with linAlg
 # https://calculus.subwiki.org/wiki/Quadratic_function_of_multiple_variables
-def quadEstMin(points, pointValues, discountRate = 1):
+def quadEstMin(points, pointValues, fitDiscount = .9):
     optParams, error = parabFit(points, pointValues)
 
     result = optParams[-1]
     n = len(points)
 
     # denom is for error to variance conversion
-    if discountRate==1:
+    if fitDiscount==1:
         denom = n
     else:
-        denom = (1 - discountRate**n)/(1 - discountRate)
+        denom = (1 - fitDiscount**n)/(1 - fitDiscount)
 
     return result, error/denom
 

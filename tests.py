@@ -61,14 +61,14 @@ class fitTests:
 
     # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
     def fitOCBA(sharedParams, minSamples,
-                           discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+                           discountFactor=.9, windowLength = 15, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         f = sharedParams[0]
         k = sharedParams[1]
         d = sharedParams[2]
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
+        results = fitBandits.fitSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                           a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         # print("Convergence Dictionary: ", end="")
@@ -84,8 +84,8 @@ class fitTests:
         # print(results[4])
         return results
 
-    def fitInfiniteOCBA(sharedParams, minSamples,
-                           discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+    def fitInfiniteOCBA(sharedParams, minSamples, discountFactor=.9, windowLength = 15,
+                           a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -93,12 +93,12 @@ class fitTests:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
-                                          a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        results = fitBandits.fitInfiniteSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                               a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def fitUCB(sharedParams, minSamples,
-                     discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+                           discountFactor=.9, windowLength = 15, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -106,13 +106,12 @@ class fitTests:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate,
-                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        results = fitBandits.fitSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def fitInfiniteUCB(sharedParams, minSamples,
-                           discountRate=.9, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+                           discountFactor=.9, windowLength = 15, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
         # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
         f = sharedParams[0]
         k = sharedParams[1]
@@ -120,8 +119,8 @@ class fitTests:
         maxBudget = sharedParams[3]
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
-        results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, discountRate=discountRate,
-                                          a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        results = fitBandits.fitInfiniteSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                               a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
 
@@ -346,13 +345,13 @@ class otherTests:
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
-k = 10
-d = 5
+k = 100
+d = 10
 maxBudget = 10000
-batchSize = 50
+batchSize = 100
 numEvalsPerGrad = 2
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
-minSamples = 10
+minSamples = 25
 a = .01
 c = .00001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
@@ -367,30 +366,30 @@ resultList = []
 figList = []
 
 # """
-resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figFitOCBA = plt.figure(1)
-figFitOCBA.suptitle("Fit OCBA Allocation")
-resultList.append(resultsFitOCBA)
-figList.append(figFitOCBA)
-#
-# resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
-# figFitInfiniteOCBA = plt.figure(2)
-# figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
-# resultList.append(resultsFitInfiniteOCBA)
-# figList.append(figFitInfiniteOCBA)
-#
-resultsFitUCB = fitTests.fitUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-figFitUCB = plt.figure(3)
-figFitUCB.suptitle("Fit UCB Allocation")
-resultList.append(resultsFitUCB)
-figList.append(figFitUCB)
-#
+# resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figFitOCBA = plt.figure(1)
+# figFitOCBA.suptitle("Fit OCBA Allocation")
+# resultList.append(resultsFitOCBA)
+# figList.append(figFitOCBA)
+
+resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
+figFitInfiniteOCBA = plt.figure(2)
+figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
+resultList.append(resultsFitInfiniteOCBA)
+figList.append(figFitInfiniteOCBA)
+
+# resultsFitUCB = fitTests.fitUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+# figFitUCB = plt.figure(3)
+# figFitUCB.suptitle("Fit UCB Allocation")
+# resultList.append(resultsFitUCB)
+# figList.append(figFitUCB)
+
 # resultsFitInfiniteUCB = fitTests.fitInfiniteUCB(sharedParams, minSamples, a=a, c=c, useSPSA=True)
 # figFitInfiniteUCB = plt.figure(4)
 # figFitInfiniteUCB.suptitle("Fit Infinite UCB Allocation")
 # resultList.append(resultsFitInfiniteUCB)
 # figList.append(figFitInfiniteUCB)
-#
+
 # resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 # figRestlessOCBA = plt.figure(5)
 # figRestlessOCBA.suptitle("Restless OCBA Allocation")

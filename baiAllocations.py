@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 
+import kriging
+
 
 class OCBA:
     # takes negative differences
@@ -160,11 +162,29 @@ class UCB:
 
 
 # has functionality for both discount and sliding window
-class discountedUCB:
+class discountedUCB(UCB):
+
+
+    def weightedVariance(prevValues, discountFactor, windowLength):
+        weightedMean = discountedOCBA.weightedMean(prevValues, discountFactor, windowLength)
+        variance = 0
+        if windowLength > len(prevValues):
+            windowLength = len(prevValues)
+
+        for i in range(windowLength):
+            numer = (prevValues[len(prevValues) - i - 1] - weightedMean)**2
+            numer *= (discountFactor ** i)
+            variance += numer
+
+        denom = (1 - discountFactor ** windowLength) / (1 - discountFactor)
+        variance /= denom
+
+        return variance
+
 
     # used for one specific arm
     # windowLength <= t
-    def discountUCBs(valueHistory, discountFactor, windowLength, c):
+    def budgetCalc(valueHistory, discountFactor, windowLength, c):
         denoms = []
         empAverages = []
         for i in range(len(valueHistory)):
@@ -191,6 +211,13 @@ class discountedUCB:
             empAverage /= denom
             empAverages.append(empAverage)
 
+        variances = [discountedUCB.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in
+                     range(len(valueHistory))]
+        pooledVar = sum(variances)/len(variances)
+
+        # 2 * B from the 2006 UCB discounted paper
+        c *= 2 * math.sqrt(pooledVar)
+
         totalN = math.log(sum(denoms))
         paddings = []
         k = len(valueHistory)
@@ -203,39 +230,48 @@ class discountedUCB:
         return budget
 
 
-    # budgetAlloc should just be [0, 1, 0, 0,...]
-    def allocateSamples(budgetAlloc, batchSize):
-        return [i * batchSize for i in budgetAlloc]
+    def fitBudgetCalc(instancePoints, instancePointValues, discountFactor, windowLength, numSamples, c):
+        k = len(numSamples)
+        for i in range(k):
+            if len(instancePoints[i]) > windowLength:
+                instancePoints[i] = instancePoints[i][:windowLength]
+                instancePointValues[i] = instancePointValues[i][:windowLength]
 
-    def weightedVariance(prevValues, discountFactor, windowLength):
-        weightedMean = discountedOCBA.weightedMean(prevValues, discountFactor, windowLength)
-        variance = 0
-        if windowLength > len(prevValues):
-            windowLength = len(prevValues)
+        d = len(instancePoints[0][0])
 
-        for i in range(windowLength):
-            numer = (prevValues[len(prevValues) - i - 1] - weightedMean)**2
-            numer *= (discountFactor ** i)
-            variance += numer
+        # values is estMins
+        estMins = []
+        variances = []
+        for i in range(k):
+            regResults = kriging.quadEstMin(instancePoints[i], instancePointValues[i], fitDiscount=discountFactor)
+            estMins.append(regResults[0])
+            variances.append(regResults[1])
 
-        denom = (1 - discountFactor ** windowLength) / (1 - discountFactor)
-        variance /= denom
-
-        return variance
-
-
-    def getBudget(valueHistory, batchSize, c, numSamples, discountFactor, windowLength):
-        variances = [discountedUCB.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in
-                     range(len(valueHistory))]
-        pooledVar = sum(variances)/len(variances)
+        pooledVar = sum(variances) / len(variances)
 
         # 2 * B from the 2006 UCB discounted paper
         c *= 2 * math.sqrt(pooledVar)
 
-        return discountedUCB.allocateSamples(discountedUCB.discountUCBs(valueHistory, c=c, discountFactor = discountFactor, windowLength = windowLength), batchSize)
+        return UCB.budgetCalc(estMins, numSamples, c=c)
 
 
-class discountedOCBA:
+    # budgetAlloc should just be [0, 1, 0, 0,...]
+    def allocateSamples(budgetAlloc, batchSize):
+        return [i * batchSize for i in budgetAlloc]
+
+
+    def getBudget(valueHistory, batchSize, c, numSamples, discountFactor, windowLength):
+
+        return discountedUCB.allocateSamples(discountedUCB.budgetCalc(valueHistory, discountFactor, windowLength, c), batchSize)
+
+
+    # I'm kind of messing up by making the fitDiscount for fitting = discount factor for BAI
+    def getFitBudget(instancePoints, instancePointValues, batchSize, c, numSamples, discountFactor, windowLength):
+        return discountedUCB.allocateSamples(
+            discountedUCB.fitBudgetCalc(instancePoints, instancePointValues, discountFactor, windowLength, numSamples, c), batchSize)
+
+
+class discountedOCBA(OCBA):
     def weightedMean(prevValues, discountFactor, windowLength):
         if windowLength > len(prevValues):
             windowLength = len(prevValues)
@@ -276,7 +312,12 @@ class discountedOCBA:
 
         return kroneckers
 
-    def budgetCalcSimple(values, variances, kroneckers, discountFactor, windowLength, numSamples):
+
+    def budgetCalc(valueHistory, discountFactor, windowLength, numSamples):
+        values = [discountedOCBA.weightedMean(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
+        variances = [discountedOCBA.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
+
+        kroneckers = OCBA.getKroneckers(values)
         numInstances = len(variances)
 
         optimalInstances = []
@@ -353,15 +394,25 @@ class discountedOCBA:
 
         return budget
 
-    # def fitBudgetCalc(values, variances, discountFactor, windowLength, numSamples):
+    def fitBudgetCalc(instancePoints, instancePointValues, discountFactor, windowLength, numSamples):
+        k = len(numSamples)
+        for i in range(k):
+            if len(instancePoints[i]) > windowLength:
+                instancePoints[i] = instancePoints[i][:windowLength]
+                instancePointValues[i] = instancePointValues[i][:windowLength]
 
-    def budgetCalc(valueHistory, discountFactor, windowLength, numSamples):
-        values = [discountedOCBA.weightedMean(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
-        variances = [discountedOCBA.weightedVariance(valueHistory[i], discountFactor, windowLength) for i in range(len(valueHistory))]
+        d = len(instancePoints[0][0])
 
-        kroneckers = OCBA.getKroneckers(values)
 
-        return discountedOCBA.budgetCalcSimple(values, variances, kroneckers, discountFactor, windowLength, numSamples)
+        # values is estMins
+        estMins = []
+        variances = []
+        for i in range(k):
+            regResults = kriging.quadEstMin(instancePoints[i], instancePointValues[i], fitDiscount=discountFactor)
+            estMins.append(regResults[0])
+            variances.append(regResults[1])
+
+        return OCBA.budgetCalc(estMins, variances, numSamples)
 
     # allocate samples given a budget allocation with fractions and a whole number batch size
     # returns array of integers
@@ -382,8 +433,14 @@ class discountedOCBA:
 
         return intParts
 
+    # wrapper for normal budget calc
     def getBudget(valueHistory, batchSize, c, numSamples, discountFactor, windowLength):
         return discountedOCBA.allocateSamples(
             discountedOCBA.budgetCalc(valueHistory, discountFactor, windowLength, numSamples), batchSize)
 
+
+    # wrapper for fit budget calc
+    def getFitBudget(instancePoints, instancePointValues, batchSize, c, numSamples, discountFactor, windowLength):
+        return discountedOCBA.allocateSamples(
+            discountedOCBA.fitBudgetCalc(instancePoints, instancePointValues, discountFactor, windowLength, numSamples), batchSize)
 

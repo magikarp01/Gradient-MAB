@@ -73,7 +73,7 @@ def tempFitInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize,
-                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                               numEvalsPerGrad, minSamples, fitDiscount=discountRate,
                                                a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
@@ -141,7 +141,7 @@ def tempFitInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize,
-                                               numEvalsPerGrad, minSamples, discountRate=discountRate,
+                                               numEvalsPerGrad, minSamples, fitDiscount=discountRate,
                                                a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -575,6 +575,38 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
             # for i in range(numProcesses):
             #     print('Process p' + str(i+1) + ' is alive: {}'.format(processes[i].is_alive()))
 
+
+            # linear interpolation:
+            for m in range(len(aveErrorList)):
+                aveErrorDic = aveErrorList[m]
+                aveErrorKeys = list(aveErrorDic.keys())
+                aveErrorKeys.sort()
+                newAveErrorDic = {}
+                for i in range(len(aveErrorKeys) - 1):
+
+                    prevKey = aveErrorKeys[i]
+                    prevVal = aveErrorDic[prevKey]
+                    nextKey = aveErrorKeys[i + 1]
+                    nextVal = aveErrorDic[nextKey]
+
+                    newAveErrorDic[prevKey] = prevVal
+
+                    # go through all of the numbers between the two keys
+                    for j in range(prevKey + 1, nextKey):
+                        # do linear interpolation
+                        interp = (nextVal - prevVal) * (j - prevKey) / (nextKey - prevKey) + prevVal
+                        newAveErrorDic[j] = interp
+
+                aveError = newAveErrorDic
+                sortedDic = {}
+                sortedKeys = sorted(list(aveErrorDic.keys()))
+                for key in sortedKeys:
+                    sortedDic[key] = aveErrorDic[key]
+
+                # should assign sortedDic to aveErrorDic
+                aveErrorList[m] = sortedDic
+
+    # averaging
             aveError = {}
             aveErrorListCopy = list(aveErrorList)
             for i in range(numProcesses):
@@ -757,7 +789,11 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 #         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
 #         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
 
-paths = ['Results/origComp/rastrigin/d10Random']
+paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d5Random',
+         'Results/origComp/ackley/d10Random', 'Results/origComp/griewank2/d2Random',
+         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
+         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d5Random',
+         'Results/origComp/rastrigin/d10Random']
 
 
 # paths = ['Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
@@ -785,21 +821,21 @@ paths = ['Results/origComp/rastrigin/d10Random']
 #     sys.stderr = g
 
 
-# """
+"""
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
-        # numProcesses = 15
-        # iterPerProcess = 10
-        # params[9] = .001
+        numProcesses = 2
+        iterPerProcess = 10
+        params[9] = .001
         d = params[2]
         k = params[1]
         # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
         # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
         # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
 
@@ -811,12 +847,20 @@ if __name__ == '__main__':
 
 
 
-"""
+
+# """
+
+# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d5Random',
+#          'Results/origComp/ackley/d10Random', 'Results/origComp/griewank2/d2Random',
+#          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
+#          'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d5Random',
+#          'Results/origComp/rastrigin/d10Random']
+
 figDic = {}
 for i in range(len(paths)):
     figDic[paths[i]] = i
 
-# path =  'Results/tests/test1'
+
 for path in paths:
     allFileNames = os.listdir(path)
     # fileNames = ["metaMax.json", "tradOCBA.json", "tradUCB.json",

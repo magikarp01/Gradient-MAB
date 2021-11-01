@@ -17,7 +17,7 @@ from tqdm import tqdm
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations, works with OCBA and UCB
-def fitSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+def fitSearch(allocMethod, fitDiscount, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
             a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad=math.sqrt(2)):
     instances = [None]*k
     xHats = [None] * k
@@ -63,6 +63,10 @@ def fitSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget, bat
         oldElapsedBudget = elapsedBudget
         # print(elapsedBudget)
 
+
+        instancePoints = []
+        instancePointValues = []
+
         for i in range(k):
             points = []
             pointValues = []
@@ -71,10 +75,10 @@ def fitSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget, bat
                 points.append(point[0])
                 pointValues.append(point[1])
 
+            instancePoints.append(points)
+            instancePointValues.append(pointValues)
 
-            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountFactor)
-
-        sampleAlloc = allocMethod(valueHistory, batchSize, UCBPad, numSamples, discountFactor, windowLength)
+        sampleAlloc = allocMethod(instancePoints, instancePointValues, batchSize, UCBPad, numSamples, fitDiscount, windowLength)
         sampleDic[elapsedBudget] = numSamples.copy()
 
         # perform sampleAlloc[i] steps for every instance
@@ -109,8 +113,8 @@ def fitSearch(allocMethod, discountFactor, windowLength, f, k, d, maxBudget, bat
     maxIndex = np.argmax(fHats)
     return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
 
-def fitInfiniteSearch(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-            discountRate = .9, a=.001, c=.001, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
+def fitInfiniteSearch(allocMethod, fitDiscount, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                      a=.001, c=.001, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
     instances = []
     xHats = []
     fHats = []
@@ -150,6 +154,9 @@ def fitInfiniteSearch(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, 
         variances.append(None)
         round += 1
 
+        instancePoints = []
+        instancePointValues = []
+
         for i in range(round):
             points = []
             pointValues = []
@@ -158,9 +165,12 @@ def fitInfiniteSearch(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, 
                 points.append(point[0])
                 pointValues.append(point[1])
 
-            estMins[i], variances[i] = kriging.quadEstMin(points, pointValues, discountRate)
+            instancePoints.append(points)
+            instancePointValues.append(pointValues)
 
-        sampleAlloc = allocMethod(estMins, variances, numSamples, batchSize, UCBPad)
+
+        sampleAlloc = allocMethod(instancePoints, instancePointValues, batchSize, UCBPad, numSamples, fitDiscount, windowLength)
+
         sampleDic[elapsedBudget] = numSamples.copy()
 
         # perform sampleAlloc[i] steps for every instance
