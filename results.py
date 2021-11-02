@@ -32,15 +32,16 @@ def tempFitOCBA(aveErrorList, iterations, sharedParams, startPosList):
     minSamples = sharedParams[6]
 
     minimum = sharedParams[7]
-    discountRate = sharedParams[8]
     a = sharedParams[9]
     c = sharedParams[10]
     useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate,
+        results = fitBandits.fitSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength,
+                                       f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                        a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -65,15 +66,15 @@ def tempFitInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
     minSamples = sharedParams[6]
 
     minimum = sharedParams[7]
-    discountRate = sharedParams[8]
     a = sharedParams[9]
     c = sharedParams[10]
     useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize,
-                                               numEvalsPerGrad, minSamples, fitDiscount=discountRate,
+        results = fitBandits.fitInfiniteSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                                a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
@@ -99,15 +100,16 @@ def tempFitUCB(aveErrorList, iterations, sharedParams, startPosList):
     minSamples = sharedParams[6]
 
     minimum = sharedParams[7]
-    discountRate = sharedParams[8]
     a = sharedParams[9]
     c = sharedParams[10]
     useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad,
-                                       minSamples, discountRate=discountRate,
+        results = fitBandits.fitSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength,
+                                       f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                        a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         # ideally, every convergeDic has the same keys
         convergeDic = results[2]
@@ -133,15 +135,15 @@ def tempFitInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList):
     minSamples = sharedParams[6]
 
     minimum = sharedParams[7]
-    discountRate = sharedParams[8]
     a = sharedParams[9]
     c = sharedParams[10]
     useSPSA = sharedParams[11]
+    discountFactor = sharedParams[12]
+    windowLength = sharedParams[13]
 
     errors = {}
     for iteration in tqdm(range(iterations)):
-        results = fitBandits.fitInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize,
-                                               numEvalsPerGrad, minSamples, fitDiscount=discountRate,
+        results = fitBandits.fitInfiniteSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                                a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -789,16 +791,14 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 #         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
 #         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
 
-paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d5Random',
-         'Results/origComp/ackley/d10Random', 'Results/origComp/griewank2/d2Random',
-         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
-         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d5Random',
-         'Results/origComp/rastrigin/d10Random']
+# paths = ['Results/origComp2/ackley2/d2Random', 'Results/origComp2/ackley2/d5Random',
+#          'Results/origComp2/ackley2/d10Random', 'Results/origComp2/griewank2/d2Random',
+#          'Results/origComp2/griewank2/d5Random', 'Results/origComp2/griewank2/d10Random',
+#          'Results/origComp2/rastrigin/d2Random', 'Results/origComp2/rastrigin/d5Random',
+#          'Results/origComp2/rastrigin/d10Random']
 
-
-# paths = ['Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
-#         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
-#         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
+# paths = ['Results/origComp2/ackley2/d2Random', 'Results/origComp2/ackley2/d5Random',
+#          'Results/origComp2/ackley2/d10Random']
 
 # paths = ['Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
 #         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
@@ -822,21 +822,27 @@ paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d5Random',
 
 
 """
+paths = ['Results/origComp2/rastrigin/d10Random']
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
+
+        # params = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
-        numProcesses = 2
-        iterPerProcess = 10
-        params[9] = .001
         d = params[2]
         k = params[1]
+
+        # numProcesses = 15
+        # iterPerProcess = 5
+        # # params[9] = .001
+        # batchSize = 100
+        # params[6] = 2*d+5
         # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        # methods = [False ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  True, True]
+        # methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        methods = [False ,  False,  False,  False,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False, False]
         # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -850,11 +856,14 @@ if __name__ == '__main__':
 
 # """
 
-# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d5Random',
-#          'Results/origComp/ackley/d10Random', 'Results/origComp/griewank2/d2Random',
+# paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
+#          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
 #          'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d5Random',
 #          'Results/origComp/rastrigin/d10Random']
+
+paths = ['Results/origComp2/rastrigin/d2Random', 'Results/origComp2/rastrigin/d5Random',
+         'Results/origComp2/rastrigin/d10Random']
 
 figDic = {}
 for i in range(len(paths)):

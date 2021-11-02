@@ -429,7 +429,12 @@ class discountedOCBA(OCBA):
         sortedFracParts = sorted(fracParts.keys(), reverse=True)
 
         for r in range(residue):
-            intParts[fracParts[sortedFracParts[r]]] += 1
+            try:
+                intParts[fracParts[sortedFracParts[r]]] += 1
+            except IndexError:
+                even = [int(batchSize / len(budgetAlloc))] * len(budgetAlloc)
+                for partLeft in range(batchSize - sum(even)):
+                    even[partLeft] += 1
 
         return intParts
 

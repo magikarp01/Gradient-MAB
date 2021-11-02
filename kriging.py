@@ -24,7 +24,7 @@ def fit_func(modelFunc, points, pointValues, numParams, paramBounds, fitDiscount
         return error
 
     x_0 = [1] * numParams
-    leastSquares = optimize.minimize(errorFunc, x_0, bounds=paramBounds, options={'maxiter':100})
+    leastSquares = optimize.minimize(errorFunc, x_0, bounds=paramBounds, options={'maxiter':60})
     optParams = list(leastSquares.x)
     # return error, function with optParams
     # return errorFunc(optParams), lambda inp: modelFunc(inp, optParams)
