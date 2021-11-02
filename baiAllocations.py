@@ -380,14 +380,17 @@ class discountedOCBA(OCBA):
                 total += ratios[action]
                 totBudget += numSamples[action]
 
-            try:
-                scale = (totBudget + 1) / total
-                for action in range(numInstances):
-                    budget[action] = scale * ratios[action]
-            except:
-                uniform = (totBudget + 1) / numInstances
-                for action in range(numInstances):
-                    budget[action] = uniform
+            scale = (totBudget + 1) / total
+            for action in range(numInstances):
+                budget[action] = scale * ratios[action]
+            # try:
+            #     scale = (totBudget + 1) / total
+            #     for action in range(numInstances):
+            #         budget[action] = scale * ratios[action]
+            # except:
+            #     uniform = (totBudget + 1) / numInstances
+            #     for action in range(numInstances):
+            #         budget[action] = uniform
 
         else:
             budget = [1] * numInstances
@@ -429,7 +432,12 @@ class discountedOCBA(OCBA):
         sortedFracParts = sorted(fracParts.keys(), reverse=True)
 
         for r in range(residue):
-            intParts[fracParts[sortedFracParts[r]]] += 1
+            try:
+                intParts[fracParts[sortedFracParts[r]]] += 1
+            except IndexError:
+                even = [int(batchSize / len(budgetAlloc))] * len(budgetAlloc)
+                for partLeft in range(batchSize - sum(even)):
+                    even[partLeft] += 1
 
         return intParts
 
