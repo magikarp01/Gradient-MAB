@@ -380,14 +380,17 @@ class discountedOCBA(OCBA):
                 total += ratios[action]
                 totBudget += numSamples[action]
 
-            try:
-                scale = (totBudget + 1) / total
-                for action in range(numInstances):
-                    budget[action] = scale * ratios[action]
-            except:
-                uniform = (totBudget + 1) / numInstances
-                for action in range(numInstances):
-                    budget[action] = uniform
+            scale = (totBudget + 1) / total
+            for action in range(numInstances):
+                budget[action] = scale * ratios[action]
+            # try:
+            #     scale = (totBudget + 1) / total
+            #     for action in range(numInstances):
+            #         budget[action] = scale * ratios[action]
+            # except:
+            #     uniform = (totBudget + 1) / numInstances
+            #     for action in range(numInstances):
+            #         budget[action] = uniform
 
         else:
             budget = [1] * numInstances

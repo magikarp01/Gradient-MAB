@@ -203,34 +203,34 @@ def fitInfiniteSearch(allocMethod, fitDiscount, windowLength, f, d, maxBudget, b
 
 
     # linear interpolation
-    convergeKeys = list(convergeDic.keys())
-    convergeKeys.sort()
-    newConvergeDic = {}
-    for i in range(len(convergeKeys) - 1):
-
-        prevKey = convergeKeys[i]
-        prevVal = convergeDic[prevKey]
-        nextKey = convergeKeys[i+1]
-        nextVal = convergeDic[nextKey]
-
-        newConvergeDic[prevKey] = prevVal
-
-        if nextKey > maxBudget:
-            break
-
-        # go through all of the numbers between the two keys
-        for j in range(prevKey+1, nextKey):
-            # do linear interpolation
-            interp = (nextVal-prevVal) * (j-prevKey)/(nextKey-prevKey) + prevVal
-            newConvergeDic[j] = interp
-
-
-    convergeDic = newConvergeDic
-    sortedDic = {}
-    sortedDic = {}
-    sortedKeys = sorted(list(convergeDic.keys()))
-    for key in sortedKeys:
-        sortedDic[key] = convergeDic[key]
+    # convergeKeys = list(convergeDic.keys())
+    # convergeKeys.sort()
+    # newConvergeDic = {}
+    # for i in range(len(convergeKeys) - 1):
+    #
+    #     prevKey = convergeKeys[i]
+    #     prevVal = convergeDic[prevKey]
+    #     nextKey = convergeKeys[i+1]
+    #     nextVal = convergeDic[nextKey]
+    #
+    #     newConvergeDic[prevKey] = prevVal
+    #
+    #     if nextKey > maxBudget:
+    #         break
+    #
+    #     # go through all of the numbers between the two keys
+    #     for j in range(prevKey+1, nextKey):
+    #         # do linear interpolation
+    #         interp = (nextVal-prevVal) * (j-prevKey)/(nextKey-prevKey) + prevVal
+    #         newConvergeDic[j] = interp
+    #
+    #
+    # convergeDic = newConvergeDic
+    # sortedDic = {}
+    # sortedKeys = sorted(list(convergeDic.keys()))
+    # for key in sortedKeys:
+    #     sortedDic[key] = convergeDic[key]
+    # convergeDic = sortedDic
 
 
     k = len(numSamples)
@@ -247,5 +247,7 @@ def fitInfiniteSearch(allocMethod, fitDiscount, windowLength, f, d, maxBudget, b
         remainderList = [0]*(k-i-1)
         sampleDic[sampleKeys[i]] += remainderList
 
+
+
     maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex],sortedDic, instances, numSamples, sampleDic)
+    return (xHats[maxIndex], fHats[maxIndex],convergeDic, instances, numSamples, sampleDic)

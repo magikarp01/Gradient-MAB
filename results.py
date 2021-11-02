@@ -579,34 +579,34 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
 
 
             # linear interpolation:
-            for m in range(len(aveErrorList)):
-                aveErrorDic = aveErrorList[m]
-                aveErrorKeys = list(aveErrorDic.keys())
-                aveErrorKeys.sort()
-                newAveErrorDic = {}
-                for i in range(len(aveErrorKeys) - 1):
-
-                    prevKey = aveErrorKeys[i]
-                    prevVal = aveErrorDic[prevKey]
-                    nextKey = aveErrorKeys[i + 1]
-                    nextVal = aveErrorDic[nextKey]
-
-                    newAveErrorDic[prevKey] = prevVal
-
-                    # go through all of the numbers between the two keys
-                    for j in range(prevKey + 1, nextKey):
-                        # do linear interpolation
-                        interp = (nextVal - prevVal) * (j - prevKey) / (nextKey - prevKey) + prevVal
-                        newAveErrorDic[j] = interp
-
-                aveError = newAveErrorDic
-                sortedDic = {}
-                sortedKeys = sorted(list(aveErrorDic.keys()))
-                for key in sortedKeys:
-                    sortedDic[key] = aveErrorDic[key]
-
-                # should assign sortedDic to aveErrorDic
-                aveErrorList[m] = sortedDic
+            # for m in range(len(aveErrorList)):
+            #     aveErrorDic = aveErrorList[m]
+            #     aveErrorKeys = list(aveErrorDic.keys())
+            #     aveErrorKeys.sort()
+            #     newAveErrorDic = {}
+            #     for i in range(len(aveErrorKeys) - 1):
+            #
+            #         prevKey = aveErrorKeys[i]
+            #         prevVal = aveErrorDic[prevKey]
+            #         nextKey = aveErrorKeys[i + 1]
+            #         nextVal = aveErrorDic[nextKey]
+            #
+            #         newAveErrorDic[prevKey] = prevVal
+            #
+            #         # go through all of the numbers between the two keys
+            #         for j in range(prevKey + 1, nextKey):
+            #             # do linear interpolation
+            #             interp = (nextVal - prevVal) * (j - prevKey) / (nextKey - prevKey) + prevVal
+            #             newAveErrorDic[j] = interp
+            #
+            #     aveError = newAveErrorDic
+            #     sortedDic = {}
+            #     sortedKeys = sorted(list(aveErrorDic.keys()))
+            #     for key in sortedKeys:
+            #         sortedDic[key] = aveErrorDic[key]
+            #
+            #     # should assign sortedDic to aveErrorDic
+            #     aveErrorList[m] = sortedDic
 
     # averaging
             aveError = {}
@@ -854,7 +854,7 @@ if __name__ == '__main__':
 
 
 
-# """
+"""
 
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',

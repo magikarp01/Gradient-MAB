@@ -1,3 +1,6 @@
+The weird stepping problem is probably because the infinites step by batchSize*stuff
+To fix, maybe do linear interpolation (make a linInterp function)
+
 Decide what UCBPad should be (For UCB, c should be multiplied by the upper bound on the value)
 
 Improvement is taken as reward: should it be divided by step size?
