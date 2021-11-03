@@ -830,8 +830,12 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 #     sys.stderr = g
 
 
-"""
-paths = ['Results/origComp2/rastrigin2/d10Random']
+# """
+paths = [
+
+         'Results/origComp2/ackley2/d10Random', 'Results/origComp2/griewank2/d10Random',
+         'Results/origComp2/rastrigin2/d10Random']
+
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
@@ -841,18 +845,19 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        # numProcesses = 15
-        # iterPerProcess = 5
-        # # params[9] = .001
-        # batchSize = 100
-        # params[6] = 2*d+5
+        numProcesses = 15
+        iterPerProcess = 5
+        # params[9] = .001
+        batchSize = 1000
+        params[6] = 2*d+5
+        params[13] = 2*d+5
         generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
         # methods = [False ,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        methods = [False ,  False,  False,  False,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False, False]
-        # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
+        # methods = [False ,  False,  False,  False,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False, False]
+        methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
 
