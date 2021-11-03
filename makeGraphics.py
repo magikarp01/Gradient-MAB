@@ -33,11 +33,12 @@ def displayResults(funcDics, figNum, names, wholeTitle,
         plt.xlabel("Total Samples")
         plt.ylabel("Error")
 
-        dics = funcDics[titles[i]]
+        # resultDic = dictionary mapping names to dictionary
+        resultDic = funcDics[titles[i]]
 
         for j in range(len(names)):
-            aveError = dics[j]
             name = names[j]
+            aveError = resultDic[name]
             x = list(aveError.keys())
 
             x = [int(val) for val in x]
@@ -52,11 +53,12 @@ def displayResults(funcDics, figNum, names, wholeTitle,
         plt.xlabel("Total Samples")
         plt.ylabel("Error")
 
-        dics = funcDics[titles[i]]
+        # resultDic = dictionary mapping names to dictionary
+        resultDic = funcDics[titles[i]]
 
         for j in range(len(names)):
-            aveError = dics[j]
             name = names[j]
+            aveError = resultDic[name]
             x = list(aveError.keys())
 
             x = [int(val) for val in x]
@@ -75,7 +77,7 @@ def displayResults(funcDics, figNum, names, wholeTitle,
 # for i in range(len(paths)):
 #     figDic[paths[i]] = i
 
-"""
+# """
 figTitles = ["Ackley", "Griewank", "Rastrigin"]
 paths = ['Results/origComp2/ackley2', 'Results/origComp2/griewank2', 'Results/origComp2/rastrigin2']
 names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB',
@@ -98,17 +100,18 @@ for i in range(len(paths)):
 
         allocRankings = {}
 
-        dics = []
+        resultDic = {}
         for fileName in fileNames:
             with open(direcPath + "/" + fileName) as jf:
-                dics.append(json.load(jf))
+                loadedDic = json.load(jf)
+                resultDic[fileName[:-5]] = loadedDic
 
-                allocRankings[fileName[:-5]] = dics[-1][sorted(list(dics[-1].keys()))[-1]]
+                allocRankings[fileName[:-5]] = loadedDic[sorted(list(loadedDic.keys()))[-1]]
         print(allocRankings)
         print()
         print()
 
-        funcDics[folder] = dics
+        funcDics[folder] = resultDic
 
     displayResults(funcDics, 1, names, figTitles[i] + " Function")
     plt.show()
@@ -142,8 +145,3 @@ orderDic(
 print()
 
 # """
-
-names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB',
-         'TradInfiniteOCBA', 'TradInfiniteUCB', 'TradOCBA', 'TradUCB', 'Uniform']
-for i in names:
-    print(i)
