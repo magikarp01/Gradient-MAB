@@ -4,7 +4,6 @@ from tqdm import tqdm
 import json
 import multiprocessing as mp
 import os
-from results import showMinimaHistory
 
 # paths = ['Results/origComp2/ackley2/d2Random', 'Results/origComp2/ackley2/d5Random',
 #          'Results/origComp2/ackley2/d10Random', 'Results/origComp2/griewank2/d2Random',
@@ -78,7 +77,7 @@ def displayResults(funcDics, figNum, names, wholeTitle,
 
 # """
 figTitles = ["Ackley", "Griewank", "Rastrigin"]
-paths = ['Results/origComp2/ackley2', 'Results/origComp2/griewank2', 'Results/origComp2/rastrigin']
+paths = ['Results/origComp2/ackley2', 'Results/origComp2/griewank2', 'Results/origComp2/rastrigin2']
 for i in range(len(paths)):
     path = paths[i]
     # path = 'Results/origComp2/griewank2'

@@ -582,7 +582,6 @@ def linearInterp(convergeDic, maxBudget):
 
     convergeDic = newConvergeDic
     sortedDic = {}
-    sortedDic = {}
     sortedKeys = sorted(list(convergeDic.keys()))
     for key in sortedKeys:
         sortedDic[key] = convergeDic[key]
@@ -832,7 +831,7 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 
 
 """
-paths = ['Results/origComp2/rastrigin/d10Random']
+paths = ['Results/origComp2/rastrigin2/d10Random']
 if __name__ == '__main__':
     for path in paths:
         print(f"Path is {path}")
@@ -851,8 +850,8 @@ if __name__ == '__main__':
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        methods = [False ,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        # methods = [False ,  False,  False,  False,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False, False]
+        # methods = [False ,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
+        methods = [False ,  False,  False,  False,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False, False]
         # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
@@ -871,7 +870,7 @@ if __name__ == '__main__':
 #          'Results/origComp/rastrigin/d10Random']
 
 paths = ['Results/origComp2/rastrigin/d2Random', 'Results/origComp2/rastrigin/d5Random',
-         'Results/origComp2/rastrigin/d10Random']
+         'Results/origComp2/rastrigin2/d10Random']
 
 figDic = {}
 for i in range(len(paths)):
