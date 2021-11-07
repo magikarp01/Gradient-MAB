@@ -99,7 +99,15 @@ class OCBA:
             for action in range(numInstances):
                 budget[action] = uniform
 
-        return budget
+        mostStarving = 0
+        for i in range(numInstances):
+            starvingScore = budget[i] - numSamples[i]
+            if starvingScore > budget[mostStarving] - numSamples[mostStarving]:
+                mostStarving = i
+
+        finBudget = [0] * numInstances
+        finBudget[mostStarving] = 1
+        return finBudget
 
     # allocate samples given a budget allocation with fractions and a whole number batch size
     # returns array of integers
@@ -393,9 +401,19 @@ class discountedOCBA(OCBA):
             #         budget[action] = uniform
 
         else:
-            budget = [1] * numInstances
+            totBudget = sum(numSamples)
+            budget = [(totBudget + 1) / numInstances] * numInstances
 
-        return budget
+        mostStarving = 0
+        for i in range(numInstances):
+            starvingScore = budget[i] - numSamples[i]
+            if starvingScore > budget[mostStarving] - numSamples[mostStarving]:
+                mostStarving = i
+
+        finBudget = [0]*numInstances
+        finBudget[mostStarving] = 1
+        return finBudget
+
 
     def fitBudgetCalc(instancePoints, instancePointValues, discountFactor, windowLength, numSamples):
         k = len(numSamples)

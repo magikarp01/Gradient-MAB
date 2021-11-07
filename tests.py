@@ -345,8 +345,8 @@ class otherTests:
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
-k = 100
-d = 10
+k = 3
+d = 1
 maxBudget = 10000
 batchSize = 100
 numEvalsPerGrad = 2
@@ -372,11 +372,11 @@ figList = []
 # resultList.append(resultsFitOCBA)
 # figList.append(figFitOCBA)
 
-resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
-figFitInfiniteOCBA = plt.figure(2)
-figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
-resultList.append(resultsFitInfiniteOCBA)
-figList.append(figFitInfiniteOCBA)
+# resultsFitInfiniteOCBA = fitTests.fitInfiniteOCBA(sharedParams, minSamples, a=a, c=c, useSPSA=True)
+# figFitInfiniteOCBA = plt.figure(2)
+# figFitInfiniteOCBA.suptitle("Fit Infinite OCBA Allocation")
+# resultList.append(resultsFitInfiniteOCBA)
+# figList.append(figFitInfiniteOCBA)
 
 # resultsFitUCB = fitTests.fitUCB(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
 # figFitUCB = plt.figure(3)
@@ -468,15 +468,17 @@ figList.append(figUniform)
 
 
 yRange = [-1, 6]
-# colors=['g','r','c','y','m','k','brown','orange','purple','pink']
-colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
+colors=['g','r','c','y','m','k','brown','orange','purple','pink']
+# colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
 lineWidth = 2.5
 alpha = .1
 
 
 # testing = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 for i in range(len(resultList)):
-    visualize.display3DResults(resultList[i], fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figList[i])
+    # visualize.display3DResults(resultList[i], fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figList[i])
+    fig, ax = plt.subplots()
+    gradientAllocation.displayInstances1D(fun, resultList[i][3], ax, colors, fColor='blue', lineWidth=5)
 
 # test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
 # test.test_display3DResults(resultsRestlessOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figRestlessOCBA)
@@ -524,3 +526,5 @@ functions.display3D(functions.rastrigin_adjusted, (0, 1), ax)
 
 plt.show()
 # """
+
+# functions.display1D(functions.min3Parabola, [-5, 10])

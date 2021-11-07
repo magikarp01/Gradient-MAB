@@ -1,5 +1,6 @@
 # Results are averaged over 1008 runs
 # Parameters are in the tempOCBA function
+import time
 
 import functions
 import matplotlib.pyplot as plt
@@ -555,57 +556,27 @@ def tempMetaMaxInfinite(aveErrorList, iterations, sharedParams, startPosList):
 #                            iterations, discountRate=discountRate, a=a, c=c, useSPSA=useSPSA)
 
 
-def linearInterp(convergeDic, maxBudget):
-    convergeKeys = list(convergeDic.keys())
-    convergeKeys.sort()
-    newConvergeDic = {}
-    for i in range(len(convergeKeys) - 1):
-
-        prevKey = convergeKeys[i]
-        prevVal = convergeDic[prevKey]
-        nextKey = convergeKeys[i + 1]
-        nextVal = convergeDic[nextKey]
-
-        newConvergeDic[prevKey] = prevVal
-
-        breakLoop = False
-        # go through all of the numbers between the two keys
-        for j in range(prevKey + 1, nextKey):
-            if j > maxBudget:
-                breakLoop = True
-                break
-            # do linear interpolation
-            interp = (nextVal - prevVal) * (j - prevKey) / (nextKey - prevKey) + prevVal
-            newConvergeDic[j] = interp
-        if breakLoop:
-            break
-
-    convergeDic = newConvergeDic
-    sortedDic = {}
-    sortedKeys = sorted(list(convergeDic.keys()))
-    for key in sortedKeys:
-        sortedDic[key] = convergeDic[key]
-
-    return sortedDic
-
-# print(linearInterp({1: 200, 3:500, 20:1230, 25: 21897, 28: 22500}, 27))
-
-
 def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStartPos, endPath):
     if __name__ == '__main__':
+        start_times = [0]*numProcesses
+        times = [0]*numProcesses
         with mp.Manager() as manager:
             aveErrorList = manager.list()
-            print("ID of main process: {}".format(os.getpid()))
+            # print("ID of main process: {}".format(os.getpid()))
             processes = []
             for i in range(numProcesses):
                 startPosList = processStartPos[i]
+                start_times[i] = time.time()
                 processes.append(mp.Process(target=func, args=(aveErrorList, iterations, sharedParams, startPosList)))
                 processes[i].start()
 
             for i in range(numProcesses):
                 processes[i].join()
+                times[i] = time.time()
+
 
             print("All processes finished execution!")
+            print(times)
 
             # check if processes are alive
             # for i in range(numProcesses):
@@ -615,7 +586,7 @@ def multiprocessSearch(numProcesses, iterations, func, sharedParams, processStar
             # linear interpolation:
             for m in range(len(aveErrorList)):
                 aveErrorDic = aveErrorList[m]
-                aveErrorList[m] = linearInterp(aveErrorDic, sharedParams[3])
+                aveErrorList[m] = gradientAllocation.linearInterp(aveErrorDic, sharedParams[3])
 
     # averaging
             aveError = {}
@@ -831,10 +802,9 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 
 
 # """
-paths = [
-
-         'Results/origComp2/ackley2/d10Random', 'Results/origComp2/griewank2/d10Random',
-         'Results/origComp2/rastrigin2/d10Random']
+paths = ['Results/origComp2/ackley2/d20Random',
+         'Results/origComp2/griewank2/d20Random',
+         'Results/origComp2/rastrigin2/d20Random']
 
 if __name__ == '__main__':
     for path in paths:
@@ -845,19 +815,20 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        numProcesses = 15
-        iterPerProcess = 5
+        # numProcesses = 2
+        # iterPerProcess = 2
         # params[9] = .001
-        batchSize = 1000
-        params[6] = 2*d+5
-        params[13] = 2*d+5
+        # batchSize = 1000
+        # params[6] = 2*d+5
+        # params[13] = 2*d+5
         generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         print()
 
         #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
         # methods = [False ,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        # methods = [False ,  False,  False,  False,  False,  True,  False,  False,  False,  False,  False,  False,  False,  False, False]
-        methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
+        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True ]
+        # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
+        # methods = [False ,  False,  False,  False,  True ,  True ,  False,  False,  True ,  True ,  False,  False,  False,  False,  False]
 
         performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
 

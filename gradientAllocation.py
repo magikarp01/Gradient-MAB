@@ -39,6 +39,41 @@ def stratifiedSampling(d, k):
     return [randomVecs[i] for i in to_keep]
 
 
+def linearInterp(convergeDic, maxBudget):
+    convergeKeys = list(convergeDic.keys())
+    convergeKeys.sort()
+    newConvergeDic = {}
+    for i in range(len(convergeKeys) - 1):
+
+        prevKey = convergeKeys[i]
+        prevVal = convergeDic[prevKey]
+        nextKey = convergeKeys[i + 1]
+        nextVal = convergeDic[nextKey]
+
+        newConvergeDic[prevKey] = prevVal
+
+        breakLoop = False
+        # go through all of the numbers between the two keys
+        for j in range(prevKey + 1, nextKey):
+            if j > maxBudget:
+                breakLoop = True
+                break
+            # do linear interpolation
+            interp = (nextVal - prevVal) * (j - prevKey) / (nextKey - prevKey) + prevVal
+            newConvergeDic[j] = interp
+        if breakLoop:
+            break
+
+    convergeDic = newConvergeDic
+    sortedDic = {}
+    sortedKeys = sorted(list(convergeDic.keys()))
+    for key in sortedKeys:
+        sortedDic[key] = convergeDic[key]
+
+    return sortedDic
+
+# print(linearInterp({1: 200, 3:500, 20:1230, 25: 21897, 28: 22500}, 27))
+
 # for displaying how the instances move on a graph
 # colors is an array of length k,
 def displayInstances1D(f, instances, ax, colors, fColor='b', lineWidth=3):

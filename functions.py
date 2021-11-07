@@ -91,6 +91,7 @@ def rastrigin_adjusted(x_adjusted, error=0):
 # accepts input in form [.5123]
 def min3Parabola(x2):
     x1 = x2[0]
+    # x1 = x2
 
     p1 = 20*(x1-1/5)*(x1-1/3)-.3
     p2 = 50*(x1-1/3)*(x1-5/8)
@@ -104,9 +105,13 @@ def min3Parabola(x2):
 
 def display1D(fun, x_range):
     x = np.linspace(x_range[0], x_range[1], 10000)
-    y = [fun(i) for i in x]
+    y = [fun([i]) for i in x]
     plt.plot(x, y)
+    plt.title("Griewank 1D")
     plt.show()
+
+display1D(griewank_adjusted, [-.5,1.5])
+
 
 def display3D(fun, domain, ax, fColor='b', alpha=1, fineness = .005):
 
