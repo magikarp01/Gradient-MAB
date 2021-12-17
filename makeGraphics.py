@@ -7,6 +7,7 @@ import json
 import multiprocessing as mp
 import os
 from results import showMinimaHistory
+import matplotlib.patches as mpatches
 
 # paths = ['Results/origComp2/ackley2/d2Random', 'Results/origComp2/ackley2/d5Random',
 #          'Results/origComp2/ackley2/d10Random', 'Results/origComp2/griewank2/d2Random',
@@ -25,7 +26,9 @@ from results import showMinimaHistory
 
 def displayResults(funcDics, figNum, names, wholeTitle,
                    titles=['d2Random', 'd5Random', 'd10Random', 'd20Random'],
-                   colorMap = {'MetaMax': 'blue', 'MetaMaxInfinite': 'orange', 'RestlessInfiniteOCBA': 'green', 'RestlessInfiniteUCB': 'red', 'RestlessOCBA': 'purple', 'RestlessUCB': 'brown', 'TradInfiniteOCBA': 'pink', 'TradInfiniteUCB': 'gray', 'TradOCBA': 'olive', 'TradUCB': 'cyan', 'Uniform': 'm'}):
+                   colorMap = {'MetaMax': 'blue', 'MetaMaxInfinite': 'orange', 'RestlessInfiniteOCBA': 'green', 'RestlessInfiniteUCB': 'red',
+                               'RestlessOCBA': 'purple', 'RestlessUCB': 'brown', 'TradInfiniteOCBA': 'black', 'TradInfiniteUCB': 'gray',
+                               'TradOCBA': 'olive', 'TradUCB': 'cyan', 'Uniform': 'fuchsia', 'FitOCBA': 'lime', 'FitUCB': 'pink'}):
     plt.figure(figNum)
     plt.suptitle(wholeTitle)
 
@@ -40,15 +43,18 @@ def displayResults(funcDics, figNum, names, wholeTitle,
         resultDic = funcDics[titles[i]]
 
         for j in range(len(names)):
-            name = names[j]
-            aveError = resultDic[name]
-            x = list(aveError.keys())
+            try:
+                name = names[j]
+                aveError = resultDic[name]
 
-            x = [int(val) for val in x]
-            x.sort()
-            y = [aveError[str(m)] for m in x]
-            plt.plot(x, y, label=name, color = colorMap[name], linewidth=.5)
+                x = list(aveError.keys())
 
+                x = [int(val) for val in x]
+                x.sort()
+                y = [aveError[str(m)] for m in x]
+                plt.plot(x, y, label=name, color = colorMap[name], linewidth=.75)
+            except:
+                pass
 
         plt.subplot(4, 2, 2 * i + 1)
         plt.title(titles[i])
@@ -59,22 +65,30 @@ def displayResults(funcDics, figNum, names, wholeTitle,
         resultDic = funcDics[titles[i]]
 
         for j in range(len(names)):
-            name = names[j]
-            aveError = resultDic[name]
-            x = list(aveError.keys())
+            try:
+                name = names[j]
+                aveError = resultDic[name]
+                x = list(aveError.keys())
 
-            x = [int(val) for val in x]
-            x.sort()
-            y = [aveError[str(m)] for m in x]
-            plt.plot(x, y, label=name, color=colorMap[name])
+                x = [int(val) for val in x]
+                x.sort()
+                y = [aveError[str(m)] for m in x]
+                plt.plot(x, y, label=name, color=colorMap[name])
+            except:
+                pass
 
     # plt.legend(loc='upper right', bbox_to_anchor=(0, -0.1, .97, 1),
     #            bbox_transform=plt.gcf().transFigure)
 
     # plt.subplots_adjust(left=.07, right=.82, hspace=.5, wspace=.15)
 
+    patches = []
+    for i in range(len(names)):
+        name = names[i]
+        patches.append(mpatches.Patch(color=colorMap[name], label=name))
+
     plt.legend(loc='upper right', bbox_to_anchor=(0, -0.1, .99, 1),
-               bbox_transform=plt.gcf().transFigure)
+               bbox_transform=plt.gcf().transFigure, handles=patches)
 
     plt.subplots_adjust(left=.07, right=.8, hspace=.667, wspace=.225)
 
@@ -88,7 +102,7 @@ def displayResults(funcDics, figNum, names, wholeTitle,
 figTitles = ["Ackley", "Griewank", "Rastrigin"]
 paths = ['Results/origComp2/ackley2', 'Results/origComp2/griewank2', 'Results/origComp2/rastrigin2']
 names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB',
-         'TradInfiniteOCBA', 'TradInfiniteUCB', 'TradOCBA', 'TradUCB', 'Uniform']
+         'TradInfiniteOCBA', 'TradInfiniteUCB', 'TradOCBA', 'TradUCB', 'Uniform', 'FitOCBA', 'FitUCB']
 
 for i in range(len(paths)):
     print(paths[i])
@@ -109,11 +123,14 @@ for i in range(len(paths)):
 
         resultDic = {}
         for fileName in fileNames:
-            with open(direcPath + "/" + fileName) as jf:
-                loadedDic = json.load(jf)
-                resultDic[fileName[:-5]] = loadedDic
+            try:
+                with open(direcPath + "/" + fileName) as jf:
+                    loadedDic = json.load(jf)
+                    resultDic[fileName[:-5]] = loadedDic
 
-                allocRankings[fileName[:-5]] = loadedDic[sorted(list(loadedDic.keys()))[-1]]
+                    allocRankings[fileName[:-5]] = loadedDic[sorted(list(loadedDic.keys()))[-1]]
+            except:
+                pass
         print(allocRankings)
         print()
         print()

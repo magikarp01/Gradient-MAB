@@ -345,10 +345,10 @@ class otherTests:
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
-k = 3
-d = 1
+k = 5
+d = 2
 maxBudget = 10000
-batchSize = 100
+batchSize = 5
 numEvalsPerGrad = 2
 sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 minSamples = 25
@@ -390,11 +390,11 @@ figList = []
 # resultList.append(resultsFitInfiniteUCB)
 # figList.append(figFitInfiniteUCB)
 
-# resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-# figRestlessOCBA = plt.figure(5)
-# figRestlessOCBA.suptitle("Restless OCBA Allocation")
-# resultList.append(resultsRestlessOCBA)
-# figList.append(figRestlessOCBA)
+resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+figRestlessOCBA = plt.figure(5)
+figRestlessOCBA.suptitle("Restless OCBA Allocation")
+resultList.append(resultsRestlessOCBA)
+figList.append(figRestlessOCBA)
 #
 # resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
 # figRestlessInfiniteOCBA = plt.figure(6)
@@ -440,11 +440,11 @@ figList = []
 # figList.append(figTradInfiniteUCB)
 #
 #
-resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
-figUniform = plt.figure(13)
-figUniform.suptitle("Uniform Allocation")
-resultList.append(resultsUniform)
-figList.append(figUniform)
+# resultsUniform = otherTests.uniform(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
+# figUniform = plt.figure(13)
+# figUniform.suptitle("Uniform Allocation")
+# resultList.append(resultsUniform)
+# figList.append(figUniform)
 #
 # resultsMetaMax = otherTests.metaMax(sharedParams, a=a, startPos=sharedStartPos, useSPSA=True)
 # figMetaMax = plt.figure(14)
@@ -476,9 +476,9 @@ alpha = .1
 
 # testing = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 for i in range(len(resultList)):
-    # visualize.display3DResults(resultList[i], fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figList[i])
-    fig, ax = plt.subplots()
-    gradientAllocation.displayInstances1D(fun, resultList[i][3], ax, colors, fColor='blue', lineWidth=5)
+    visualize.display3DResults(resultList[i], fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figList[i])
+    # fig, ax = plt.subplots()
+    # gradientAllocation.displayInstances1D(fun, resultList[i][3], ax, colors, fColor='blue', lineWidth=5)
 
 # test.test_display3DResults(resultsFitOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figFitOCBA)
 # test.test_display3DResults(resultsRestlessOCBA, fun, colors, fColor = 'b', lineWidth=lineWidth, alpha=alpha, showFunction=True, fig=figRestlessOCBA)

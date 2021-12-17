@@ -107,10 +107,10 @@ def display1D(fun, x_range):
     x = np.linspace(x_range[0], x_range[1], 10000)
     y = [fun([i]) for i in x]
     plt.plot(x, y)
-    plt.title("Griewank 1D")
+    plt.title("Parabola")
     plt.show()
 
-display1D(griewank_adjusted, [-.5,1.5])
+display1D(lambda x: x[0]**2, [-1.5,1.5])
 
 
 def display3D(fun, domain, ax, fColor='b', alpha=1, fineness = .005):
