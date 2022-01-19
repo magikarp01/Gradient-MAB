@@ -6,22 +6,24 @@ from scipy import optimize
 
 
 class finiteDifs:
-    def __init__(self, alpha=.602, gamma=.101, stability=60):
+    def __init__(self, alpha=.602, gamma=.101, stability=60, a=.001, c=.001):
         self.alpha = alpha
         self.gamma = gamma
         self.stability = stability
+        self.a = a
+        self.c = c
 
-    def get_at(self, a, t):
+    def get_at(self, t):
         denom = (self.stability+t+1)**self.alpha
-        return a/denom
+        return self.a/denom
 
-    def get_ct(self, c, t):
+    def get_ct(self, t):
         denom = (t+1) ** self.gamma
-        return c/denom
+        return self.c/denom
 
 # for the analytic functions, try doing a direct gradient
-    def partials(self, f, x, t, c=.001):
-        c_t = self.get_ct(c, t)
+    def partials(self, f, x, t):
+        c_t = self.get_ct(t)
         d = len(x)
         grad = [0]*d
         for dim in range(d):
@@ -43,18 +45,18 @@ class finiteDifs:
 
 #        return np.array(optimize.approx_fprime(x, f, c_t))
 
-    def step(self, x, t, partials, a=.001):
-        a_t = self.get_at(a, t)
+    def step(self, x, t, partials):
+        a_t = self.get_at(t)
         return np.add(x, np.multiply(partials, a_t))
 
     # x is starting point
-    def gradDescent(self, f, x, steps, a=.001, c=.001):
+    def gradDescent(self, f, x, steps):
         min = f(x)
         minParams = x
         samples = [(x, min)]
         for t in range(steps):
-            grad = self.partials(f, x, t+1, c)
-            x = self.step(x, t+1, np.negative(grad), a)
+            grad = self.partials(f, x, t+1)
+            x = self.step(x, t+1, np.negative(grad))
             eval = f(x)
             samples.append((x, eval))
             if eval < min:
@@ -62,13 +64,13 @@ class finiteDifs:
                 minParams = x
         return minParams, min, samples
 
-    def gradAscent(self, f, x, steps, a=.001, c=.001):
+    def gradAscent(self, f, x, steps):
         max = f(x)
         maxParams = x
         samples = [(x, max)]
         for t in range(steps):
-            grad = self.partials(f, x, t + 1, c)
-            x = self.step(x, t + 1, grad, a)
+            grad = self.partials(f, x, t + 1)
+            x = self.step(x, t + 1, grad)
             eval = f(x)
             samples.append(x, eval)
             if eval > max:
@@ -90,9 +92,9 @@ class SPSA(finiteDifs):
     # t-th step
     # c is for get_ct
     # returns an approximation of the gradient
-    def partials(self, f, x, t, c=.001):
+    def partials(self, f, x, t):
         d = len(x)
-        c_t = self.get_ct(c, t)
+        c_t = self.get_ct(t)
         b = self.get_b(d)
         pert = np.multiply(b, c_t)
         numer = f(np.add(x, pert)) - f(np.subtract(x, pert))
