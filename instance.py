@@ -23,7 +23,8 @@ class Instance:
         self.points.append((startPos, startVal))
         self.pointValues.append(startVal)
 
-
+        # for gradientDescent
+        self.t = 0
 
     def get_points(self):
         return self.points
@@ -38,12 +39,17 @@ class Instance:
     def get_lastPoint(self):
         return self.points[-1]
 
+    def get_numSamples(self):
+        return self.numSamples
+
     # performs one descent step
-    def descend(self, f, a, c):
+    def descend(self, numEvalsPerGrad):
 
-        partials = self.gradDescentObject.partials(f, self.points[-1][0], self.numSamples, c=c)
+        partials = self.gradDescentObject.partials(self.f, self.points[-1][0], self.t)
         partials = np.negative(partials)
-        newX = self.gradDescentObject.step(self.points[-1][0], self.numSamples, partials, a=a)
-        self.points.append((newX, f(newX)))
+        newX = self.gradDescentObject.step(self.points[-1][0], self.t, partials)
+        self.points.append((newX, self.f(newX)))
 
-        self.numSamples += 1
+        # I had += numEvalsPerGrad + 2, but I don't think it should be that
+        self.numSamples += numEvalsPerGrad + 2
+        self.t += 1
