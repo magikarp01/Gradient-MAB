@@ -128,7 +128,8 @@ class OCBA:
 
         return intParts
 
-    def getBudget(values, variances, numSamples, batchSize, c):
+    # def getBudget(values, variances, numSamples, batchSize, c):
+    def getBudget(instances, batchSize):
         return OCBA.allocateSamples( OCBA.budgetCalc(values,variances,numSamples), batchSize)
 
 
@@ -163,7 +164,8 @@ class UCB:
     def allocateSamples(budgetAlloc, batchSize):
         return [i * batchSize for i in budgetAlloc]
 
-    def getBudget(values, variances, numSamples, batchSize, c):
+    # def getBudget(values, variances, numSamples, batchSize, c):
+    def getBudget(instances, batchSize):
         pooledVar = sum(variances)/len(variances)
         c *= math.sqrt(pooledVar)
         return UCB.allocateSamples(UCB.budgetCalc(values, numSamples, c=c), batchSize)

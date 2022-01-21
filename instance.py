@@ -45,11 +45,11 @@ class Instance:
     # performs one descent step
     def descend(self, numEvalsPerGrad):
 
+        # previously, it was self.numSamples instead of self.t
         partials = self.gradDescentObject.partials(self.f, self.points[-1][0], self.t)
         partials = np.negative(partials)
         newX = self.gradDescentObject.step(self.points[-1][0], self.t, partials)
         self.points.append((newX, self.f(newX)))
 
-        # I had += numEvalsPerGrad + 2, but I don't think it should be that
         self.numSamples += numEvalsPerGrad + 2
         self.t += 1

@@ -7,18 +7,10 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import json
 import multiprocessing as mp
-import os
 
 import gradientAllocation
-import paramPickler
-import baiAllocations
-import fitBandits
-import restlessBandits
-import tradBandits
-import uniformAlloc
-import metaMaxAlloc
-
-import sys
+from meta import paramPickler
+from old import tradBandits, fitBandits, restlessBandits, metaMaxAlloc, uniformAlloc, baiAllocations
 
 fun = functions.ackley_adjusted
 
@@ -253,7 +245,7 @@ def tempRestlessUCB(aveErrorList, iterations, sharedParams, startPosList):
     for iteration in tqdm(range(iterations)):
         results = restlessBandits.restlessSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
                                                  f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+                                                 a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
@@ -289,7 +281,7 @@ def tempRestlessInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList
     for iteration in tqdm(range(iterations)):
         results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
                                                          f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                   a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+                                                         a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
@@ -322,7 +314,7 @@ def tempTradOCBA(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = tradBandits.tradSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+                                         a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
 
         convergeDic = results[2]
         for s in convergeDic.keys():
@@ -356,7 +348,7 @@ def tempTradInfiniteOCBA(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = tradBandits.tradInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                     a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+                                                 a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
@@ -389,7 +381,7 @@ def tempTradUCB(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = tradBandits.tradSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
+                                         a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:
@@ -422,7 +414,7 @@ def tempTradInfiniteUCB(aveErrorList, iterations, sharedParams, startPosList):
     errors = {}
     for iteration in tqdm(range(iterations)):
         results = tradBandits.tradInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                     a=a, c=c, useTqdm=False, useSPSA=useSPSA)
+                                                 a=a, c=c, useTqdm=False, useSPSA=useSPSA)
         convergeDic = results[2]
         for s in convergeDic.keys():
             try:

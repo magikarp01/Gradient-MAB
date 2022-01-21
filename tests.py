@@ -1,19 +1,9 @@
-import unittest
-import random
-
-import kriging
-import gradDescent
 import functions
 import matplotlib.pyplot as plt
 import gradientAllocation
 
-import uniformAlloc
-import metaMaxAlloc
+from old import tradBandits, fitBandits, restlessBandits, metaMaxAlloc, uniformAlloc, baiAllocations
 
-import fitBandits
-import restlessBandits
-import tradBandits
-import baiAllocations
 
 # class TestClass(unittest.TestCase):
 class visualize:
@@ -69,7 +59,7 @@ class fitTests:
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
         results = fitBandits.fitSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
         # print("Convergence Dictionary: ", end="")
         # print(results[2])
@@ -107,7 +97,7 @@ class fitTests:
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
         results = fitBandits.fitSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def fitInfiniteUCB(sharedParams, minSamples,
@@ -138,7 +128,7 @@ class restlessTests:
         numEvalsPerGrad = sharedParams[5]
         results = restlessBandits.restlessSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
                                                  f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+                                                 a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def restlessInfiniteOCBA(sharedParams, discountFactor, windowLength, minSamples,
@@ -150,7 +140,7 @@ class restlessTests:
         numEvalsPerGrad = sharedParams[5]
         results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
                                                          f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                   a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+                                                         a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def restlessUCB(sharedParams, discountFactor, windowLength, minSamples,
@@ -164,7 +154,7 @@ class restlessTests:
         numEvalsPerGrad = sharedParams[5]
         results = restlessBandits.restlessSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
                                                  f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+                                                 a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def restlessInfiniteUCB(sharedParams, discountFactor, windowLength, minSamples,
@@ -176,7 +166,7 @@ class restlessTests:
         numEvalsPerGrad = sharedParams[5]
         results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
                                                          f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                   a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+                                                         a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
 
@@ -191,7 +181,7 @@ class tradTests:
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
         results = tradBandits.tradSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+                                         a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def tradInfiniteOCBA(sharedParams, minSamples,
@@ -202,7 +192,7 @@ class tradTests:
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
         results = tradBandits.tradInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                     a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+                                                 a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def tradUCB(sharedParams, minSamples,
@@ -214,7 +204,7 @@ class tradTests:
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
         results = tradBandits.tradSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                          a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+                                         a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
     def tradInfiniteUCB(sharedParams, minSamples,
@@ -225,7 +215,7 @@ class tradTests:
         batchSize = sharedParams[4]
         numEvalsPerGrad = sharedParams[5]
         results = tradBandits.tradInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                                                     a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+                                                 a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
         return results
 
 

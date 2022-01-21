@@ -1,12 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import math
-import random
 import gradDescent
-import kriging
-import pyDOE
-import functions
-import baiAllocations
+from old import baiAllocations
 from gradientAllocation import stratifiedSampling, randomParams
 from tqdm import tqdm
 

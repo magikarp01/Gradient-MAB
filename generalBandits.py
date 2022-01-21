@@ -1,8 +1,7 @@
 import numpy as np
 import math
 import gradDescent
-import baiAllocations
-from gradientAllocation import stratifiedSampling, randomParams
+from gradientAllocation import stratifiedSampling
 from tqdm import tqdm
 from instance import Instance
 
@@ -25,15 +24,11 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
 
     if not startPos:
         startPositions = stratifiedSampling(d, k)
-
     else:
         startPositions = startPos
 
     for i in range(k):
-        startPoint = startPositions[i]
-
-        # this is for minimizing not maximizing
-        instances[i] = Instance(f, d, gradientDescentObject, startPoint)
+        instances[i] = Instance(f, d, gradientDescentObject, startPositions[i])
 
     # change True to while budget < maxBudget
     convergeDic = {}
@@ -45,10 +40,7 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         pbar = tqdm(total=tqdmTotal)
     while elapsedBudget < maxBudget:
         oldElapsedBudget = elapsedBudget
-        # print(elapsedBudget)
-
-        sampleAlloc = allocMethod(instances)
-
+        sampleAlloc = allocMethod(instances, )
         sampleDic[elapsedBudget] = [instance.get_numSamples() for instance in instances]
 
         # perform sampleAlloc[i] steps for every instance
@@ -56,8 +48,6 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         for i in range(k):
             samples = sampleAlloc[i]
             for j in range(samples):
-                # step from the previous point of the ith instance once
-
                 instances[i].descend()
                 elapsedBudget += numEvalsPerGrad + 2
 
@@ -68,5 +58,6 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         if(useTqdm):
             pbar.update(elapsedBudget - oldElapsedBudget)
 
-    maxIndex = np.argmax(fHats)
-    return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+    maxIndex = np.argmax([instance.get_fHat() for instance in instances])
+    return (instances[maxIndex].get_xHat(), instances[maxIndex].get_fHat(),
+            convergeDic, instances, [instance.get_numSamples() for instance in instances], sampleDic)
