@@ -1,0 +1,2 @@
+discountFactor = .9
+slidingWindow = 15

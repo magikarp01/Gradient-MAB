@@ -29,6 +29,9 @@ class Instance:
     def get_points(self):
         return self.points
 
+    def get_pointValues(self):
+        return [point[1] for point in self.points]
+
     def get_fHat(self):
         return max(self.pointValues)
 

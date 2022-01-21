@@ -10,15 +10,15 @@ class parameters:
         self.sharedParams = sharedParams
 
     def load(self, loc):
-        h = open(loc, "rb")
-        savedParams = pickle.load(h)
-        self.numProcesses = savedParams.numProcesses
-        self.iterPerProcess = savedParams.iterPerProcess
-        self.sharedParams = savedParams.sharedParams
+        with open(loc, "rb") as h:
+            savedParams = pickle.load(h)
+            self.numProcesses = savedParams.numProcesses
+            self.iterPerProcess = savedParams.iterPerProcess
+            self.sharedParams = savedParams.sharedParams
 
     def save(self, path):
-        g = open(path + "/params.txt", "wb")
-        pickle.dump(self, g)
+        with open(path + "/params.txt", "wb") as g:
+            pickle.dump(self, g)
 
 
     def display(self):
