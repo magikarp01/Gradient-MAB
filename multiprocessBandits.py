@@ -4,7 +4,7 @@ import gradDescent
 from gradientAllocation import stratifiedSampling
 from tqdm import tqdm
 from instance import Instance
-
+from multiprocessing import Process, Queue
 
 # rewardModel is fit, restless, trad
 # baiBudget is getBudget function from OCBA or UCB
@@ -14,7 +14,8 @@ from instance import Instance
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
-def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, numProcesses,
+              numEvalsPerGrad, minSamples,
                   a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
 
     instances = []
@@ -51,16 +52,25 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
 
         sampleDic[elapsedBudget] = numSamples.copy()
 
-
-        sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
+        sampleAlloc = baiBudget(values, variances, numSamples, numProcesses)
 
         # perform sampleAlloc[i] steps for every instance
         # could add in multi-threading here
-        for i in sampleAlloc:
-            instances[i].descend()
-            elapsedBudget += numEvalsPerGrad + 2
 
+        # it's possible that instance.descend has to be changed to be descend(instance), returns new instance
+        # Process may be messed up
+        processes = [Process(target=instances[x].descend, args=()) for x in range(len(sampleAlloc))]
+
+        for p in processes:
+            p.start()
+
+        for p in processes:
+            # not sure if this should go here or with p.start()
+            elapsedBudget += numEvalsPerGrad + 2
             convergeDic[elapsedBudget] = min([instance.get_fHat()] for instance in instances)
+            p.join()
+
+
 
         # convergeDic[elapsedBudget] = min(fHats)
 

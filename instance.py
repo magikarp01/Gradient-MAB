@@ -45,6 +45,9 @@ class Instance:
     def get_numSamples(self):
         return self.numSamples
 
+    def get_gradDescentObject(self):
+        return self.gradDescentObject
+
     # performs one descent step
     def descend(self, numEvalsPerGrad):
 
