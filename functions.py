@@ -110,7 +110,7 @@ def display1D(fun, x_range):
     plt.title("Parabola")
     plt.show()
 
-display1D(lambda x: x[0]**2, [-1.5,1.5])
+# display1D(lambda x: x[0]**2, [-1.5,1.5])
 
 
 def display3D(fun, domain, ax, fColor='b', alpha=1, fineness = .005):

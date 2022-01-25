@@ -3,12 +3,7 @@ import gradientAllocation
 
 
 class Instance:
-    # point is (x, f(x))
-    points = []
 
-    # list of f(x) for previously visited x
-    pointValues = []
-    numSamples = 0
 
     # makes new instance of search
     # starts at random or ___, performs minSamples descents,
@@ -20,11 +15,14 @@ class Instance:
             startPos = gradientAllocation.randomParams(d)
 
         startVal = self.f(startPos)
-        self.points.append((startPos, startVal))
-        self.pointValues.append(startVal)
+        # point is (x, f(x))
+        self.points = [(startPos, startVal)]
+
+        # list of f(x) for previously visited x
+        self.pointValues = [startVal]
 
         # for gradientDescent
-        self.t = 0
+        self.numSamples = 0
 
     def get_points(self):
         return self.points
@@ -48,14 +46,17 @@ class Instance:
     def get_gradDescentObject(self):
         return self.gradDescentObject
 
-    # performs one descent step
-    def descend(self, numEvalsPerGrad):
+    # should speed up multiprocessing
+    def multiprocessDescend(self, newPoint):
+        self.points.append(newPoint)
+        self.numSamples += 1
 
-        # previously, it was self.numSamples instead of self.t
-        partials = self.gradDescentObject.partials(self.f, self.points[-1][0], self.t)
+    # performs one descent step
+    def descend(self):
+        partials = self.gradDescentObject.partials(self.f, self.points[-1][0], self.numSamples)
         partials = np.negative(partials)
-        newX = self.gradDescentObject.step(self.points[-1][0], self.t, partials)
+        newX = self.gradDescentObject.step(self.points[-1][0], self.numSamples, partials)
         self.points.append((newX, self.f(newX)))
 
-        self.numSamples += numEvalsPerGrad + 2
-        self.t += 1
+        # previously, it was self.numSamples += minEvalsPerGrad
+        self.numSamples += 1

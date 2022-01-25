@@ -1,6 +1,8 @@
 import numpy as np
 import math
 import gradDescent
+import gradDescent
+
 from gradientAllocation import stratifiedSampling
 from tqdm import tqdm
 from instance import Instance
@@ -14,9 +16,8 @@ from multiprocessing import Process, Queue
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
-def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, numProcesses,
-              numEvalsPerGrad, minSamples,
-                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
+def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
 
     instances = []
 
@@ -31,16 +32,21 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, numProcesses,
         startPositions = startPos
 
     for i in range(k):
-        instances[i] = Instance(f, d, gradientDescentObject, startPositions[i])
+        newInstance = Instance(f, d, gradientDescentObject, startPositions[i])
+        instances.append(newInstance)
+        for j in range(minSamples):
+            instances[i].descend()
 
-    # change True to while budget < maxBudget
+
     convergeDic = {}
     sampleDic = {}
     elapsedBudget = 0
 
     if useTqdm:
         tqdmTotal = maxBudget - elapsedBudget
-        pbar = tqdm(total=tqdmTotal)
+        pbar = tqdm(total=tqdmTotal, position = 0, leave=True)
+
+
     while elapsedBudget < maxBudget:
         oldElapsedBudget = elapsedBudget
 
@@ -52,27 +58,31 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, numProcesses,
 
         sampleDic[elapsedBudget] = numSamples.copy()
 
-        sampleAlloc = baiBudget(values, variances, numSamples, numProcesses)
 
-        # perform sampleAlloc[i] steps for every instance
-        # could add in multi-threading here
+        sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
 
-        # it's possible that instance.descend has to be changed to be descend(instance), returns new instance
         # Process may be messed up
-        processes = [Process(target=instances[x].descend, args=()) for x in range(len(sampleAlloc))]
+        # processes = [Process(target=instances[x].descend, args=()) for x in range(len(sampleAlloc))]
+        qout = Queue()
+        processes = [Process(target=gradDescent.methods.descend,
+                             args=(instances[x].get_lastPoint(), f, instances[x].get_numSamples(), a, c, qout))
+                     for x in range(len(sampleAlloc))]
 
         for p in processes:
             p.start()
 
+        instanceNum = 0
         for p in processes:
+
             # not sure if this should go here or with p.start()
-            elapsedBudget += numEvalsPerGrad + 2
-            convergeDic[elapsedBudget] = min([instance.get_fHat()] for instance in instances)
             p.join()
 
+            instances[instanceNum].multiprocessDescend(qout.get())
 
+            elapsedBudget += numEvalsPerGrad + 2
+            convergeDic[elapsedBudget] = min([instance.get_fHat()] for instance in instances)
+            instanceNum += 1
 
-        # convergeDic[elapsedBudget] = min(fHats)
 
         if(useTqdm):
             pbar.update(elapsedBudget - oldElapsedBudget)
@@ -80,3 +90,5 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, numProcesses,
     maxIndex = np.argmax([instance.get_fHat() for instance in instances])
     return (instances[maxIndex].get_xHat(), instances[maxIndex].get_fHat(),
             convergeDic, instances, [instance.get_numSamples() for instance in instances], sampleDic)
+    # return instances, convergeDic, sampleDic
+

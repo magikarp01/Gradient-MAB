@@ -5,6 +5,47 @@ import random
 from scipy import optimize
 
 
+class methods:
+
+    def get_at(t, stability = 60, alpha=.602, a=.001):
+        denom = (stability+t+1)**alpha
+        return a/denom
+
+    def get_ct(t, gamma = .101, c=.001):
+        denom = (t+1) ** gamma
+        return c/denom
+
+    def partials(f, x, t, c=.001):
+        c_t = methods.get_ct(t, c=c)
+        d = len(x)
+        grad = [0] * d
+        for dim in range(d):
+            # try:
+            #     x1 = x.copy()
+            # except AttributeError:
+            #     pass
+            x1 = x.copy()
+
+            x1[dim] += c_t
+            x2 = x.copy()
+            x2[dim] -= c_t
+            numer = f(x1) - f(x2)
+            grad[dim] = numer / (2 * c_t)
+
+        # grad /= ((grad**2).sum*()**.5)
+        return np.array(grad)
+
+    def step(x, t, partials, a=.001):
+        a_t = methods.get_at(t, a=a)
+        return np.add(x, np.multiply(partials, a_t))
+
+    def descend(point, f, t, a, c, q):
+        partials = methods.partials(f, point[0], t, c=c)
+        partials = np.negative(partials)
+        newX = methods.step(point[0], t, partials, a=a)
+        q.put((newX, f(newX)))
+
+
 class finiteDifs:
     def __init__(self, alpha=.602, gamma=.101, stability=60, a=.001, c=.001):
         self.alpha = alpha

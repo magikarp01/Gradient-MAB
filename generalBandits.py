@@ -15,7 +15,7 @@ from instance import Instance
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
 def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False, UCBPad = math.sqrt(2)):
+                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
 
     instances = []
 
@@ -30,16 +30,21 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
         startPositions = startPos
 
     for i in range(k):
-        instances[i] = Instance(f, d, gradientDescentObject, startPositions[i])
+        newInstance = Instance(f, d, gradientDescentObject, startPositions[i])
+        instances.append(newInstance)
+        for j in range(minSamples):
+            instances[i].descend()
 
-    # change True to while budget < maxBudget
+
     convergeDic = {}
     sampleDic = {}
     elapsedBudget = 0
 
     if useTqdm:
         tqdmTotal = maxBudget - elapsedBudget
-        pbar = tqdm(total=tqdmTotal)
+        pbar = tqdm(total=tqdmTotal, position = 0, leave=True)
+
+
     while elapsedBudget < maxBudget:
         oldElapsedBudget = elapsedBudget
 
@@ -54,15 +59,11 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
 
         sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
 
-        # perform sampleAlloc[i] steps for every instance
-        # could add in multi-threading here
         for i in sampleAlloc:
             instances[i].descend()
             elapsedBudget += numEvalsPerGrad + 2
 
             convergeDic[elapsedBudget] = min([instance.get_fHat()] for instance in instances)
-
-        # convergeDic[elapsedBudget] = min(fHats)
 
         if(useTqdm):
             pbar.update(elapsedBudget - oldElapsedBudget)
@@ -70,3 +71,4 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
     maxIndex = np.argmax([instance.get_fHat() for instance in instances])
     return (instances[maxIndex].get_xHat(), instances[maxIndex].get_fHat(),
             convergeDic, instances, [instance.get_numSamples() for instance in instances], sampleDic)
+    # return instances, convergeDic, sampleDic

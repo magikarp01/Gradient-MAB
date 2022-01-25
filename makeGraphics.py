@@ -94,11 +94,14 @@ def displayResults(funcDics, figNum, names, wholeTitle,
 
 
 
+# def animate3D()
+
+
 # figDic = {}
 # for i in range(len(paths)):
 #     figDic[paths[i]] = i
 
-# """
+"""
 figTitles = ["Ackley", "Griewank", "Rastrigin"]
 paths = ['Results/origComp2/ackley2', 'Results/origComp2/griewank2', 'Results/origComp2/rastrigin2']
 names = ['MetaMax', 'MetaMaxInfinite', 'RestlessInfiniteOCBA', 'RestlessInfiniteUCB', 'RestlessOCBA', 'RestlessUCB',
