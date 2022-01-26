@@ -47,9 +47,10 @@ class Instance:
         return self.gradDescentObject
 
     # should speed up multiprocessing
-    def multiprocessDescend(self, newPoint):
-        self.points.append(newPoint)
-        self.numSamples += 1
+    def multiprocessDescend(self, newPoints):
+        for newPoint in newPoints:
+            self.points.append(newPoint)
+            self.numSamples += 1
 
     # performs one descent step
     def descend(self):

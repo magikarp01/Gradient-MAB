@@ -2,11 +2,8 @@ import functions
 import matplotlib.pyplot as plt
 import gradientAllocation
 
-# from old import tradBandits, fitBandits, restlessBandits, metaMaxAlloc, uniformAlloc, baiAllocations
-import rewardModels
-import newBaiAllocations
-import generalBandits
-import multiprocessBandits
+from old import tradBandits, fitBandits, restlessBandits, metaMaxAlloc, uniformAlloc, baiAllocations
+
 
 # class TestClass(unittest.TestCase):
 class visualize:
@@ -23,7 +20,7 @@ class visualize:
 
     def display3DResults(results, fun, colors, fColor='b', lineWidth=3, alpha=.1, showFunction=True,
                               fig=plt.figure()):
-        instances = [instance.get_points() for instance in results[3]]
+        instances = results[3]
         sampleDic = results[5]
         convergeDic = results[2]
         ax1 = fig.add_subplot(121, projection='3d')
@@ -48,6 +45,179 @@ class visualize:
         gradientAllocation.displayInstancesND(instances, ax1, colors)
         gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
+
+
+class fitTests:
+
+    # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
+    def fitOCBA(sharedParams, minSamples,
+                           discountFactor=.9, windowLength = 15, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        # return (xHats[maxIndex], fHats[maxIndex], convergeDic, instances, numSamples, sampleDic)
+        # print("Convergence Dictionary: ", end="")
+        # print(results[2])
+        # print()
+        #
+        # instances = results[3]
+        # for i in range(k):
+        #     print(f"Instance #{i}: ", end="")
+        #     print(instances[i])
+        #     print()
+        # print("Sample Allocation: ", end="")
+        # print(results[4])
+        return results
+
+    def fitInfiniteOCBA(sharedParams, minSamples, discountFactor=.9, windowLength = 15,
+                           a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitInfiniteSearch(baiAllocations.discountedOCBA.getFitBudget, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                               a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def fitUCB(sharedParams, minSamples,
+                           discountFactor=.9, windowLength = 15, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                       a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def fitInfiniteUCB(sharedParams, minSamples,
+                           discountFactor=.9, windowLength = 15, a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = fitBandits.fitInfiniteSearch(baiAllocations.discountedUCB.getFitBudget, discountFactor, windowLength, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                               a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+
+class restlessTests:
+
+    # params is [f, k, d, maxBudget, batchSize, numEvalsPerGrad]
+    def restlessOCBA(sharedParams, discountFactor, windowLength, minSamples,
+                                a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                 f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                 a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def restlessInfiniteOCBA(sharedParams, discountFactor, windowLength, minSamples,
+                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedOCBA.getBudget, discountFactor, windowLength,
+                                                         f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                         a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def restlessUCB(sharedParams, discountFactor, windowLength, minSamples,
+                                a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        # UCBSearch(f, k, d, maxBudget, minSamples, batchSize, numEvalsPerGrad)
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
+                                                 f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                 a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def restlessInfiniteUCB(sharedParams, discountFactor, windowLength, minSamples,
+                                    a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = restlessBandits.restlessInfiniteSearch(baiAllocations.discountedUCB.getBudget, discountFactor, windowLength,
+                                                         f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                         a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+
+class tradTests:
+
+    def tradOCBA(sharedParams, minSamples,
+                           a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = tradBandits.tradSearch(baiAllocations.OCBA.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                         a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def tradInfiniteOCBA(sharedParams, minSamples,
+                                   a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = tradBandits.tradInfiniteSearch(baiAllocations.OCBA.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                 a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def tradUCB(sharedParams, minSamples,
+                           a=.001, c=.001, startPos=False, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        k = sharedParams[1]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = tradBandits.tradSearch(baiAllocations.UCB.getBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                         a=a, c=c, startPos=startPos, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
+    def tradInfiniteUCB(sharedParams, minSamples,
+                                   a=.001, c=.001, useTqdm=True, useSPSA=False):
+        f = sharedParams[0]
+        d = sharedParams[2]
+        maxBudget = sharedParams[3]
+        batchSize = sharedParams[4]
+        numEvalsPerGrad = sharedParams[5]
+        results = tradBandits.tradInfiniteSearch(baiAllocations.UCB.getBudget, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+                                                 a=a, c=c, useTqdm=useTqdm, useSPSA=useSPSA)
+        return results
+
 
 class otherTests:
 
@@ -165,13 +335,14 @@ class otherTests:
 # fun = functions.ackley_adjusted
 fun = functions.griewank_adjusted
 
-k = 50
+k = 5
 d = 2
 maxBudget = 10000
+batchSize = 5
 numEvalsPerGrad = 2
-# sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
-minSamples = 2
-a = .02
+sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
+minSamples = 25
+a = .01
 c = .00001
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 useSPSA = True
@@ -179,47 +350,10 @@ useSPSA = True
 discountFactor = .9
 slidingWindow = 15
 
-batchSize = 10
-numProcesses = 10
 # """
 
-
-if __name__ == '__main__':
-    models = [rewardModels.restless, rewardModels.trad]
-    mabPolicies = [newBaiAllocations.OCBA.getBudget, newBaiAllocations.UCB.getBudget]
-
-
-    yRange = [-1, 6]
-    colors=['g','r','c','y','m','k','brown','orange','purple','pink']
-    # colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
-    lineWidth = 2.5
-    alpha = .1
-
-    figNum = 0
-    figList = []
-    resultList = []
-
-
-    for model in models:
-        for mabPolicy in mabPolicies:
-
-            print(model.__name__ + "," + mabPolicy.__name__)
-
-            figNum += 1
-            # results = generalBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-            #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
-            results = multiprocessBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
-                                     a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
-
-            resultList.append(results)
-            newFig = plt.figure(figNum)
-            newFig.suptitle( model.__name__ + ", " + mabPolicy.__name__)
-            visualize.display3DResults(results, fun, colors, fColor='b', lineWidth=lineWidth, alpha=alpha,
-                                       showFunction=True, fig=newFig)
-            plt.show()
-
-    resultList = []
-    figList = []
+resultList = []
+figList = []
 
 # """
 # resultsFitOCBA = fitTests.fitOCBA(sharedParams, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
@@ -246,11 +380,11 @@ if __name__ == '__main__':
 # resultList.append(resultsFitInfiniteUCB)
 # figList.append(figFitInfiniteUCB)
 
-# resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
-# figRestlessOCBA = plt.figure(5)
-# figRestlessOCBA.suptitle("Restless OCBA Allocation")
-# resultList.append(resultsRestlessOCBA)
-# figList.append(figRestlessOCBA)
+resultsRestlessOCBA = restlessTests.restlessOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, startPos=sharedStartPos, useSPSA=True)
+figRestlessOCBA = plt.figure(5)
+figRestlessOCBA.suptitle("Restless OCBA Allocation")
+resultList.append(resultsRestlessOCBA)
+figList.append(figRestlessOCBA)
 #
 # resultsRestlessInfiniteOCBA = restlessTests.restlessInfiniteOCBA(sharedParams, discountFactor, slidingWindow, minSamples, a=a, c=c, useSPSA=True)
 # figRestlessInfiniteOCBA = plt.figure(6)
@@ -323,7 +457,6 @@ if __name__ == '__main__':
 #         print(f"{i}th key")
 
 
-"""
 yRange = [-1, 6]
 colors=['g','r','c','y','m','k','brown','orange','purple','pink']
 # colors = [(random.random(), random.random(), random.random()) for i in range(1000)]

@@ -61,6 +61,7 @@ def griewank(x):
 
 # accepts input in [0, 1]
 def griewank_adjusted(x_adjusted, error=0):
+    # time.sleep(.1)
     x = []
     for i in x_adjusted:
         x.append((i-.5)*2)

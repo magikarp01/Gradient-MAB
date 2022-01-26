@@ -7,6 +7,8 @@ from gradientAllocation import stratifiedSampling
 from tqdm import tqdm
 from instance import Instance
 from multiprocessing import Process, Queue
+# from multiprocessing.managers import SharedMemoryManager
+# from multiprocessing.shared_memory import SharedMemory
 
 # rewardModel is fit, restless, trad
 # baiBudget is getBudget function from OCBA or UCB
@@ -16,7 +18,8 @@ from multiprocessing import Process, Queue
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
-def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+# numProcesses is number of processes, batchSize is number of gradients for each process
+def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
                   a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
 
     instances = []
@@ -59,14 +62,14 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
         sampleDic[elapsedBudget] = numSamples.copy()
 
 
-        sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
+        sampleAlloc = baiBudget(values, variances, numSamples, numProcesses)
 
         # Process may be messed up
         # processes = [Process(target=instances[x].descend, args=()) for x in range(len(sampleAlloc))]
         qout = Queue()
         processes = [Process(target=gradDescent.methods.descend,
-                             args=(instances[x].get_lastPoint(), f, instances[x].get_numSamples(), a, c, qout))
-                     for x in range(len(sampleAlloc))]
+                             args=(instances[x].get_lastPoint(), f, instances[x].get_numSamples(), a, c, batchSize, qout))
+                     for x in range(numProcesses)]
 
         for p in processes:
             p.start()
@@ -77,9 +80,10 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
             # not sure if this should go here or with p.start()
             p.join()
 
-            instances[instanceNum].multiprocessDescend(qout.get())
+            newPoints = qout.get()
+            instances[instanceNum].multiprocessDescend(newPoints)
 
-            elapsedBudget += numEvalsPerGrad + 2
+            elapsedBudget += (numEvalsPerGrad + 1) * len(newPoints)
             convergeDic[elapsedBudget] = min([instance.get_fHat()] for instance in instances)
             instanceNum += 1
 

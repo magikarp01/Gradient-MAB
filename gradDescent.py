@@ -39,11 +39,17 @@ class methods:
         a_t = methods.get_at(t, a=a)
         return np.add(x, np.multiply(partials, a_t))
 
-    def descend(point, f, t, a, c, q):
-        partials = methods.partials(f, point[0], t, c=c)
-        partials = np.negative(partials)
-        newX = methods.step(point[0], t, partials, a=a)
-        q.put((newX, f(newX)))
+
+    def descend(point, f, t, a, c, iters, q):
+        newPoints = []
+        for iter in range(iters):
+            partials = methods.partials(f, point[0], t, c=c)
+            partials = np.negative(partials)
+            newX = methods.step(point[0], t, partials, a=a)
+            newPoints.append((newX, f(newX)))
+            t += 1
+
+        q.put(newPoints)
 
 
 class finiteDifs:
