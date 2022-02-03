@@ -163,23 +163,25 @@ class otherTests:
 # fun = functions.ackley_adjusted
 # fun = functions.rastrigin_adjusted
 # fun = functions.ackley_adjusted
-fun = functions.griewank_adjusted
+fun = lambda x : functions.griewank_adjusted(x, error=.25)
 
-k = 50
+k = 10
 d = 2
-maxBudget = 10000
+maxBudget = 100000
 numEvalsPerGrad = 2
 # sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 minSamples = 2
 a = .02
-c = .00001
+# c = .000001
+c = .2
+
 sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
 useSPSA = True
 
 discountFactor = .9
 slidingWindow = 15
 
-batchSize = 10
+batchSize = 5
 numProcesses = 10
 # """
 
@@ -206,10 +208,10 @@ if __name__ == '__main__':
             print(model.__name__ + "," + mabPolicy.__name__)
 
             figNum += 1
-            # results = generalBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-            #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
-            results = multiprocessBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
+            results = generalBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                      a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
+            # results = multiprocessBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
+            #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
 
             resultList.append(results)
             newFig = plt.figure(figNum)

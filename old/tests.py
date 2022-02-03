@@ -2,7 +2,8 @@ import functions
 import matplotlib.pyplot as plt
 import gradientAllocation
 
-from old import tradBandits, fitBandits, restlessBandits, metaMaxAlloc, uniformAlloc, baiAllocations
+from old import tradBandits, fitBandits, restlessBandits, uniformAlloc, baiAllocations
+import metaMaxAlloc
 
 
 # class TestClass(unittest.TestCase):

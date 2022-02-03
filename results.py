@@ -10,7 +10,8 @@ import multiprocessing as mp
 
 import gradientAllocation
 from meta import paramPickler
-from old import tradBandits, fitBandits, restlessBandits, metaMaxAlloc, uniformAlloc, baiAllocations
+from old import tradBandits, fitBandits, restlessBandits, uniformAlloc, baiAllocations
+import metaMaxAlloc
 
 fun = functions.ackley_adjusted
 

@@ -14,7 +14,7 @@ from instance import Instance
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
-def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                   a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
 
     instances = []
@@ -48,16 +48,19 @@ def MABSearch(rewardModel, baiBudget, f, k, d, maxBudget, batchSize, numEvalsPer
     while elapsedBudget < maxBudget:
         oldElapsedBudget = elapsedBudget
 
+        """
         rewardCalcs = [rewardModel(instance) for instance in instances]
 
         values = [calc[0] for calc in rewardCalcs]
         variances = [calc[1] for calc in rewardCalcs]
         numSamples = [instance.get_numSamples() for instance in instances]
-
+        """
+        numSamples = [instance.get_numSamples() for instance in instances]
         sampleDic[elapsedBudget] = numSamples.copy()
 
+        sampleAlloc = allocMethod(instances, batchSize)
+        # sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
 
-        sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
 
         for i in sampleAlloc:
             instances[i].descend()
