@@ -61,7 +61,9 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         sampleAlloc = allocMethod(instances, batchSize)
         # sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
 
-
+        # only descends once?
+        # I think sampleAlloc has to be a list of indices only,
+        # can't specify which instances get additional descents
         for i in sampleAlloc:
             instances[i].descend()
             elapsedBudget += numEvalsPerGrad + 2

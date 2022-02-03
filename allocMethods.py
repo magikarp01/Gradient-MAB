@@ -1,6 +1,7 @@
 import newBaiAllocations
 import rewardModels
 import metaMaxAlloc
+import random
 
 # returns the allocMethod function
 def baiAllocate(rewardModel, policy):
@@ -16,5 +17,14 @@ def baiAllocate(rewardModel, policy):
 
 
 def uniform(instances, batchSize):
+    k = len(instances)
+    samplesPerInstance = batchSize // k
+    results = [samplesPerInstance] * k
+    residue = batchSize % k
+    extras = random.sample(range(k), residue)
+    for i in extras:
+        results[i] += 1
+    return results
 
 
+def metaMax(instances, batchSize):
