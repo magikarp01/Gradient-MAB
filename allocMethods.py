@@ -20,13 +20,12 @@ def baiAllocate(rewardModel, policy):
 
 def uniform(instances, batchSize):
     k = len(instances)
-    samplesPerInstance = batchSize // k
-    results = [samplesPerInstance] * k
-    residue = batchSize % k
-    extras = random.sample(range(k), residue)
-    for i in extras:
-        results[i] += 1
-    return results
+
+    if batchSize < k:
+        return random.sample(range(0, k), batchSize)
+    else:
+        return range(0, k)
+
 
 
 def metaMax(instances, batchSize):
@@ -36,7 +35,7 @@ def metaMax(instances, batchSize):
 
     hSet = [math.exp(-n / math.sqrt(t)) for n in nSet]
 
-    selectedPoints = metaMaxAlloc.selectPoints(hSet, fHats)
+    return metaMaxAlloc.selectPoints(hSet, fHats)
 
 
 

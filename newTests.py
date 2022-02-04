@@ -172,20 +172,21 @@ fun = lambda x : functions.griewank_adjusted(x, error=.25)
 # fun = lambda x : functions.griewank_adjusted(x)
 
 
-# k = 20
-# d = 50
-k = 10
-d = 2
+k = 20
+d = 50
+# k = 10
+# d = 2
 maxBudget = 50000
 numEvalsPerGrad = 2
 # sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
 minSamples = 20
-a = .2
-# c = .000001
-c = .2
+# a = .2
+a = .001
+c = .000001
+# c = .2
 
-sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
-# sharedStartPos = [gradientAllocation.randomParams(d) for i in range(k)]
+# sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
+sharedStartPos = [gradientAllocation.randomParams(d) for i in range(k)]
 useSPSA = True
 
 discountFactor = .9
@@ -202,8 +203,8 @@ if __name__ == '__main__':
 
 
     yRange = [-1, 6]
-    colors=['g','r','c','y','m','k','brown','orange','purple','pink']
-    # colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
+    # colors=['g','r','c','y','m','k','brown','orange','purple','pink']
+    colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
     lineWidth = 2.5
     alpha = .1
 
@@ -214,8 +215,9 @@ if __name__ == '__main__':
 
     for model in models:
         for mabPolicy in mabPolicies:
-            allocMethod = allocMethods.baiAllocate(model, mabPolicy)
-
+            # allocMethod = allocMethods.baiAllocate(model, mabPolicy)
+            # allocMethod = allocMethods.uniform
+            allocMethod = allocMethods.metaMax
             figNum += 1
             results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                      a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
@@ -225,9 +227,9 @@ if __name__ == '__main__':
             resultList.append(results)
             newFig = plt.figure(figNum)
             newFig.suptitle( model.__name__ + ", " + mabPolicy.__name__)
-            visualize.display3DResults(results, fun, colors, fColor='b', lineWidth=lineWidth, alpha=alpha,
-                                       showFunction=True, fig=newFig)
-            # visualize.displayNDResults(results, colors, fig=newFig)
+            # visualize.display3DResults(results, fun, colors, fColor='b', lineWidth=lineWidth, alpha=alpha,
+            #                            showFunction=True, fig=newFig)
+            visualize.displayNDResults(results, colors, fig=newFig)
             plt.show()
 
     resultList = []
