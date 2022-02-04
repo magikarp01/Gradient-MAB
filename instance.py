@@ -31,7 +31,7 @@ class Instance:
         return [point[1] for point in self.points]
 
     def get_fHat(self):
-        return max(self.pointValues)
+        return min(self.pointValues)
 
     def get_xHat(self):
         return np.argmax(self.pointValues)
@@ -58,6 +58,7 @@ class Instance:
         partials = np.negative(partials)
         newX = self.gradDescentObject.step(self.points[-1][0], self.numSamples, partials)
         self.points.append((newX, self.f(newX)))
+        self.pointValues.append(self.get_lastPoint()[1])
 
         # previously, it was self.numSamples += minEvalsPerGrad
         self.numSamples += 1

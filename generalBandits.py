@@ -68,7 +68,8 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
             instances[i].descend()
             elapsedBudget += numEvalsPerGrad + 2
 
-            convergeDic[elapsedBudget] = min([instance.get_fHat()] for instance in instances)
+            mins = [instance.get_fHat() for instance in instances]
+            convergeDic[elapsedBudget] = min(mins)
 
         if(useTqdm):
             pbar.update(elapsedBudget - oldElapsedBudget)
