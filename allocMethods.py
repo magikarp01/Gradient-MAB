@@ -1,3 +1,5 @@
+import math
+
 import newBaiAllocations
 import rewardModels
 import metaMaxAlloc
@@ -28,3 +30,13 @@ def uniform(instances, batchSize):
 
 
 def metaMax(instances, batchSize):
+    fHats = [instance.get_fHat() for instance in instances]
+    nSet = [instance.get_numSamples() for instance in instances]
+    t = sum(nSet)
+
+    hSet = [math.exp(-n / math.sqrt(t)) for n in nSet]
+
+    selectedPoints = metaMaxAlloc.selectPoints(hSet, fHats)
+
+
+

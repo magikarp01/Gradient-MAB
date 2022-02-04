@@ -1,3 +1,5 @@
+import random
+
 import functions
 import matplotlib.pyplot as plt
 import gradientAllocation
@@ -7,6 +9,8 @@ import rewardModels
 import newBaiAllocations
 import generalBandits
 import multiprocessBandits
+import allocMethods
+
 
 # class TestClass(unittest.TestCase):
 class visualize:
@@ -36,8 +40,8 @@ class visualize:
         gradientAllocation.displaySamplingHistory(sampleDic, ax2, colors)
         gradientAllocation.displayMinimaHistory(convergeDic, ax3)
 
-    def test_displayNDResults(results, colors, fig=plt.figure()):
-        instances = results[3]
+    def displayNDResults(results, colors, fig=plt.figure()):
+        instances = [instance.get_points() for instance in results[3]]
         sampleDic = results[5]
         convergeDic = results[2]
         ax1 = fig.add_subplot(121)
@@ -165,17 +169,18 @@ class otherTests:
 # fun = functions.ackley_adjusted
 fun = lambda x : functions.griewank_adjusted(x, error=.25)
 
-k = 10
-d = 2
-maxBudget = 100000
+k = 20
+d = 50
+maxBudget = 50000
 numEvalsPerGrad = 2
 # sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad]
-minSamples = 2
-a = .02
+minSamples = 20
+a = .2
 # c = .000001
 c = .2
 
-sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
+# sharedStartPos = gradientAllocation.stratifiedSampling(d, k)
+sharedStartPos = [gradientAllocation.randomParams(d) for i in range(k)]
 useSPSA = True
 
 discountFactor = .9
@@ -188,12 +193,12 @@ numProcesses = 10
 
 if __name__ == '__main__':
     models = [rewardModels.restless, rewardModels.trad]
-    mabPolicies = [newBaiAllocations.OCBA.getBudget, newBaiAllocations.UCB.getBudget]
+    mabPolicies = [newBaiAllocations.UCB.getBudget]
 
 
     yRange = [-1, 6]
-    colors=['g','r','c','y','m','k','brown','orange','purple','pink']
-    # colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
+    # colors=['g','r','c','y','m','k','brown','orange','purple','pink']
+    colors = [(random.random(), random.random(), random.random()) for i in range(1000)]
     lineWidth = 2.5
     alpha = .1
 
@@ -204,11 +209,10 @@ if __name__ == '__main__':
 
     for model in models:
         for mabPolicy in mabPolicies:
-
-            print(model.__name__ + "," + mabPolicy.__name__)
+            allocMethod = allocMethods.baiAllocate(model, mabPolicy)
 
             figNum += 1
-            results = generalBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+            results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
                                      a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
             # results = multiprocessBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
             #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
@@ -216,8 +220,9 @@ if __name__ == '__main__':
             resultList.append(results)
             newFig = plt.figure(figNum)
             newFig.suptitle( model.__name__ + ", " + mabPolicy.__name__)
-            visualize.display3DResults(results, fun, colors, fColor='b', lineWidth=lineWidth, alpha=alpha,
-                                       showFunction=True, fig=newFig)
+            # visualize.display3DResults(results, fun, colors, fColor='b', lineWidth=lineWidth, alpha=alpha,
+            #                            showFunction=True, fig=newFig)
+            visualize.displayNDResults(results, colors, fig=newFig)
             plt.show()
 
     resultList = []
