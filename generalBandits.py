@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import gradDescent
-from gradientAllocation import stratifiedSampling
+from gradientAllocation import stratifiedSampling, randomParams
 from tqdm import tqdm
 from instance import Instance
 
@@ -90,16 +90,11 @@ def MABSearchInfinite(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, 
     else:
         gradientDescentObject = gradDescent.finiteDifs(a=a, c=c)
 
-    if not startPos:
-        startPositions = stratifiedSampling(d, k)
-    else:
-        startPositions = startPos
 
-    for i in range(k):
-        newInstance = Instance(f, d, gradientDescentObject, startPositions[i])
-        instances.append(newInstance)
-        for j in range(minSamples):
-            instances[i].descend()
+    newInstance = Instance(f, d, gradientDescentObject, randomParams(d))
+    instances.append(newInstance)
+    for j in range(minSamples):
+        instances[0].descend()
 
 
     convergeDic = {}
@@ -121,6 +116,12 @@ def MABSearchInfinite(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, 
         variances = [calc[1] for calc in rewardCalcs]
         numSamples = [instance.get_numSamples() for instance in instances]
         """
+
+        newInstance = Instance(f, d, gradientDescentObject, randomParams(d))
+        instances.append(newInstance)
+        for j in range(minSamples):
+            instances[-1].descend()
+
         numSamples = [instance.get_numSamples() for instance in instances]
         sampleDic[elapsedBudget] = numSamples.copy()
 

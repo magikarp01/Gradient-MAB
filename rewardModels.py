@@ -32,8 +32,14 @@ def restless(instance):
     improvements = []
     for t in range(len(points)-1):
         improvement = pointValues[t+1] - pointValues[t]
-        c_t = instance.get_gradDescentObject().get_ct(t)
-        improvement /= c_t
+        # c_t = instance.get_gradDescentObject().get_ct(t)
+        # Should I divide by c_t???
+        # probably fucking everything up
+        # improvement /= c_t
+
+        # dividing by a_t instead (size of step):
+        # a_t = instance.get_gradDescentObject().get_at(t)
+        # improvement /= a_t
         improvements.append(improvement)
 
     # finding weighted mean here
@@ -63,12 +69,15 @@ def restless(instance):
 def trad(instance):
     pointValues = instance.get_pointValues()
 
+    # last point value
+    reward = pointValues[-1]
+
     numer = 0
     avg = sum(pointValues) / len(pointValues)
     for fVal in pointValues:
         numer += (fVal - avg) ** 2
     variance = numer / (len(pointValues) + 1)
 
-    return avg, variance
+    return reward, variance
 
 
