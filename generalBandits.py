@@ -14,8 +14,11 @@ from instance import Instance
 # maxBudget must be much greater than k*minSamples*numEvalsPerGrad, min bound is k*(minSamples*numEvalsPerGrad + 1)
 # k is number of instances
 # allocMethod is one of the getBudget methods from baiAllocations
-def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False):
+# allocSize is number of instances that are exploited per round
+# batchSize is number of gradient descents that an exploited process does in one round
+def MABSearch(allocMethod, f, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples,
+                  a=.001, c=.001, startPos = False, useSPSA=False, useTqdm=False,
+              discountFactor = .9, slidingWindow = 15):
 
     instances = []
 
@@ -58,15 +61,16 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
         numSamples = [instance.get_numSamples() for instance in instances]
         sampleDic[elapsedBudget] = numSamples.copy()
 
-        sampleAlloc = allocMethod(instances, batchSize)
-        # sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
+        sampleAlloc = allocMethod(instances, allocSize, discountFactor=discountFactor, slidingWindow=slidingWindow)
+        # sampleAlloc = baiBudget(values, variances, numSamples, allocSize)
 
         # only descends once?
         # I think sampleAlloc has to be a list of indices only,
         # can't specify which instances get additional descents
         for i in sampleAlloc:
-            instances[i].descend()
-            elapsedBudget += numEvalsPerGrad + 2
+            for ij in range(batchSize):
+                instances[i].descend()
+                elapsedBudget += numEvalsPerGrad + 2
 
             mins = [instance.get_fHat() for instance in instances]
             convergeDic[elapsedBudget] = min(mins)
@@ -80,7 +84,7 @@ def MABSearch(allocMethod, f, k, d, maxBudget, batchSize, numEvalsPerGrad, minSa
     # return instances, convergeDic, sampleDic
 
 
-def MABSearchInfinite(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+def MABSearchInfinite(allocMethod, f, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples,
                   a=.001, c=.001, useSPSA=False, useTqdm=False):
 
     instances = []
@@ -125,7 +129,7 @@ def MABSearchInfinite(allocMethod, f, d, maxBudget, batchSize, numEvalsPerGrad, 
         numSamples = [instance.get_numSamples() for instance in instances]
         sampleDic[elapsedBudget] = numSamples.copy()
 
-        sampleAlloc = allocMethod(instances, batchSize)
+        sampleAlloc = allocMethod(instances, allocSize)
         # sampleAlloc = baiBudget(values, variances, numSamples, batchSize)
 
         # only descends once?

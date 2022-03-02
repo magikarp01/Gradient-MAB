@@ -54,21 +54,22 @@ def readParams(loc):
     k = int(valDic["k"])
     d = int(valDic["d"])
     maxBudget = int(valDic["maxBudget"])
+    allocSize = int(valDic["allocSize"])
     batchSize = int(valDic["batchSize"])
     numEvalsPerGrad = int(valDic["numEvalsPerGrad"])
     minSamples = int(valDic["minSamples"])
 
-    minimum = float(valDic["minimum"])
-    discountRate = float(valDic["discountRate"])
     a = float(valDic["a"])
     c = float(valDic["c"])
     useSPSA = (valDic["useSPSA"] == "True")
     discountFactor = float(valDic["discountFactor"])
     slidingWindow = int(valDic["slidingWindow"])
+
+    minimum = float(valDic["minimum"])
     randomPos = (valDic["randomPos"] == "True")
 
-    params = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c, useSPSA,
-              discountFactor, slidingWindow]
+    params = [fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples, a, c, useSPSA,
+              discountFactor, slidingWindow, minimum]
 
     return numProcesses, iterPerProcess, params, randomPos
 

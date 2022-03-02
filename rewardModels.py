@@ -5,11 +5,11 @@
 # need discountFactor, windowLength
 import kriging
 
-discountFactor = .9
-slidingWindow = 15
+discountFactorDefault = .9
+slidingWindowDefault = 15
 
 # outputs estimated value, variance
-def fit(instance):
+def fit(instance, discountFactor=discountFactorDefault, slidingWindow = slidingWindowDefault):
     # if len(instances.get_points()) > slidingWindow:
 
     points = instance.get_points()
@@ -25,7 +25,7 @@ def fit(instance):
 
 
 
-def restless(instance):
+def restless(instance, discountFactor=discountFactorDefault, slidingWindow = slidingWindowDefault):
     points = instance.get_points()
     pointValues = instance.get_pointValues()
 
@@ -66,7 +66,7 @@ def restless(instance):
 
 
 
-def trad(instance):
+def trad(instance, discountFactor=discountFactorDefault, slidingWindow = slidingWindowDefault):
     pointValues = instance.get_pointValues()
 
     # last point value

@@ -192,8 +192,8 @@ useSPSA = True
 discountFactor = .9
 slidingWindow = 15
 
-batchSize = 2
-# numProcesses = 3
+numProcesses = 2
+batchSize = 3
 # """
 
 
@@ -219,7 +219,7 @@ if __name__ == '__main__':
             # allocMethod = allocMethods.uniform
             # allocMethod = allocMethods.metaMax
             figNum += 1
-            results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
+            results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, numProcesses, batchSize, numEvalsPerGrad, minSamples,
                                      a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
             # results = multiprocessBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
             #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)

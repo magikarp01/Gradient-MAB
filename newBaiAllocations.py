@@ -4,7 +4,7 @@ import numpy as np
 
 import kriging
 
-# allocates one to best batchSize arms
+# allocates one to best allocSize arms
 
 class OCBA:
     # takes negative differences
@@ -98,16 +98,16 @@ class OCBA:
 
 
 
-    # def getBudget(values, variances, numSamples, batchSize, c):
-    def getBudget(values, variances, numSamples, batchSize, c=math.sqrt(2)):
+    # def getBudget(values, variances, numSamples, allocSize, c):
+    def getBudget(values, variances, numSamples, allocSize, c=math.sqrt(2)):
         starving = OCBA.starvingCalc(values,variances,numSamples)
         starvingSorted = sorted(range(len(starving)), key= lambda x : starving[x], reverse=True)
 
         # should make sure there are more instances than batch size
-        if batchSize > len(starvingSorted):
+        if allocSize > len(starvingSorted):
             return starvingSorted
         else:
-            return starvingSorted[:batchSize]
+            return starvingSorted[:allocSize]
 
 
 
@@ -135,8 +135,8 @@ class UCB:
         return uncertainties
 
 
-    # def getBudget(values, variances, numSamples, batchSize, c):
-    def getBudget(values, variances, numSamples, batchSize, c=math.sqrt(2)):
+    # def getBudget(values, variances, numSamples, allocSize, c):
+    def getBudget(values, variances, numSamples, allocSize, c=math.sqrt(2)):
         pooledVar = sum(variances)/len(variances)
         newC = c * math.sqrt(pooledVar)
         uncertainties = UCB.budgetCalc(values, numSamples, c=newC)
@@ -144,7 +144,7 @@ class UCB:
         uncertaintiesSorted = sorted(range(len(uncertainties)), key=lambda x: uncertainties[x], reverse=True)
 
         # should make sure there are more instances than batch size
-        if batchSize > len(uncertaintiesSorted):
+        if allocSize > len(uncertaintiesSorted):
             return uncertaintiesSorted
         else:
-            return uncertaintiesSorted[:batchSize]
+            return uncertaintiesSorted[:allocSize]

@@ -1,0 +1,18 @@
+numProcesses = 15
+iterPerProcess = 167
+fun = functions.ackley_adjusted
+k = 100
+d = 10
+maxBudget = 10000
+allocSize = 5
+batchSize = 10
+numEvalsPerGrad = 2
+minSamples = 10
+
+minimum = -1
+a = .1
+c = .00001
+useSPSA = True
+discountFactor = .9
+slidingWindow = 15
+randomPos = True

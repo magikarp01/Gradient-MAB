@@ -19,7 +19,7 @@ import generalBandits
 fun = functions.ackley_adjusted
 
 
-def multiprocessTesting(numProcesses, iterations, func, sharedParams, processStartPos, endPath):
+def multiprocessTesting(numProcesses, iterations, iterateMethod, method, sharedParams, processStartPos, endPath):
     if __name__ == '__main__':
         start_times = [0]*numProcesses
         times = [0]*numProcesses
@@ -30,7 +30,7 @@ def multiprocessTesting(numProcesses, iterations, func, sharedParams, processSta
             for i in range(numProcesses):
                 startPosList = processStartPos[i]
                 start_times[i] = time.time()
-                processes.append(mp.Process(target=func, args=(aveErrorList, iterations, sharedParams, startPosList)))
+                processes.append(mp.Process(target=iterateMethod, args=(aveErrorList, iterations, method, sharedParams, startPosList)))
                 processes[i].start()
 
             for i in range(numProcesses):
@@ -106,30 +106,36 @@ methods.append(allocMethods.uniform)
 methods.append(allocMethods.metaMax)
 
 
+# for finite metohds
+def iterateMethod(aveErrorList, iterations, method, sharedParams, startPosList):
+
+    [fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples, a, c, useSPSA,
+     discountFactor, slidingWindow, minimum] = sharedParams
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = generalBandits.MABSearch(method, fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples,
+                                       a=a, c=c, startPos=startPosList[iteration], useTqdm=False, useSPSA=useSPSA,
+                                           discountFactor=discountFactor, slidingWindow=slidingWindow)
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+
 def performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods):
-    fun = params[0]
-    k = params[1]
-    d = params[2]
-    maxBudget = params[3]
-    batchSize = params[4]
-    numEvalsPerGrad = params[5]
-    minSamples = params[6]
-
-    minimum = params[7]
-    discountRate = params[8]
-    a = params[9]
-    c = params[10]
-    useSPSA = params[11]
-    discountFactor = params[12]
-    slidingWindow = params[13]
-
 
     with open(path + "/startingPos.json") as jf:
         processStartPos = json.load(jf)
 
-
-    sharedParams = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples,
-                    minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
 
     if __name__ == '__main__':
         dir = path + "/"
@@ -138,7 +144,7 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods
             if whichMethods[i]:
                 print(methodNames[i])
                 # make a function that takes in a method and performs the search
-                multiprocessTesting(numProcesses, iterPerProcess, ___, sharedParams,
+                multiprocessTesting(numProcesses, iterPerProcess, iterateMethod, params,
                                     processStartPos, dir + methodNames[i] + ".json")
 
 
