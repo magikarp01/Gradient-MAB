@@ -44,6 +44,10 @@ class OCBA:
         ratios = [0] * numInstances
 
         for instanceIndex in range(numInstances):
+            try:
+                print(startInstance)
+            except:
+                print("problem")
             if instanceIndex in optimalInstances:
                 continue
             elif instanceIndex == startInstance:

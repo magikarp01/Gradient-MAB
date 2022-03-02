@@ -193,7 +193,7 @@ discountFactor = .9
 slidingWindow = 15
 
 numProcesses = 2
-batchSize = 3
+batchSize = 10
 # """
 
 
@@ -215,9 +215,10 @@ if __name__ == '__main__':
 
     for model in models:
         for mabPolicy in mabPolicies:
-            allocMethod = allocMethods.baiAllocate(model, mabPolicy)
+            # allocMethod = allocMethods.baiAllocate(model, mabPolicy)
             # allocMethod = allocMethods.uniform
             # allocMethod = allocMethods.metaMax
+            allocMethod = allocMethods.restlessOCBA
             figNum += 1
             results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, numProcesses, batchSize, numEvalsPerGrad, minSamples,
                                      a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)

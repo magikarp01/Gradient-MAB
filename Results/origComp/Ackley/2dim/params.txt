@@ -7,7 +7,7 @@ maxBudget = 10000
 allocSize = 2
 batchSize = 10
 numEvalsPerGrad = 2
-minSamples = 10
+minSamples = 15
 
 minimum = -1
 a = .01

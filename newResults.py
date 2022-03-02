@@ -39,7 +39,7 @@ def multiprocessTesting(numProcesses, iterations, iterateMethod, method, sharedP
 
 
             print("All processes finished execution!")
-            print(times)
+            # print(times)
 
             # check if processes are alive
             # for i in range(numProcesses):
@@ -88,22 +88,25 @@ def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
 
 
 # models = [rewardModels.fit, rewardModels.restless, rewardModels.trad]
-models = [rewardModels.restless, rewardModels.trad]
-modelNames = ["Restless", "Trad"]
-mabPolicies = [newBaiAllocations.OCBA.getBudget, newBaiAllocations.UCB.getBudget]
-policyNames = ["OCBA", "UCB"]
+# models = [rewardModels.restless, rewardModels.trad]
+# modelNames = ["Restless", "Trad"]
+# mabPolicies = [newBaiAllocations.OCBA.getBudget, newBaiAllocations.UCB.getBudget]
+# policyNames = ["OCBA", "UCB"]
+#
+# methods = []
+# methodNames = []
+#
+# for modelNum in range(len(models)):
+#     for policyNum in range(len(mabPolicies)):
+#         allocMethod = allocMethods.baiAllocate(models[modelNum], mabPolicies[policyNum])
+#         methods.append(allocMethod)
+#         methodNames.append(modelNames[modelNum] + policyNames[policyNum])
+#
+# methods.append(allocMethods.uniform)
+# methods.append(allocMethods.metaMax)
 
-methods = []
-methodNames = []
-
-for modelNum in range(len(models)):
-    for policyNum in range(len(mabPolicies)):
-        allocMethod = allocMethods.baiAllocate(models[modelNum], mabPolicies[policyNum])
-        methods.append(allocMethod)
-        methodNames.append(modelNames[modelNum] + policyNames[policyNum])
-
-methods.append(allocMethods.uniform)
-methods.append(allocMethods.metaMax)
+methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
+methodNames = ["RestlessOCBA", "RestlessUCB", "FitOCBA", "FitUCB", "Uniform", "MetaMax"]
 
 
 # for finite metohds
@@ -144,7 +147,7 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods
             if whichMethods[i]:
                 print(methodNames[i])
                 # make a function that takes in a method and performs the search
-                multiprocessTesting(numProcesses, iterPerProcess, iterateMethod, params,
+                multiprocessTesting(numProcesses, iterPerProcess, iterateMethod, methods[i], params,
                                     processStartPos, dir + methodNames[i] + ".json")
 
 
@@ -176,39 +179,11 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.show()
 
 
-# paths = ['Results/efficientStrategiesComp/d2Random', 'Results/efficientStrategiesComp/d2Stratified',
-#          'Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
+resultsDir = 'Results/origComp'
 
-# paths = ['Results/origComp/ackley/d2Random', 'Results/origComp/ackley/d2Stratified',
-#         'Results/origComp/ackley/d5Random', 'Results/origComp/ackley/d5Stratified',
-#         'Results/origComp/ackley/d10Random', 'Results/origComp/ackley/d10Stratified',
-#         'Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
-#         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
-#         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified',
-#         'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d2Stratified',
-#         'Results/origComp/rastrigin/d5Random', 'Results/origComp/rastrigin/d5Stratified',
-#         'Results/origComp/rastrigin/d10Random', 'Results/origComp/rastrigin/d10Stratified']
-
-# paths = ['Results/origComp2/ackley2/d2Random', 'Results/origComp2/ackley2/d5Random',
-#          'Results/origComp2/ackley2/d10Random', 'Results/origComp2/griewank2/d2Random',
-#          'Results/origComp2/griewank2/d5Random', 'Results/origComp2/griewank2/d10Random',
-#          'Results/origComp2/rastrigin/d2Random', 'Results/origComp2/rastrigin/d5Random',
-#          'Results/origComp2/rastrigin/d10Random']
-
-# paths = ['Results/origComp2/ackley2/d2Random', 'Results/origComp2/ackley2/d5Random',
-#          'Results/origComp2/ackley2/d10Random']
-
-# paths = ['Results/origComp/griewank2/d2Random', 'Results/origComp/griewank2/d2Stratified',
-#         'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d5Stratified',
-#         'Results/origComp/griewank2/d10Random', 'Results/origComp/griewank2/d10Stratified']
-
-
-# paths = ['Results/efficientStrategiesComp/d10Random', 'Results/efficientStrategiesComp/d10Stratified']
-
-# paths = ['Results/tests/test1', 'Results/tests/test2']
-
-# path = "Results/efficientStrategiesComp/d2Random"
-# path = "Results/tests/test2"
+paths = ['ackley/2dim', 'ackley/5dim', 'ackley/10dim', 'ackley/20dim',
+         'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
+         'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
 
 # if __name__ == '__main__':
 #     orig_stdout = sys.stdout
@@ -220,35 +195,29 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 
 
 # """
-paths = ['Results/origComp2/ackley2/d20Random',
-         'Results/origComp2/griewank2/d20Random',
-         'Results/origComp2/rastrigin2/d20Random']
 
 if __name__ == '__main__':
-    for path in paths:
-        print(f"Path is {path}")
+    for pathTemp in paths:
+        print(f"Path is {pathTemp}")
+        path = resultsDir + "/" + pathTemp
 
         # params = [fun, k, d, maxBudget, batchSize, numEvalsPerGrad, minSamples, minimum, discountRate, a, c, useSPSA, discountFactor, slidingWindow]
         numProcesses, iterPerProcess, params, randomPos = paramPickler.readParams(path + "/params.txt")
         d = params[2]
         k = params[1]
 
-        # numProcesses = 2
-        # iterPerProcess = 2
+        numProcesses = 2
+        iterPerProcess = 5
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5
         # params[13] = 2*d+5
-        generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
-        print()
+        # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
+        # print()
 
-        #         [fo,      foi,    fu,     fui,    ro,     roi,    ru,     rui,    to,     toi,    tu,     tui,    u,      mm,     mmi]
-        # methods = [False ,  False,  False,  False,  True ,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True]
-        methods = [False ,  False,  False,  False,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True ,  True , True ]
-        # methods = [True ,   False,  True ,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False]
-        # methods = [False ,  False,  False,  False,  True ,  True ,  False,  False,  True ,  True ,  False,  False,  False,  False,  False]
-
-        performMultiprocess(params, numProcesses, iterPerProcess, path, methods)
+        #         [ro,      ru,     to,     tu,     u,      mm]
+        whichMethods = [True,    True,   True,   True,   True,   True]
+        performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods)
 
         for i in range(5):
             print()
