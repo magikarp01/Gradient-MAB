@@ -34,6 +34,7 @@ def restlessOCBA(instances, allocSize, discountFactor=.9, slidingWindow=15):
 
 def restlessUCB(instances, allocSize, discountFactor=.9, slidingWindow=15):
     rewardModel = rewardModels.restless
+    #
     policy = newBaiAllocations.UCB.getBudget
     rewardCalcs = [rewardModel(instance, discountFactor=discountFactor, slidingWindow=slidingWindow) for instance in
                    instances]
