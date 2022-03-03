@@ -9,6 +9,8 @@ import random
 # doesn't work I think because the inner function can't be pickled
 def baiAllocate(rewardModel, policy):
     def allocMethod(instances, allocSize, discountFactor=.9, slidingWindow=15):
+        if allocSize >= len(instances):
+            return range(len(instances))
         rewardCalcs = [rewardModel(instance, discountFactor=discountFactor, slidingWindow=slidingWindow) for instance in instances]
         values = [calc[0] for calc in rewardCalcs]
         variances = [calc[1] for calc in rewardCalcs]
@@ -23,6 +25,8 @@ def baiAllocate(rewardModel, policy):
 
 
 def restlessOCBA(instances, allocSize, discountFactor=.9, slidingWindow=15):
+    if allocSize >= len(instances):
+        return range(len(instances))
     rewardModel = rewardModels.restless
     policy = newBaiAllocations.OCBA.getBudget
     rewardCalcs = [rewardModel(instance, discountFactor=discountFactor, slidingWindow=slidingWindow) for instance in
@@ -33,6 +37,8 @@ def restlessOCBA(instances, allocSize, discountFactor=.9, slidingWindow=15):
     return policy(values, variances, numSamples, allocSize)
 
 def restlessUCB(instances, allocSize, discountFactor=.9, slidingWindow=15):
+    if allocSize >= len(instances):
+        return range(len(instances))
     rewardModel = rewardModels.restless
     #
     policy = newBaiAllocations.UCB.getBudget
@@ -44,6 +50,8 @@ def restlessUCB(instances, allocSize, discountFactor=.9, slidingWindow=15):
     return policy(values, variances, numSamples, allocSize)
 
 def tradOCBA(instances, allocSize, discountFactor=.9, slidingWindow=15):
+    if allocSize >= len(instances):
+        return range(len(instances))
     rewardModel = rewardModels.trad
     policy = newBaiAllocations.OCBA.getBudget
     rewardCalcs = [rewardModel(instance, discountFactor=discountFactor, slidingWindow=slidingWindow) for instance in
@@ -54,6 +62,8 @@ def tradOCBA(instances, allocSize, discountFactor=.9, slidingWindow=15):
     return policy(values, variances, numSamples, allocSize)
 
 def tradUCB(instances, allocSize, discountFactor=.9, slidingWindow=15):
+    if allocSize >= len(instances):
+        return range(len(instances))
     rewardModel = rewardModels.trad
     policy = newBaiAllocations.UCB.getBudget
     rewardCalcs = [rewardModel(instance, discountFactor=discountFactor, slidingWindow=slidingWindow) for instance in

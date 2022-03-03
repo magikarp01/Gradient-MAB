@@ -106,12 +106,8 @@ def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
 # methods.append(allocMethods.uniform)
 # methods.append(allocMethods.metaMax)
 
-methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
-methodNames = ["RestlessOCBA", "RestlessUCB", "FitOCBA", "FitUCB", "Uniform", "MetaMax"]
-
-
 # for finite metohds
-def iterateMethod(aveErrorList, iterations, method, sharedParams, startPosList):
+def iterateFiniteMethod(aveErrorList, iterations, method, sharedParams, startPosList):
 
     [fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples, a, c, useSPSA,
      discountFactor, slidingWindow, minimum] = sharedParams
@@ -134,8 +130,31 @@ def iterateMethod(aveErrorList, iterations, method, sharedParams, startPosList):
 
     aveErrorList.append(aveError)
 
+def iterateInfiniteMethod(aveErrorList, iterations, method, sharedParams, startPosList):
 
-def performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods):
+    [fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples, a, c, useSPSA,
+     discountFactor, slidingWindow, minimum] = sharedParams
+
+    errors = {}
+    for iteration in tqdm(range(iterations)):
+        results = generalBandits.MABSearchInfinite(method, fun, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples,
+                                       a=a, c=c, useTqdm=False, useSPSA=useSPSA,
+                                           discountFactor=discountFactor, slidingWindow=slidingWindow)
+        convergeDic = results[2]
+        for s in convergeDic.keys():
+            try:
+                errors[s].append(convergeDic[s] - minimum)
+            except:
+                errors[s] = [convergeDic[s] - minimum]
+
+    aveError = {}
+    for s in errors.keys():
+        aveError[s] = float(sum(errors[s])) / len(errors[s])
+
+    aveErrorList.append(aveError)
+
+
+def performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=True):
 
     with open(path + "/startingPos.json") as jf:
         processStartPos = json.load(jf)
@@ -148,8 +167,12 @@ def performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods
             if whichMethods[i]:
                 print(methodNames[i])
                 # make a function that takes in a method and performs the search
-                multiprocessTesting(numProcesses, iterPerProcess, iterateMethod, methods[i], params,
-                                    processStartPos, dir + methodNames[i] + ".json")
+                if isFinite:
+                    multiprocessTesting(numProcesses, iterPerProcess, iterateFiniteMethod, methods[i], params,
+                                        processStartPos, dir + methodNames[i] + ".json")
+                else:
+                    multiprocessTesting(numProcesses, iterPerProcess, iterateInfiniteMethod, methods[i], params,
+                                        processStartPos, dir + methodNames[i] + ".json")
 
 
 def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'm', 'limegreen', 'bisque', 'lime', 'lightcoral', 'gold']):
@@ -180,23 +203,21 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.show()
 
 
+finiteMethods = False
+
+methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
+if finiteMethods:
+    methodNames = ["RestlessOCBA", "RestlessUCB", "TradOCBA", "TradUCB", "Uniform", "MetaMax"]
+else:
+    methodNames = ["RestlessOCBAInfinite", "RestlessUCBInfinite", "TradOCBAInfinite", "TradUCBInfinite", "UniformInfinite", "MetaMaxInfinite"]
+
 resultsDir = 'Results/origComp'
 
 paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
 # paths = ['ackley/2dim', 'ackley/5dim', 'ackley/10dim', 'ackley/20dim',
 #          'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
 #          'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
-
-# if __name__ == '__main__':
-#     orig_stdout = sys.stdout
-#     orig_stderr = sys.stderr
-#     f = open(path+'/consoleOutput.txt', 'w')
-#     g = open(path+'/consoleOutput.txt', 'w')
-#     sys.stdout = f
-#     sys.stderr = g
-
-
-"""
+# """
 
 if __name__ == '__main__':
     for pathTemp in paths:
@@ -209,7 +230,7 @@ if __name__ == '__main__':
         k = params[1]
 
         numProcesses = 2
-        iterPerProcess = 5
+        iterPerProcess = 2
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5
@@ -219,14 +240,15 @@ if __name__ == '__main__':
 
         #         [ro,      ru,     to,     tu,     u,      mm]
         whichMethods = [True,    True,   True,   True,   True,   True]
-        performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods)
+        # performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
+        performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
 
         for i in range(5):
             print()
 # """
 
 
-# """
+"""
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
@@ -234,8 +256,8 @@ if __name__ == '__main__':
 #          'Results/origComp/rastrigin/d10Random']
 
 resultsDir = 'Results/origComp'
-# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
+paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
+# paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]
 
 figDic = {}
