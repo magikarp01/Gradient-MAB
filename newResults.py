@@ -107,7 +107,7 @@ def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
 # methods.append(allocMethods.metaMax)
 
 methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
-methodNames = ["RestlessOCBA", "RestlessUCB", "FitOCBA", "FitUCB", "Uniform", "MetaMax"]
+methodNames = ["RestlessOCBA", "RestlessUCB", "TradOCBA", "TradUCB", "Uniform", "MetaMax"]
 
 
 # for finite metohds
@@ -182,10 +182,11 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 
 resultsDir = 'Results/origComp'
 
-paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-# paths = ['ackley/2dim', 'ackley/5dim', 'ackley/10dim', 'ackley/20dim',
-#          'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
-#          'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+#          'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+#          'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+
+paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
 
 # if __name__ == '__main__':
 #     orig_stdout = sys.stdout
@@ -208,8 +209,8 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        numProcesses = 2
-        iterPerProcess = 5
+        # numProcesses = 2
+        # iterPerProcess = 5
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5
@@ -227,6 +228,7 @@ if __name__ == '__main__':
 
 
 # """
+
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
@@ -234,8 +236,10 @@ if __name__ == '__main__':
 #          'Results/origComp/rastrigin/d10Random']
 
 resultsDir = 'Results/origComp'
-# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
+
+# paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim']
+paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+
 paths = [resultsDir + "/" + path for path in paths]
 
 figDic = {}
@@ -253,7 +257,7 @@ for path in paths:
     names = [fileName[:-5] for fileName in fileNames]
     dics = []
     for fileName in fileNames:
-        with open(path + "\\" + fileName) as jf:
+        with open(path + "/" + fileName) as jf:
             dics.append(json.load(jf))
     print(dics)
     showMinimaHistory(dics, names, path, figDic[path])
