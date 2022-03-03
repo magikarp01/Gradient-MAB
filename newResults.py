@@ -234,8 +234,8 @@ if __name__ == '__main__':
 #          'Results/origComp/rastrigin/d10Random']
 
 resultsDir = 'Results/origComp'
-paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
+paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]
 
 figDic = {}
