@@ -237,6 +237,7 @@ if __name__ == '__main__':
 
 resultsDir = 'Results/origComp'
 
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
 # paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim']
 paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
 
