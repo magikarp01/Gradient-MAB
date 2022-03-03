@@ -186,8 +186,8 @@ resultsDir = 'Results/origComp'
 #          'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
 #          'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
 
-paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
-         'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
+paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+         'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
 
 # if __name__ == '__main__':
 #     orig_stdout = sys.stdout
@@ -198,7 +198,7 @@ paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
 #     sys.stderr = g
 
 
-# """
+"""
 
 if __name__ == '__main__':
     for pathTemp in paths:
@@ -228,7 +228,7 @@ if __name__ == '__main__':
 # """
 
 
-"""
+# """
 
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
@@ -238,7 +238,7 @@ if __name__ == '__main__':
 
 resultsDir = 'Results/origComp'
 
-paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
+paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]
 
 figDic = {}
@@ -256,7 +256,7 @@ for path in paths:
     names = [fileName[:-5] for fileName in fileNames]
     dics = []
     for fileName in fileNames:
-        with open(path + "\\" + fileName) as jf:
+        with open(path + "/" + fileName) as jf:
             dics.append(json.load(jf))
     print(dics)
     showMinimaHistory(dics, names, path, figDic[path])
