@@ -32,53 +32,59 @@ class OCBA:
             if kroneckers[minIndex] == 0:
                 optimalInstances.append(minIndex)
 
+        startIndex = -1
+
         for instanceIndex in range(numInstances):
             if instanceIndex not in optimalInstances:
                 if variances[instanceIndex] != 0 and kroneckers[instanceIndex] != 0:
                     startInstance = instanceIndex
                     break
+
+        zeroFlag = False
         try:
             denom = variances[startInstance] / (kroneckers[startInstance] ** 2)
         except:  # happens when all of the nonoptimal moves have zero variance
-            varFlag = False
+            zeroFlag = True
         ratios = [0] * numInstances
 
-        for instanceIndex in range(numInstances):
-            # try:
-            #     print(startInstance)
-            # except:
-            #     print("problem")
-            if instanceIndex in optimalInstances:
-                continue
-            elif instanceIndex == startInstance:
-                ratios[instanceIndex] = 1
-                continue
-            else:
-                ratio = variances[instanceIndex] / (kroneckers[instanceIndex] ** 2)
-                try:
-                    ratio /= denom
-                except:  # happens when all of the nonoptimal moves have zero variance, only one possible move
-                    budget = [0] * numInstances
-                    totBudget = 0
-                    for action in range(numInstances):
-                        totBudget += numSamples[action]
-                    averageAlloc = (totBudget + 1) / len(optimalInstances)
-                    for x in optimalInstances:
-                        budget[x] = averageAlloc
 
-                    return budget
+        if startIndex == -1:
+            ratios = [1]*numInstances
 
-                ratios[instanceIndex] = ratio
+        else:
+            for instanceIndex in range(numInstances):
 
-        # set up calculation for the proportion of the budget for optimal actions
-        tempSum = 0  # sum of N^2/stdev
-        for action in range(numInstances):
-            if ratios[action] != 0:
-                tempSum += ratios[action] ** 2 / variances[action]  # stuff cancels
-        tempSum = math.sqrt(tempSum)
+                if instanceIndex in optimalInstances:
+                    continue
+                elif instanceIndex == startInstance:
+                    ratios[instanceIndex] = 1
+                    continue
+                else:
+                    ratio = variances[instanceIndex] / (kroneckers[instanceIndex] ** 2)
+                    try:
+                        ratio /= denom
+                    except:  # happens when all of the nonoptimal moves have zero variance, only one possible move
+                        budget = [0] * numInstances
+                        totBudget = 0
+                        for action in range(numInstances):
+                            totBudget += numSamples[action]
+                        averageAlloc = (totBudget + 1) / len(optimalInstances)
+                        for x in optimalInstances:
+                            budget[x] = averageAlloc
 
-        for action in optimalInstances:  # not sure if optimalProportion might be different for multiple optimal actions
-            ratios[action] = math.sqrt(variances[action]) * tempSum
+                        return budget
+
+                    ratios[instanceIndex] = ratio
+
+            # set up calculation for the proportion of the budget for optimal actions
+            tempSum = 0  # sum of N^2/stdev
+            for action in range(numInstances):
+                if ratios[action] != 0:
+                    tempSum += ratios[action] ** 2 / variances[action]  # stuff cancels
+            tempSum = math.sqrt(tempSum)
+
+            for action in optimalInstances:  # not sure if optimalProportion might be different for multiple optimal actions
+                ratios[action] = math.sqrt(variances[action]) * tempSum
 
         # calculate the actual budgets from the proportions
         total = 0
