@@ -213,10 +213,10 @@ else:
 
 resultsDir = 'Results/origComp'
 
-paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-# paths = ['ackley/2dim', 'ackley/5dim', 'ackley/10dim', 'ackley/20dim',
-#          'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
-#          'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
+paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+         'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+         'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
 # """
 
 if __name__ == '__main__':
@@ -229,8 +229,8 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        numProcesses = 2
-        iterPerProcess = 2
+        # numProcesses = 2
+        # iterPerProcess = 2
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5
