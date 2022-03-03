@@ -1,0 +1,18 @@
+numProcesses = 15
+iterPerProcess = 167
+fun = functions.random_griewank
+k = 10
+d = 5
+maxBudget = 10000
+allocSize = 3
+batchSize = 10
+numEvalsPerGrad = 2
+minSamples = 10
+
+minimum = -1
+a = .01
+c = .2
+useSPSA = True
+discountFactor = .9
+slidingWindow = 15
+randomPos = True

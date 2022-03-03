@@ -50,6 +50,12 @@ def readParams(loc):
         fun = functions.ackley_adjusted
     elif valDic["fun"] == "functions.rastrigin_adjusted":
         fun = functions.rastrigin_adjusted
+    elif valDic["fun"] == "functions.random_ackley":
+        fun = functions.random_ackley
+    elif valDic["fun"] == "functions.random_griewank":
+        fun = functions.random_griewank
+    elif valDic["fun"] == "functions.random_rastrigin":
+        fun = functions.random_rastrigin
 
     k = int(valDic["k"])
     d = int(valDic["d"])
@@ -67,6 +73,7 @@ def readParams(loc):
 
     minimum = float(valDic["minimum"])
     randomPos = (valDic["randomPos"] == "True")
+
 
     params = [fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples, a, c, useSPSA,
               discountFactor, slidingWindow, minimum]

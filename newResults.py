@@ -48,6 +48,7 @@ def multiprocessTesting(numProcesses, iterations, iterateMethod, method, sharedP
 
 
             # linear interpolation:
+            print("Number of processes is: " + str(len(aveErrorList)))
             for m in range(len(aveErrorList)):
                 aveErrorDic = aveErrorList[m]
                 aveErrorList[m] = gradientAllocation.linearInterp(aveErrorDic, sharedParams[3])
@@ -111,6 +112,7 @@ def iterateFiniteMethod(aveErrorList, iterations, method, sharedParams, startPos
 
     [fun, k, d, maxBudget, allocSize, batchSize, numEvalsPerGrad, minSamples, a, c, useSPSA,
      discountFactor, slidingWindow, minimum] = sharedParams
+
 
     errors = {}
     for iteration in tqdm(range(iterations)):
@@ -203,7 +205,7 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.show()
 
 
-finiteMethods = False
+finiteMethods = True
 
 methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
 if finiteMethods:
@@ -214,9 +216,13 @@ else:
 resultsDir = 'Results/origComp'
 
 # paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
-         'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
-         'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+#          'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+#          'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
+         'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+         'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
+
 # """
 
 if __name__ == '__main__':
@@ -229,8 +235,8 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        # numProcesses = 2
-        # iterPerProcess = 2
+        numProcesses = 2
+        iterPerProcess = 3
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5

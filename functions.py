@@ -28,7 +28,11 @@ def ackley_adjusted(x_adjusted, a = 20, b=.2, c=math.pi/4, error=0):
         x.append((i-.5)*2*32.768)
         # x.append((i-.5)*2*5)
 
-    return ackley(np.array(x), a, b, c)+np.random.normal(0,error)
+    return ackley(np.array(x), a, b, c)
+
+def random_ackley(x_adjusted):
+    error = .25
+    return ackley_adjusted(x_adjusted)+np.random.normal(0,error)
 
 # supposed to simulate an expensive function
 def sleep_ackley_adjusted(x_adjusted, a = 20, b=.2, c=2*math.pi, sleepTime=.5):
@@ -60,12 +64,17 @@ def griewank(x):
 
 
 # accepts input in [0, 1]
-def griewank_adjusted(x_adjusted, error=0):
+def griewank_adjusted(x_adjusted):
     # time.sleep(.1)
     x = []
     for i in x_adjusted:
         x.append((i-.5)*2)
-    return griewank(np.array(x))+np.random.normal(0,error)
+    return griewank(np.array(x))
+
+
+def random_griewank(x_adjusted):
+    error = .05
+    return griewank_adjusted(x_adjusted)+np.random.normal(0,error)
 
 
 def reverse_griewank_adjusted(x_adjusted):
@@ -81,11 +90,16 @@ def rastrigin(x):
     return 10*d + sumSin
 
 # accepts input in [0, 1]
-def rastrigin_adjusted(x_adjusted, error=0):
+def rastrigin_adjusted(x_adjusted):
     x = []
     for i in x_adjusted:
         x.append((i-.5)*5)
-    return rastrigin(x) + np.random.normal(0, error)
+    return rastrigin(x)
+
+def random_rastrigin(x_adjusted):
+    error = 1
+    return rastrigin_adjusted(x_adjusted) + np.random.normal(0, error)
+
 
 # 1D function, made manually
 # https://www.desmos.com/calculator/dfy1vkccwa
