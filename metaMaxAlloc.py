@@ -65,7 +65,8 @@ def selectPoints(hSet, fSet):
     # should probably check that points are not collinear
     # almost certainly not collinear, i'm too lazy
 
-    hull = ConvexHull(points).points.tolist()
+    cHull = ConvexHull(points)
+    hull = [points[index] for index in cHull.vertices]
     hull.sort(key = getX)
     minPoint = hull[0]
     maxPoint = hull[-1]

@@ -149,3 +149,5 @@ def MABSearchInfinite(allocMethod, f, d, maxBudget, allocSize, batchSize, numEva
     return (instances[maxIndex].get_xHat(), instances[maxIndex].get_fHat(),
             convergeDic, instances, [instance.get_numSamples() for instance in instances], sampleDic)
     # return instances, convergeDic, sampleDic
+
+

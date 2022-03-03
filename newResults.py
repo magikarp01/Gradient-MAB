@@ -1,5 +1,6 @@
 # Results are averaged over 1008 runs
 # Parameters are in the tempOCBA function
+import os
 import time
 
 import allocMethods
@@ -106,7 +107,7 @@ def generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=False):
 # methods.append(allocMethods.metaMax)
 
 methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
-methodNames = ["RestlessOCBA", "RestlessUCB", "FitOCBA", "FitUCB", "Uniform", "MetaMax"]
+methodNames = ["RestlessOCBA", "RestlessUCB", "TradOCBA", "TradUCB", "Uniform", "MetaMax"]
 
 
 # for finite metohds
@@ -181,8 +182,11 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 
 resultsDir = 'Results/origComp'
 
-paths = ['ackley/2dim', 'ackley/5dim', 'ackley/10dim', 'ackley/20dim',
-         'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
+# paths = ['ackley/2dim', 'ackley/5dim', 'ackley/10dim', 'ackley/20dim',
+#          'griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
+#          'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
+
+paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim',
          'rastrigin/2dim', 'rastrigin/5dim', 'rastrigin/10dim', 'rastrigin/20dim']
 
 # if __name__ == '__main__':
@@ -206,8 +210,8 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        numProcesses = 2
-        iterPerProcess = 5
+        # numProcesses = 2
+        # iterPerProcess = 5
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5
@@ -232,8 +236,10 @@ if __name__ == '__main__':
 #          'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d5Random',
 #          'Results/origComp/rastrigin/d10Random']
 
-paths = ['Results/origComp2/rastrigin/d2Random', 'Results/origComp2/rastrigin/d5Random',
-         'Results/origComp2/rastrigin2/d10Random']
+resultsDir = 'Results/origComp'
+
+paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
+paths = [resultsDir + "/" + path for path in paths]
 
 figDic = {}
 for i in range(len(paths)):

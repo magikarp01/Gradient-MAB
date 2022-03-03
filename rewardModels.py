@@ -38,8 +38,8 @@ def restless(instance, discountFactor=discountFactorDefault, slidingWindow = sli
         # improvement /= c_t
 
         # dividing by a_t instead (size of step):
-        # a_t = instance.get_gradDescentObject().get_at(t)
-        # improvement /= a_t
+        a_t = instance.get_gradDescentObject().get_at(t)
+        improvement /= a_t
         improvements.append(improvement)
 
     # finding weighted mean here
