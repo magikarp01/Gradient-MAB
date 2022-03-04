@@ -207,11 +207,11 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
 
 finiteMethods = True
 
-methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax]
+methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax, allocMethods.eeUniform]
 if finiteMethods:
-    methodNames = ["RestlessOCBA", "RestlessUCB", "TradOCBA", "TradUCB", "Uniform", "MetaMax"]
+    methodNames = ["RestlessOCBA", "RestlessUCB", "TradOCBA", "TradUCB", "Uniform", "MetaMax", "EEUniform"]
 else:
-    methodNames = ["RestlessOCBAInfinite", "RestlessUCBInfinite", "TradOCBAInfinite", "TradUCBInfinite", "UniformInfinite", "MetaMaxInfinite"]
+    methodNames = ["RestlessOCBAInfinite", "RestlessUCBInfinite", "TradOCBAInfinite", "TradUCBInfinite", "UniformInfinite", "MetaMaxInfinite", "EEUniformInfinite"]
 
 resultsDir = 'Results/origComp'
 
@@ -222,9 +222,16 @@ resultsDir = 'Results/origComp'
 # paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
 #          'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
 #          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
-paths = ['GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+
+paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+         'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+         'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim',
+         'AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
+         'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
-"""
+
+
+# """
 
 if __name__ == '__main__':
     for pathTemp in paths:
@@ -245,8 +252,9 @@ if __name__ == '__main__':
         # generateStartingPos(numProcesses, iterPerProcess, d, k, path, random=randomPos)
         # print()
 
-        #         [ro,      ru,     to,     tu,     u,      mm]
-        whichMethods = [True,    True,   True,   True,   True,   True]
+        #         [ro,      ru,     to,     tu,     u,      mm,     ee]
+        # whichMethods = [True,    True,   True,   True,   True,   True,  True]
+        whichMethods = [False,    False,   False,   False,  False,  False,  True]
         # performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
         performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
 
@@ -255,7 +263,7 @@ if __name__ == '__main__':
 # """
 
 
-# """
+"""
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
