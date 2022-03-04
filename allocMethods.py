@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 import newBaiAllocations
 import rewardModels
 import metaMaxAlloc
@@ -95,5 +97,16 @@ def metaMax(instances, allocSize, discountFactor=.9, slidingWindow=15):
 
     return metaMaxAlloc.selectPoints(hSet, fHats)
 
+# requires you to change the totalBudget parameter, totalSamples=2500 for 10000 total budget (im too lazy to fix it manually)
+def eeUniform(instances, allocSize, discountFactor=.9, slidingWindow=15, totalSamples = 2500):
+    numSamples = [instance.get_numSamples() for instance in instances]
 
+    if sum(numSamples) < totalSamples/2:
+        return uniform(instances, allocSize, discountFactor=discountFactor, slidingWindow=slidingWindow)
+    else:
+        fHats = [instance.get_fHat() for instance in instances]
+        A = np.array(fHats)
 
+        idx = np.argpartition(A, allocSize)
+        best = idx[:allocSize]
+        return best

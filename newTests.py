@@ -215,15 +215,16 @@ if __name__ == '__main__':
 
     for model in models:
         for mabPolicy in mabPolicies:
-            allocMethod = allocMethods.baiAllocate(model, mabPolicy)
+            # allocMethod = allocMethods.baiAllocate(model, mabPolicy)
             # allocMethod = allocMethods.uniform
             # allocMethod = allocMethods.metaMax
             # allocMethod = allocMethods.restlessOCBA
+            allocMethod = allocMethods.eeUniform
             figNum += 1
-            # results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, numProcesses, batchSize, numEvalsPerGrad, minSamples,
-            #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
-            results = generalBandits.MABSearchInfinite(allocMethod, fun, d, maxBudget, numProcesses, batchSize, numEvalsPerGrad, minSamples,
-                                     a=a, c=c, useSPSA=useSPSA, useTqdm = True, discountFactor=discountFactor, slidingWindow=slidingWindow)
+            results = generalBandits.MABSearch(allocMethod, fun, k, d, maxBudget, numProcesses, batchSize, numEvalsPerGrad, minSamples,
+                                     a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
+            # results = generalBandits.MABSearchInfinite(allocMethod, fun, d, maxBudget, numProcesses, batchSize, numEvalsPerGrad, minSamples,
+            #                          a=a, c=c, useSPSA=useSPSA, useTqdm = True, discountFactor=discountFactor, slidingWindow=slidingWindow)
             # results = multiprocessBandits.MABSearch(model, mabPolicy, fun, k, d, maxBudget, numEvalsPerGrad, minSamples, numProcesses, batchSize,
             #                          a=a, c=c, startPos=sharedStartPos, useSPSA=useSPSA, useTqdm = True)
 
