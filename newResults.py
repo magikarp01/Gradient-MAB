@@ -219,11 +219,12 @@ resultsDir = 'Results/origComp'
 # paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
 #          'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
 #          'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
-paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
-         'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+# paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
+#          'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+#          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
+paths = ['GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
-
-# """
+"""
 
 if __name__ == '__main__':
     for pathTemp in paths:
@@ -235,8 +236,8 @@ if __name__ == '__main__':
         d = params[2]
         k = params[1]
 
-        numProcesses = 2
-        iterPerProcess = 3
+        # numProcesses = 2
+        # iterPerProcess = 3
         # params[9] = .001
         # batchSize = 1000
         # params[6] = 2*d+5
@@ -254,7 +255,7 @@ if __name__ == '__main__':
 # """
 
 
-"""
+# """
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
@@ -262,7 +263,10 @@ if __name__ == '__main__':
 #          'Results/origComp/rastrigin/d10Random']
 
 resultsDir = 'Results/origComp'
-paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
+# paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim']
+paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+# paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim']
 # paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]
 
