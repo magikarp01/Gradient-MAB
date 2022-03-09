@@ -194,7 +194,7 @@ slidingWindow = 15
 
 numProcesses = 2
 batchSize = 10
-# """
+"""
 
 
 if __name__ == '__main__':
@@ -382,21 +382,24 @@ plt.show()
 # """
 
 
-"""
+# """
 fig1 = plt.figure(1)
 ax = fig1.add_subplot(111, projection='3d')
 fig1.suptitle("Griewank Function")
-functions.display3D(functions.griewank_adjusted, (0, 1), ax)
+# functions.display3D(functions.griewank_adjusted, (0, 1), ax)
+functions.display3D(functions.random_griewank, (0, 1), ax)
 
 fig2 = plt.figure(2)
 ax = fig2.add_subplot(111, projection='3d')
 fig2.suptitle("Ackley Function")
-functions.display3D(functions.ackley_adjusted, (0, 1), ax)
+# functions.display3D(functions.ackley_adjusted, (0, 1), ax)
+functions.display3D(functions.random_ackley, (0, 1), ax)
 
 fig2 = plt.figure(3)
 ax = fig2.add_subplot(111, projection='3d')
 fig2.suptitle("Rastrigin Function")
-functions.display3D(functions.rastrigin_adjusted, (0, 1), ax)
+# functions.display3D(functions.rastrigin_adjusted, (0, 1), ax)
+functions.display3D(functions.random_rastrigin, (0, 1), ax)
 
 
 plt.show()

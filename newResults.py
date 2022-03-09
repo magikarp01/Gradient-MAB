@@ -205,7 +205,7 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.show()
 
 
-finiteMethods = True
+finiteMethods = False
 
 methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax, allocMethods.eeUniform]
 if finiteMethods:
@@ -213,25 +213,25 @@ if finiteMethods:
 else:
     methodNames = ["RestlessOCBAInfinite", "RestlessUCBInfinite", "TradOCBAInfinite", "TradUCBInfinite", "UniformInfinite", "MetaMaxInfinite", "EEUniformInfinite"]
 
-resultsDir = 'Results/origComp'
+resultsDir = 'Results/origComp2'
 
-# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
-# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
-#          'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
-#          'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim.', 'Ackley/10dim', 'Ackley/20dim']
+paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+         'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+         'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
 # paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
 #          'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
 #          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
 
-paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
-         'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
-         'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim',
-         'AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
-         'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
-         'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+#          'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+#          'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim',
+#          'AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
+#          'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+#          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
 
 
-"""
+# """
 
 if __name__ == '__main__':
     for pathTemp in paths:
@@ -253,8 +253,8 @@ if __name__ == '__main__':
         # print()
 
         #         [ro,      ru,     to,     tu,     u,      mm,     ee]
-        # whichMethods = [True,    True,   True,   True,   True,   True,  True]
-        whichMethods = [False,    False,   False,   False,  False,  False,  True]
+        whichMethods = [True,    True,   True,   True,   True,   True,  False]
+        # whichMethods = [False,    False,   False,   False,  False,  False,  True]
         # performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
         performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
 
@@ -263,7 +263,7 @@ if __name__ == '__main__':
 # """
 
 
-# """
+"""
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
@@ -273,12 +273,18 @@ if __name__ == '__main__':
 resultsDir = 'Results/origComp'
 # paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
 # paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim']
-paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
-# paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim']
+# paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
+paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim']
 # paths = ['GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim']
 # paths = ['RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
+# paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim',
+#          'Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim',
+#          'Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim',
+#          'AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
+#          'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+#          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
 
-# paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
+
 paths = [resultsDir + "/" + path for path in paths]
 
 figDic = {}
