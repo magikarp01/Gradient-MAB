@@ -19,8 +19,8 @@ def normalizeDic(dic):
 
 resultsDir = 'Results/origComp'
 # resultsDir = 'Results/origComp2'
-# paths = ['Ackley', 'Griewank', 'Rastrigin']
-paths = ['AckleyRandom', 'GriewankRandom', 'RastriginRandom']
+paths = ['Ackley', 'Griewank', 'Rastrigin']
+# paths = ['AckleyRandom', 'GriewankRandom', 'RastriginRandom']
 
 # paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]
@@ -152,6 +152,7 @@ def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True
     for tick in ax.get_xticklabels():
         tick.set_rotation(70)
 if __name__ == "__main__":
+
     # Usage example:
     # data = {
     #     "a": [1, 2, 3, 2, 1],
@@ -163,6 +164,7 @@ if __name__ == "__main__":
     # }
 
     fig, ax = plt.subplots()
+    fig.subplots_adjust(bottom=0.3)
     bar_plot(ax, data, total_width=.7, single_width=.9)
     plt.show()
 
