@@ -19,8 +19,8 @@ def normalizeDic(dic):
 
 resultsDir = 'Results/origComp'
 # resultsDir = 'Results/origComp2'
-paths = ['Ackley', 'Griewank', 'Rastrigin']
-# paths = ['AckleyRandom', 'GriewankRandom', 'RastriginRandom']
+# paths = ['Ackley', 'Griewank', 'Rastrigin']
+paths = ['AckleyRandom', 'GriewankRandom', 'RastriginRandom']
 
 # paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]
@@ -70,7 +70,7 @@ for dim in dimensions:
 
     # print(funcScores)
 
-print(dimScores)
+print(dimScores[10])
 
 # data = [list(dimScores[2].values()), list(dimScores[5].values()), list(dimScores[10].values()), list(dimScores[20].values())]
 data = {2:[3-val for val in list(dimScores[2].values())], 5:[3-val for val in list(dimScores[5].values())], 10:[3-val for val in list(dimScores[10].values())],

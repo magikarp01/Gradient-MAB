@@ -128,7 +128,7 @@ def display1D(fun, x_range):
 # display1D(lambda x: x[0]**2, [-1.5,1.5])
 
 
-def display3D(fun, domain, ax, fColor='b', alpha=1, fineness = .005):
+def display3D(fun, domain, ax, fColor='b', alpha=.7, fineness = .005):
 
     x = y = np.arange(domain[0], domain[1], fineness)
     X, Y = np.meshgrid(x, y)
@@ -137,8 +137,8 @@ def display3D(fun, domain, ax, fColor='b', alpha=1, fineness = .005):
 
     ax.plot_surface(X, Y, Z, color=fColor, alpha=alpha)
 
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
+    ax.set_xlabel('X Value')
+    ax.set_ylabel('Y Value')
+    ax.set_zlabel('Function Value')
 
     # plt.show()
