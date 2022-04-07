@@ -17,10 +17,10 @@ def normalizeDic(dic):
 
     return normalized
 
-resultsDir = 'Results/origComp'
+resultsDir = 'Results/origComp3'
 # resultsDir = 'Results/origComp2'
-# paths = ['Ackley', 'Griewank', 'Rastrigin']
-paths = ['AckleyRandom', 'GriewankRandom', 'RastriginRandom']
+paths = ['Ackley', 'Griewank', 'Rastrigin']
+# paths = ['AckleyRandom', 'GriewankRandom', 'RastriginRandom']
 
 # paths = ['griewank/2dim', 'griewank/5dim', 'griewank/10dim', 'griewank/20dim']
 paths = [resultsDir + "/" + path for path in paths]

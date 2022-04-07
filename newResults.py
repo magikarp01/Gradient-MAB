@@ -205,8 +205,8 @@ def showMinimaHistory(dics, names, title, figNum, colors=['blue', 'orange', 'gre
     # plt.show()
 
 
-finiteMethods = True
-# finiteMethods = False
+# finiteMethods = True
+finiteMethods = False
 
 methods = [allocMethods.restlessOCBA, allocMethods.restlessUCB, allocMethods.tradOCBA, allocMethods.tradUCB, allocMethods.uniform, allocMethods.metaMax, allocMethods.eeUniform]
 if finiteMethods:
@@ -230,9 +230,11 @@ resultsDir = 'Results/origComp3'
 #          'AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
 #          'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
 #          'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
-paths = ['RastriginRandom/20dim']
+paths = ['AckleyRandom/2dim', 'AckleyRandom/5dim', 'AckleyRandom/10dim', 'AckleyRandom/20dim',
+         'GriewankRandom/2dim', 'GriewankRandom/5dim', 'GriewankRandom/10dim', 'GriewankRandom/20dim',
+         'RastriginRandom/2dim', 'RastriginRandom/5dim', 'RastriginRandom/10dim', 'RastriginRandom/20dim']
 
-# """
+"""
 
 if __name__ == '__main__':
     for pathTemp in paths:
@@ -254,8 +256,8 @@ if __name__ == '__main__':
         # print()
 
         #         [ro,      ru,     to,     tu,     u,      mm,     ee]
-        whichMethods = [True,    True,   True,   True,   True,   True,  True]
-        # whichMethods = [True,    True,   True,   True,   True,   True,  False]
+        # whichMethods = [True,    True,   True,   True,   True,   True,  True]
+        whichMethods = [True,    True,   True,   True,   True,   True,  False]
         # whichMethods = [False,    False,   False,   False,  False,  False,  True]
         performMultiprocess(params, numProcesses, iterPerProcess, path, whichMethods, isFinite=finiteMethods)
 
@@ -264,14 +266,14 @@ if __name__ == '__main__':
 # """
 
 
-"""
+# """
 # paths = ['Results/origComp/ackley2/d2Random', 'Results/origComp/ackley2/d5Random',
 #          'Results/origComp/ackley2/d10Random', 'Results/origComp/griewank2/d2Random',
 #          'Results/origComp/griewank2/d5Random', 'Results/origComp/griewank2/d10Random',
 #          'Results/origComp/rastrigin/d2Random', 'Results/origComp/rastrigin/d5Random',
 #          'Results/origComp/rastrigin/d10Random']
 
-resultsDir = 'Results/origComp'
+resultsDir = 'Results/origComp3'
 # paths = ['Ackley/2dim', 'Ackley/5dim', 'Ackley/10dim', 'Ackley/20dim']
 # paths = ['Griewank/2dim', 'Griewank/5dim', 'Griewank/10dim', 'Griewank/20dim']
 # paths = ['Rastrigin/2dim', 'Rastrigin/5dim', 'Rastrigin/10dim', 'Rastrigin/20dim']
